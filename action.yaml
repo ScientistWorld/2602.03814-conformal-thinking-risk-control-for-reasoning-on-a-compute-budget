@@ -3,4 +3,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim_plus
-notes: "Final verification passed; cleaned method-agnostic docs and scoring names, then validated reproduce/compare."
+notes: "Core scaled reproduction verified. Extended eval to recompute the full score metric set from saved decisions, reran reproduce/validate locally, and committed the cleanup."
