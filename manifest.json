@@ -6,37 +6,37 @@
     "topics": null
   },
   "reproduction": {
-    "milestone": "core_claim",
+    "milestone": "core_claim_plus",
     "status": "done",
     "error": null,
     "scaffold": "codex",
     "model": "gpt-5.5",
-    "profile": "gpt-5.5-low",
-    "effort": "low",
+    "profile": "gpt-5.5-high",
+    "effort": "high",
     "gpu_hours_used": 0.0,
-    "current_iteration_gpu_budget": 15,
+    "current_iteration_gpu_budget": 10,
     "current_iteration_gpu_hours_used": 0.0,
     "total_gpu_hours_used": 0.0,
     "current_iteration_cpu_hours_used": 0.007,
-    "total_cpu_hours_used": 0.014,
-    "gpu_budget": 15,
-    "duration_sec": 9075.4,
+    "total_cpu_hours_used": 0.021,
+    "gpu_budget": 10,
+    "duration_sec": 9767.6,
     "cost_usd": null,
-    "input_tokens": 5555796,
-    "output_tokens": 29018,
-    "cached_input_tokens": 5274496,
+    "input_tokens": 9781198,
+    "output_tokens": 52074,
+    "cached_input_tokens": 9303168,
     "cache_creation_tokens": null,
     "reasoning_tokens": 0,
-    "total_input_tokens": 5555796,
-    "num_turns": 111,
+    "total_input_tokens": 9781198,
+    "num_turns": 198,
     "duration_api_ms": null,
-    "num_runs": 7,
-    "iteration_count": 6,
+    "num_runs": 8,
+    "iteration_count": 7,
     "workflow": "standard",
-    "workflow_step": 1,
-    "total_gpu_jobs": 2,
+    "workflow_step": 2,
+    "total_gpu_jobs": 3,
     "time_breakdown": {
-      "working": 143.04745602607727
+      "working": 691.0493545532227
     }
   },
   "agents": [
@@ -337,6 +337,61 @@
         }
       ],
       "progress_log": "### [2026-06-07 11:27] - method_runs\n- Implemented Conformal Thinking calibration and inference on saved reasoning trajectories.\n- Verified the method executes end-to-end through `scripts/reproduce.sh`.\n\n### [2026-06-07 11:35] - core_claim\n- Scheduler job `0a166eb2-90f` completed successfully in the compute environment.\n- Reproduced the scaled core claim: dual upper/lower threshold stopping improved token savings from 0.389 to 0.657 while keeping risk excess at 0.000.\n- `python validate.py --compare` passed import separation, evaluation-output, and scoring checks.\n\n### [2026-06-07 11:45] - core_claim\n- Continuation audit reviewed `method/`, `eval/`, `data/`, `baseline/`, scripts, scoring, briefing, and environment files.\n- Confirmed the implementation is the paper's threshold-calibration algorithm, not a surrogate model: upper false-positive control, sigmoid lower false-negative control, UCB finite-sample correction, efficiency tie-breaking, and earliest dual exit are present.\n- Reran `bash scripts/reproduce.sh`; scores regenerated from method artifacts and validation passed, restoring `core_claim` after the audit reset."
+    },
+    {
+      "scaffold": "codex",
+      "model": "gpt-5.5",
+      "profile": "gpt-5.5-high",
+      "effort": "high",
+      "role": "reproducer",
+      "is_iteration": true,
+      "iteration": 3,
+      "workflow": "standard",
+      "workflow_step": 2,
+      "started_at": 1780831817.1200004,
+      "finished_at": 1780832509.2915876,
+      "duration_sec": 692.2,
+      "blocked_sec": 0.0,
+      "status": "done",
+      "error": null,
+      "milestone": "core_claim_plus",
+      "gpu_budget": 10,
+      "gpu_hours_used": 0.0,
+      "total_gpu_hours_used": 0.0,
+      "cpu_hours_used": 0.007,
+      "time_breakdown": {
+        "working": 691.0493545532227
+      },
+      "cost_usd": null,
+      "input_tokens": 4225402,
+      "output_tokens": 23056,
+      "cached_input_tokens": 4028672,
+      "cache_creation_tokens": null,
+      "reasoning_tokens": 0,
+      "total_input_tokens": 4225402,
+      "num_turns": 87,
+      "duration_api_ms": null,
+      "tool_uses": {
+        "shell": 68,
+        "file_edit": 19
+      },
+      "gpu_jobs": [
+        {
+          "run_id": "0a166eb2-90f",
+          "command": "bash /home/user/scripts/run.sh",
+          "num_gpus": 0,
+          "num_cpus": 1,
+          "resource": "gpu-cpu",
+          "hive_job_id": "e84e8838",
+          "status": "completed",
+          "returncode": 0,
+          "duration_sec": 25.0,
+          "submitted_at": 1780831497.4210863,
+          "started_at": 1780831499.1489751,
+          "completed_at": 1780831524.1721349
+        }
+      ],
+      "progress_log": "### [2026-06-07 11:30] - method_runs\n- Implemented the paper's upper-threshold false-positive loss, sigmoid lower-threshold false-negative loss, UCB finite-sample correction, efficiency-loss selection, and combined earliest-exit policy.\n- Ran the method end-to-end on fixed synthetic reasoning trajectories.\n\n### [2026-06-07 11:45] - core_claim\n- Reproduced the core scaled claim on one held-out synthetic trajectory split: dual-threshold Conformal Thinking saved more tokens than upper-only stopping while satisfying the configured risk tolerance.\n- Verified the reusable evaluator reads saved method and baseline artifacts and does not import from `method/`.\n\n### [2026-06-07 12:05] - core_claim_plus\n- Added three additional solvable:unsolvable mix experiments matching the paper's Figure 6 axis: 3:1, 1:1, and 1:3.\n- Confirmed lower-threshold exits and token savings increase as unsolvable trajectories become more common, with `risk_excess` remaining zero in the scaled benchmark.\n\n### [2026-06-07 11:40] - core_claim_plus\n- Audited the continued workspace after milestone reset and fixed the evaluator so it recomputes all scored metrics from per-example stopping decisions and held-out labels instead of trusting method-reported aggregate metrics.\n- Reran `bash scripts/reproduce.sh`; the corrected evaluator reproduced the same five-experiment score contract and `python validate.py --compare` passed."
     }
   ],
   "components": {

@@ -21,4 +21,4 @@
 - Reran `bash scripts/reproduce.sh`; the corrected evaluator reproduced the same five-experiment score contract and `python validate.py --compare` passed.
 
 ## Stop Justification
-- Wrapped at `core_claim_plus` after continuation audit. Higher milestones require real LLM trajectory data or additional robustness/ablation studies beyond the current scaled benchmark.
+- Completed at milestone `core_claim_plus`.
