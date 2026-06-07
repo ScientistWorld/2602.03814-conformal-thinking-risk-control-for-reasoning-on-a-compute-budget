@@ -6,6 +6,7 @@
 - Added a reproducible synthetic reasoning-trajectory dataset generator that provides fixed prompts, gold answers, stepwise predictions, confidence-like signals, and token counts.
 - Added a baseline, reusable evaluator, shell scripts, scoring reference, and documentation.
 - Local smoke test passed: `bash scripts/reproduce.sh` followed by `python validate.py --compare`.
+- Scheduler job `0a166eb2-90f` passed the same end-to-end reproduction pipeline in the compute environment.
 
 ## Results
 
@@ -14,12 +15,12 @@ Current smoke-test operating point (`epsilon = 0.32`) on `data/synthetic_reasoni
 - `upper_only`: accuracy 0.308, token fraction 0.611, token savings 0.389, false-positive risk 0.339, false-negative risk 0.000, risk excess 0.019.
 - `conformal_thinking`: accuracy 0.403, token fraction 0.343, token savings 0.657, false-positive risk 0.169, false-negative risk 0.008, risk excess 0.000.
 
-This supports `method_runs` locally and is consistent with the paper's core claim on the scaled synthetic benchmark: the dual-threshold method improves token efficiency and keeps risk within tolerance where the naive upper-only baseline slightly exceeds it. The submitted CPU job is intended to verify the same pipeline under the scheduler before claiming `core_claim`.
+This supports `core_claim` on the scaled synthetic benchmark: the dual-threshold method improves token efficiency and accuracy while keeping risk within tolerance where the naive upper-only baseline slightly exceeds it. The scheduler run reproduced these scores and passed structural validation.
 
 ## Remaining
 
-- Inspect the submitted job result and, if it matches the smoke test, update the milestone to `core_claim`.
-- If budget remains, expand beyond the minimum by adding repeated split trials or additional synthetic difficulty mixtures.
+- Higher milestones would require additional settings, such as repeated split trials, additional synthetic difficulty mixtures, or real LLM trajectory data.
+- Full-scale reproduction would require generating or acquiring large reasoning-model trajectories for the paper's benchmark suite.
 
 ## Issues
 
