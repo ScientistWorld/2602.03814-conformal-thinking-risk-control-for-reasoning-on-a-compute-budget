@@ -70,6 +70,7 @@ trajectory/
 .empty_*/
 outputs/
 logs/
+jobs/
 .venv/
 venv/
 env/

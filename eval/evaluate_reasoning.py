@@ -31,6 +31,29 @@ def metrics(policy: dict, epsilon: float) -> dict[str, float]:
             0.0,
             max(policy["false_positive_risk"], policy["false_negative_risk"]) - epsilon,
         ),
+        "exit_lower_fraction": policy.get("exit_lower_fraction", 0.0),
+        "exit_budget_fraction": policy.get("exit_budget_fraction", 0.0),
+    }
+
+
+def add_policy_comparison(
+    scores: dict,
+    experiment_name: str,
+    method_path: Path,
+    baseline_path: Path,
+    epsilon: float,
+) -> None:
+    if not method_path.exists() or not baseline_path.exists():
+        return
+    method_point = select_operating_point(load(method_path), epsilon)
+    baseline_point = select_operating_point(load(baseline_path), epsilon)
+    scores["experiments"][experiment_name] = {
+        "results": {
+            "upper_only": metrics(baseline_point["policies"]["upper_only"], method_point["epsilon"]),
+            "conformal_thinking": metrics(
+                method_point["policies"]["conformal_thinking"], method_point["epsilon"]
+            ),
+        }
     }
 
 
@@ -45,28 +68,33 @@ def main() -> None:
     method_point = select_operating_point(load(Path(args.method_results)), args.epsilon)
     baseline_point = select_operating_point(load(Path(args.baseline_results)), args.epsilon)
 
-    scores = {
-        "experiments": {
-            "dual_threshold_efficiency": {
-                "results": {
-                    "upper_only": metrics(baseline_point["policies"]["upper_only"], method_point["epsilon"]),
-                    "conformal_thinking": metrics(
-                        method_point["policies"]["conformal_thinking"], method_point["epsilon"]
-                    ),
-                }
-            },
-            "risk_control": {
-                "results": {
-                    "naive_or_uncalibrated": metrics(
-                        baseline_point["policies"]["upper_only"], method_point["epsilon"]
-                    ),
-                    "conformal_thinking": metrics(
-                        method_point["policies"]["conformal_thinking"], method_point["epsilon"]
-                    ),
-                }
-            },
+    scores = {"experiments": {}}
+    scores["experiments"]["dual_threshold_efficiency"] = {
+        "results": {
+            "upper_only": metrics(baseline_point["policies"]["upper_only"], method_point["epsilon"]),
+            "conformal_thinking": metrics(
+                method_point["policies"]["conformal_thinking"], method_point["epsilon"]
+            ),
         }
     }
+    scores["experiments"]["risk_control"] = {
+        "results": {
+            "naive_or_uncalibrated": metrics(
+                baseline_point["policies"]["upper_only"], method_point["epsilon"]
+            ),
+            "conformal_thinking": metrics(
+                method_point["policies"]["conformal_thinking"], method_point["epsilon"]
+            ),
+        }
+    }
+    for ratio in ("3_1", "1_1", "1_3"):
+        add_policy_comparison(
+            scores,
+            f"lower_threshold_ratio_{ratio}",
+            Path(f"outputs/conformal_thinking/ratio_{ratio}.json"),
+            Path(f"outputs/baseline/ratio_{ratio}.json"),
+            args.epsilon,
+        )
 
     out = Path(args.scores)
     out.parent.mkdir(parents=True, exist_ok=True)

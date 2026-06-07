@@ -22,3 +22,15 @@ cd /home/user
 # This scaled reproduction uses agent-authored synthetic trajectory data stored
 # in git. No external downloads are required for the runnable benchmark.
 python data/generate_synthetic_reasoning.py --output data/synthetic_reasoning.jsonl
+python data/generate_synthetic_reasoning.py \
+  --output data/synthetic_ratio_3_1.jsonl \
+  --solvable-probability 0.75 \
+  --seed 260203815
+python data/generate_synthetic_reasoning.py \
+  --output data/synthetic_ratio_1_1.jsonl \
+  --solvable-probability 0.50 \
+  --seed 260203816
+python data/generate_synthetic_reasoning.py \
+  --output data/synthetic_ratio_1_3.jsonl \
+  --solvable-probability 0.25 \
+  --seed 260203817

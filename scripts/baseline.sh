@@ -11,14 +11,17 @@
 # You can decide what this baseline script should do yourself.
 #
 # Usage:
-#   bash scripts/baseline.sh <name>
+#   bash scripts/baseline.sh [data_jsonl] [output_json]
 
 set -e
 
 cd /home/user
 
+DATA_PATH="${1:-data/synthetic_reasoning.jsonl}"
+OUTPUT_PATH="${2:-outputs/baseline/results.json}"
+
 python baseline/upper_only.py \
-  --data data/synthetic_reasoning.jsonl \
-  --output outputs/baseline/results.json \
+  --data "$DATA_PATH" \
+  --output "$OUTPUT_PATH" \
   --calibration naive \
   --epsilons 0.18 0.25 0.32 0.40

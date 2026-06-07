@@ -22,12 +22,15 @@ def sigmoid(x: float) -> float:
     return 1.0 / (1.0 + math.exp(-x))
 
 
-def make_instance(rng: random.Random, idx: int, split: str) -> dict:
+def make_instance(rng: random.Random, idx: int, split: str, solvable_probability: float | None) -> dict:
     total_steps = rng.randint(10, 18)
     token_stride = rng.randint(24, 46)
     gold = f"ans_{idx % 97}"
 
-    solvable = rng.random() < (0.58 if split == "test" else 0.60)
+    if solvable_probability is None:
+        solvable = rng.random() < (0.58 if split == "test" else 0.60)
+    else:
+        solvable = rng.random() < solvable_probability
     latest_solve_step = max(4, int(total_steps * 0.58))
     solve_step = rng.randint(3, latest_solve_step) if solvable else total_steps + 1
     false_confident = (not solvable) and rng.random() < 0.18
@@ -80,6 +83,12 @@ def main() -> None:
     parser.add_argument("--validation-size", type=int, default=180)
     parser.add_argument("--test-size", type=int, default=360)
     parser.add_argument("--seed", type=int, default=260203814)
+    parser.add_argument(
+        "--solvable-probability",
+        type=float,
+        default=None,
+        help="Optional fixed probability that a trajectory becomes correct within budget.",
+    )
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
@@ -88,9 +97,9 @@ def main() -> None:
 
     with out.open("w", encoding="utf-8") as handle:
         for i in range(args.validation_size):
-            handle.write(json.dumps(make_instance(rng, i, "validation")) + "\n")
+            handle.write(json.dumps(make_instance(rng, i, "validation", args.solvable_probability)) + "\n")
         for i in range(args.test_size):
-            handle.write(json.dumps(make_instance(rng, i, "test")) + "\n")
+            handle.write(json.dumps(make_instance(rng, i, "test", args.solvable_probability)) + "\n")
 
 
 if __name__ == "__main__":

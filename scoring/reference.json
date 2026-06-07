@@ -1,8 +1,8 @@
 {
   "experiments": {
     "dual_threshold_efficiency": {
-      "description": "Core claim: adding a lower no-progress threshold to upper-threshold adaptive reasoning should improve the accuracy-token trade-off while controlling early-stopping risks.",
-      "weight": 0.65,
+      "description": "Core scaled target for the paper's main claim: a risk-calibrated lower+upper stopping rule should save more tokens than upper-threshold-only adaptive stopping while satisfying false-positive and false-negative risk constraints.",
+      "weight": 0.30,
       "primary_metric": "token_savings",
       "metrics": {
         "accuracy": {"higher_is_better": true, "coefficient": 0.7},
@@ -10,32 +10,38 @@
         "token_savings": {"higher_is_better": true, "coefficient": 1.0},
         "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0},
         "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0},
-        "risk_excess": {"higher_is_better": false, "coefficient": -2.0}
+        "risk_excess": {"higher_is_better": false, "coefficient": -2.0},
+        "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.1},
+        "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2}
       },
       "results": {
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.31,
-          "token_fraction": 0.61,
-          "token_savings": 0.39,
-          "false_positive_risk": 0.32,
-          "false_negative_risk": 0.01,
-          "risk_excess": 0.02
+          "accuracy": 0.308,
+          "token_fraction": 0.611,
+          "token_savings": 0.389,
+          "false_positive_risk": 0.339,
+          "false_negative_risk": 0.000,
+          "risk_excess": 0.019,
+          "exit_lower_fraction": 0.000,
+          "exit_budget_fraction": 0.358
         },
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.40,
-          "token_fraction": 0.34,
-          "token_savings": 0.66,
-          "false_positive_risk": 0.17,
-          "false_negative_risk": 0.01,
-          "risk_excess": 0.00
+          "accuracy": 0.403,
+          "token_fraction": 0.343,
+          "token_savings": 0.657,
+          "false_positive_risk": 0.169,
+          "false_negative_risk": 0.008,
+          "risk_excess": 0.000,
+          "exit_lower_fraction": 0.428,
+          "exit_budget_fraction": 0.000
         }
       }
     },
     "risk_control": {
-      "description": "Risk-control claim: finite-sample-adjusted calibration should keep realized risks at or below the requested operating risk more reliably than naive validation tuning.",
-      "weight": 0.35,
+      "description": "Risk-control target: finite-sample-adjusted calibration should keep realized risks at or below the requested operating risk more reliably than naive validation tuning.",
+      "weight": 0.20,
       "primary_metric": "risk_excess",
       "metrics": {
         "accuracy": {"higher_is_better": true, "coefficient": 0.3},
@@ -43,26 +49,149 @@
         "token_savings": {"higher_is_better": true, "coefficient": 0.4},
         "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0},
         "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0},
-        "risk_excess": {"higher_is_better": false, "coefficient": -2.0}
+        "risk_excess": {"higher_is_better": false, "coefficient": -2.0},
+        "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.1},
+        "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2}
       },
       "results": {
         "naive_or_uncalibrated": {
           "type": "baseline",
-          "accuracy": 0.31,
-          "token_fraction": 0.61,
-          "token_savings": 0.39,
-          "false_positive_risk": 0.34,
-          "false_negative_risk": 0.00,
-          "risk_excess": 0.02
+          "accuracy": 0.308,
+          "token_fraction": 0.611,
+          "token_savings": 0.389,
+          "false_positive_risk": 0.339,
+          "false_negative_risk": 0.000,
+          "risk_excess": 0.019,
+          "exit_lower_fraction": 0.000,
+          "exit_budget_fraction": 0.358
         },
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.40,
-          "token_fraction": 0.34,
-          "token_savings": 0.66,
-          "false_positive_risk": 0.17,
-          "false_negative_risk": 0.01,
-          "risk_excess": 0.00
+          "accuracy": 0.403,
+          "token_fraction": 0.343,
+          "token_savings": 0.657,
+          "false_positive_risk": 0.169,
+          "false_negative_risk": 0.008,
+          "risk_excess": 0.000,
+          "exit_lower_fraction": 0.428,
+          "exit_budget_fraction": 0.000
+        }
+      }
+    },
+    "lower_threshold_ratio_3_1": {
+      "description": "Scaled Figure 6 setting with a 3:1 solvable:unsolvable mix. Lower exits should add modest token savings while maintaining risk constraints.",
+      "weight": 0.15,
+      "primary_metric": "token_savings",
+      "metrics": {
+        "accuracy": {"higher_is_better": true, "coefficient": 0.7},
+        "token_fraction": {"higher_is_better": false, "coefficient": -0.8},
+        "token_savings": {"higher_is_better": true, "coefficient": 1.0},
+        "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "risk_excess": {"higher_is_better": false, "coefficient": -2.0},
+        "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.2},
+        "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2}
+      },
+      "results": {
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.461,
+          "token_fraction": 0.520,
+          "token_savings": 0.480,
+          "false_positive_risk": 0.297,
+          "false_negative_risk": 0.000,
+          "risk_excess": 0.000,
+          "exit_lower_fraction": 0.000,
+          "exit_budget_fraction": 0.242
+        },
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.503,
+          "token_fraction": 0.332,
+          "token_savings": 0.668,
+          "false_positive_risk": 0.206,
+          "false_negative_risk": 0.007,
+          "risk_excess": 0.000,
+          "exit_lower_fraction": 0.292,
+          "exit_budget_fraction": 0.000
+        }
+      }
+    },
+    "lower_threshold_ratio_1_1": {
+      "description": "Scaled Figure 6 setting with a 1:1 solvable:unsolvable mix. The lower threshold should produce a larger leftward token-efficiency shift than in the 3:1 mix.",
+      "weight": 0.15,
+      "primary_metric": "token_savings",
+      "metrics": {
+        "accuracy": {"higher_is_better": true, "coefficient": 0.7},
+        "token_fraction": {"higher_is_better": false, "coefficient": -0.8},
+        "token_savings": {"higher_is_better": true, "coefficient": 1.0},
+        "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "risk_excess": {"higher_is_better": false, "coefficient": -2.0},
+        "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.2},
+        "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2}
+      },
+      "results": {
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.289,
+          "token_fraction": 0.668,
+          "token_savings": 0.332,
+          "false_positive_risk": 0.300,
+          "false_negative_risk": 0.000,
+          "risk_excess": 0.000,
+          "exit_lower_fraction": 0.000,
+          "exit_budget_fraction": 0.414
+        },
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.294,
+          "token_fraction": 0.337,
+          "token_savings": 0.663,
+          "false_positive_risk": 0.172,
+          "false_negative_risk": 0.007,
+          "risk_excess": 0.000,
+          "exit_lower_fraction": 0.533,
+          "exit_budget_fraction": 0.000
+        }
+      }
+    },
+    "lower_threshold_ratio_1_3": {
+      "description": "Scaled Figure 6 setting with a 1:3 solvable:unsolvable mix. Lower-threshold gains should be largest because upper-only stopping leaves many unsolved instances at the full budget.",
+      "weight": 0.20,
+      "primary_metric": "token_savings",
+      "metrics": {
+        "accuracy": {"higher_is_better": true, "coefficient": 0.7},
+        "token_fraction": {"higher_is_better": false, "coefficient": -0.8},
+        "token_savings": {"higher_is_better": true, "coefficient": 1.0},
+        "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "risk_excess": {"higher_is_better": false, "coefficient": -2.0},
+        "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.2},
+        "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2}
+      },
+      "results": {
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.078,
+          "token_fraction": 0.790,
+          "token_savings": 0.210,
+          "false_positive_risk": 0.314,
+          "false_negative_risk": 0.000,
+          "risk_excess": 0.000,
+          "exit_lower_fraction": 0.000,
+          "exit_budget_fraction": 0.625
+        },
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.147,
+          "token_fraction": 0.359,
+          "token_savings": 0.641,
+          "false_positive_risk": 0.133,
+          "false_negative_risk": 0.011,
+          "risk_excess": 0.000,
+          "exit_lower_fraction": 0.719,
+          "exit_budget_fraction": 0.000
         }
       }
     }
