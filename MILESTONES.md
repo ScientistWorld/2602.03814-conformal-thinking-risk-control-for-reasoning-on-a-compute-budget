@@ -16,5 +16,9 @@
 - Added three additional solvable:unsolvable mix experiments matching the paper's Figure 6 axis: 3:1, 1:1, and 1:3.
 - Confirmed lower-threshold exits and token savings increase as unsolvable trajectories become more common, with `risk_excess` remaining zero in the scaled benchmark.
 
+### [2026-06-07 11:40] - core_claim_plus
+- Audited the continued workspace after milestone reset and fixed the evaluator so it recomputes all scored metrics from per-example stopping decisions and held-out labels instead of trusting method-reported aggregate metrics.
+- Reran `bash scripts/reproduce.sh`; the corrected evaluator reproduced the same five-experiment score contract and `python validate.py --compare` passed.
+
 ## Stop Justification
-- Active reproduction is at `core_claim_plus`; not stopped.
+- Wrapped at `core_claim_plus` after continuation audit. Higher milestones require real LLM trajectory data or additional robustness/ablation studies beyond the current scaled benchmark.

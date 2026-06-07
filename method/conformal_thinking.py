@@ -165,6 +165,7 @@ def evaluate_policy(
     fp = []
     fn = []
     reasons = {"upper": 0, "lower": 0, "budget": 0}
+    decisions = []
     for instance in data:
         exit_idx, reason = exit_fn(instance)
         step = instance["steps"][exit_idx]
@@ -174,10 +175,12 @@ def evaluate_policy(
         correct += int(step["prediction"] == instance["gold"] and reason != "lower")
         fp.append(fp_loss(instance, exit_idx, reason))
         fn.append(fn_loss(instance, exit_idx, reason))
+        decisions.append({"id": instance["id"], "exit_idx": exit_idx, "reason": reason})
 
     n = len(data)
     return {
         "name": name,
+        "decisions": decisions,
         "accuracy": correct / n,
         "false_positive_risk": mean(fp),
         "false_negative_risk": mean(fn),
