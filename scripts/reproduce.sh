@@ -8,7 +8,7 @@
 # Assumes:
 #   - Container is built (environment/container.sif)
 #   - Data and models are downloaded (via scripts/download.sh)
-#   - Working directory is /home/user
+#   - Working directory is the repository root
 #
 # This is the "gold standard" reproduction — 
 # You do not need to run this, but keep this in good shape
@@ -16,7 +16,8 @@
 
 set -e
 
-cd /home/user
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
 
 python data/generate_synthetic_reasoning.py --output data/synthetic_reasoning.jsonl
 python data/generate_synthetic_reasoning.py \

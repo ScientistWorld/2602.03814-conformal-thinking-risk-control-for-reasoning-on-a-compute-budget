@@ -4,7 +4,8 @@
 
 set -e
 
-cd /home/user
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
 
-bash scripts/evaluate_train.sh /home/user/checkpoints
-bash scripts/evaluate_test.sh /home/user/checkpoints
+bash scripts/evaluate_train.sh checkpoints
+bash scripts/evaluate_test.sh checkpoints

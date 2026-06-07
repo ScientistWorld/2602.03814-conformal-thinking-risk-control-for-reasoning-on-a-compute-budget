@@ -17,7 +17,8 @@
 
 set -e
 
-cd /home/user
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
 
 # This scaled reproduction uses agent-authored synthetic trajectory data stored
 # in git. No external downloads are required for the runnable benchmark.

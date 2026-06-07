@@ -8,7 +8,8 @@
 
 set -e
 
-cd /home/user
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
 
 DATA_PATH="${1:-data/synthetic_reasoning.jsonl}"
 OUTPUT_PATH="${2:-outputs/conformal_thinking/results.json}"
