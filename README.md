@@ -173,12 +173,36 @@ All methods must be evaluated from saved outputs produced by the candidate syste
 
 </details>
 
+### Iteration 2: gpt-5.5
+- **Milestone**: `core_claim` | **Status**: done
+- **Working time**: 2m | **GPU**: 0.0h
+- **Jobs**: 1 total (1 completed, 0 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-07 11:27] - method_runs
+- Implemented Conformal Thinking calibration and inference on saved reasoning trajectories.
+- Verified the method executes end-to-end through `scripts/reproduce.sh`.
+
+### [2026-06-07 11:35] - core_claim
+- Scheduler job `0a166eb2-90f` completed successfully in the compute environment.
+- Reproduced the scaled core claim: dual upper/lower threshold stopping improved token savings from 0.389 to 0.657 while keeping risk excess at 0.000.
+- `python validate.py --compare` passed import separation, evaluation-output, and scoring checks.
+
+### [2026-06-07 11:45] - core_claim
+- Continuation audit reviewed `method/`, `eval/`, `data/`, `baseline/`, scripts, scoring, briefing, and environment files.
+- Confirmed the implementation is the paper's threshold-calibration algorithm, not a surrogate model: upper false-positive control, sigmoid lower false-negative control, UCB finite-sample correction, efficiency tie-breaking, and earliest dual exit are present.
+- Reran `bash scripts/reproduce.sh`; scores regenerated from method artifacts and validation passed, restoring `core_claim` after the audit reset.
+
+</details>
+
 
 ---
 
 # Reproduction Milestones
 
-**Current: method_runs**
+**Current: core_claim**
 
 ## Stop Justification
-- Completed at milestone `method_runs`.
+- Completed at milestone `core_claim`.

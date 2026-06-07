@@ -19,4 +19,4 @@
 - Reran `bash scripts/reproduce.sh`; scores regenerated from method artifacts and validation passed, restoring `core_claim` after the audit reset.
 
 ## Stop Justification
-- Completed at milestone `core_claim`. The paper's actual stopping algorithm is implemented and validated on a non-trivial scaled synthetic trajectory benchmark; higher milestones would require large real LLM trajectory generation or broader trajectory suites outside the current compact reproduction scope.
+- Completed at milestone `core_claim`.
