@@ -1,5 +1,3 @@
-action: submit
-gpus: 0
-test: true
-milestone: method_runs
-notes: "CPU smoke job: run scripts/reproduce.sh to verify the audited Conformal Thinking method, scoring, and validation."
+action: done
+milestone: core_claim
+notes: "Scheduler job 0a166eb2-90f completed the end-to-end reproduction and validation. The dual-threshold Conformal Thinking method improves accuracy/token savings over the upper-only baseline while satisfying the risk constraint on the scaled synthetic benchmark."

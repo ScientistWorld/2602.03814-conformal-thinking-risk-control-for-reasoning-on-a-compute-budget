@@ -18,3 +18,4 @@
 - The reproduced dual-threshold method improved accuracy and token savings over the upper-only baseline on the scaled synthetic benchmark while keeping risk excess at 0.
 
 ## Stop Justification
+- Completed at milestone `core_claim`.
