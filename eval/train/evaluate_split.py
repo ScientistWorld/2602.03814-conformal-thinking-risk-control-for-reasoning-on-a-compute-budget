@@ -16,7 +16,9 @@ from pathlib import Path
 
 
 SLICE = "train"
-SPLIT_SEED = "conformal-thinking-anti-shortcut-v1"
+SPLIT_SEED = "conformal-thinking-anti-shortcut-v2"
+SLICE_MODULUS = 5
+SLICE_RESIDUES = {0, 1}
 CONTROL_POLICIES = {"full_budget", "lower_only", "upper_only"}
 EXPERIMENT_FILES = {
     "dual_threshold_efficiency": "results.json",
@@ -99,7 +101,7 @@ def slice_ids(data: list[dict]) -> set[str]:
     for ids in groups.values():
         ordered = sorted(ids, key=stable_key)
         for index, instance_id in enumerate(ordered):
-            if index % 2 == 0:
+            if index % SLICE_MODULUS in SLICE_RESIDUES:
                 selected.add(instance_id)
     return selected
 
@@ -123,6 +125,12 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
     fp_values: list[float] = []
     fn_values: list[float] = []
     reasons = {"upper": 0, "lower": 0, "budget": 0}
+    solvable_count = 0
+    solvable_correct = 0
+    unsolvable_tokens = 0
+    unsolvable_full_tokens = 0
+    lower_exit_count = 0
+    lower_exit_unsolvable = 0
 
     seen: set[str] = set()
     for decision in decisions:
@@ -142,12 +150,23 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
             raise ValueError(f"Invalid exit_idx {exit_idx} for {instance_id}")
 
         step = instance["steps"][exit_idx]
+        is_solvable = bool(instance.get("solvable_under_budget"))
         reasons[reason] += 1
         total_tokens += step["tokens"]
         full_tokens += instance["steps"][-1]["tokens"]
-        correct += int(step["prediction"] == instance["gold"] and reason != "lower")
+        is_correct = step["prediction"] == instance["gold"] and reason != "lower"
+        correct += int(is_correct)
         fp_values.append(fp_loss(instance, exit_idx, reason))
         fn_values.append(fn_loss(instance, exit_idx, reason))
+        if is_solvable:
+            solvable_count += 1
+            solvable_correct += int(is_correct)
+        else:
+            unsolvable_tokens += step["tokens"]
+            unsolvable_full_tokens += instance["steps"][-1]["tokens"]
+        if reason == "lower":
+            lower_exit_count += 1
+            lower_exit_unsolvable += int(not is_solvable)
 
     if seen != eval_ids:
         missing = sorted(eval_ids - seen)[:5]
@@ -157,14 +176,20 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
     token_fraction = total_tokens / full_tokens if full_tokens else 0.0
     false_positive_risk = mean(fp_values)
     false_negative_risk = mean(fn_values)
+    unsolvable_token_fraction = (
+        unsolvable_tokens / unsolvable_full_tokens if unsolvable_full_tokens else 0.0
+    )
     return {
         "accuracy": correct / n if n else 0.0,
+        "solvable_accuracy": solvable_correct / solvable_count if solvable_count else 0.0,
         "token_fraction": token_fraction,
         "token_savings": 1.0 - token_fraction,
+        "unsolvable_token_savings": 1.0 - unsolvable_token_fraction,
         "false_positive_risk": false_positive_risk,
         "false_negative_risk": false_negative_risk,
         "risk_excess": max(0.0, max(false_positive_risk, false_negative_risk) - epsilon),
         "exit_lower_fraction": reasons["lower"] / n if n else 0.0,
+        "lower_exit_precision": lower_exit_unsolvable / lower_exit_count if lower_exit_count else 0.0,
         "exit_budget_fraction": reasons["budget"] / n if n else 0.0,
     }
 
@@ -262,10 +287,13 @@ def build_scores(args: argparse.Namespace) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--method-results", action="append", default=None)
+    parser.add_argument("method_artifacts", nargs="*")
     parser.add_argument("--baseline-results", default="outputs/baseline/results.json")
     parser.add_argument("--scores", default="scoring/scores_train.json")
     parser.add_argument("--epsilon", type=float, default=0.32)
     args = parser.parse_args()
+    if args.method_artifacts:
+        args.method_results = (args.method_results or []) + args.method_artifacts
 
     scores = build_scores(args)
     out = Path(args.scores)
