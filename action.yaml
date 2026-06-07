@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: done
-gpus: 0
+action: pending
+gpus: 1
 test: false
-milestone: core_claim
-notes: "Continuation audit restored core_claim. Reviewed method/eval/scripts/docs, reran bash scripts/reproduce.sh, and confirmed prior scheduler job 0a166eb2-90f plus local validation pass end-to-end."
+milestone: method_runs
+notes: ""
