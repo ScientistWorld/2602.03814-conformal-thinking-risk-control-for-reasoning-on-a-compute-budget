@@ -9,7 +9,7 @@ Check off items as you complete them. Order doesn't matter — work however make
 - [x] `briefing/overview.md`
 
 ## Scoring
-- [x] `scoring/reference.json` — paper's reported numbers
+- [x] `scoring/reference.json` — scaled benchmark reference targets, with paper-reported setup documented in `briefing/evaluation.md`
 - [x] Workspace validated via `python validate.py`
 - [x] `scoring/scores.json` — reproduced numbers (must match reference.json experiment/metric structure)
 - [x] `scoring/EXPERIMENTS.md` — high-level purpose of each experiment in `scores.json` (do not edit until wrap up)

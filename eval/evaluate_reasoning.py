@@ -83,6 +83,12 @@ def recompute_policy_metrics(policy: dict, data: list[dict], epsilon: float) -> 
     fp_values: list[float] = []
     fn_values: list[float] = []
     reasons = {"answer": 0, "defer": 0, "budget": 0}
+    solvable_count = 0
+    solvable_correct = 0
+    unsolvable_tokens = 0
+    unsolvable_full_tokens = 0
+    defer_count = 0
+    defer_unsolvable = 0
 
     seen: set[str] = set()
     for decision in decisions:
@@ -100,12 +106,23 @@ def recompute_policy_metrics(policy: dict, data: list[dict], epsilon: float) -> 
             raise ValueError(f"Invalid exit_idx {exit_idx} for {instance_id}")
 
         step = instance["steps"][exit_idx]
+        is_solvable = bool(instance.get("solvable_under_budget"))
         reasons[reason] += 1
         total_tokens += step["tokens"]
         full_tokens += instance["steps"][-1]["tokens"]
-        correct += int(step["prediction"] == instance["gold"] and reason != "defer")
+        is_correct = step["prediction"] == instance["gold"] and reason != "defer"
+        correct += int(is_correct)
         fp_values.append(fp_loss(instance, exit_idx, reason))
         fn_values.append(fn_loss(instance, exit_idx, reason))
+        if is_solvable:
+            solvable_count += 1
+            solvable_correct += int(is_correct)
+        else:
+            unsolvable_tokens += step["tokens"]
+            unsolvable_full_tokens += instance["steps"][-1]["tokens"]
+        if reason == "defer":
+            defer_count += 1
+            defer_unsolvable += int(not is_solvable)
 
     if seen != set(by_id):
         missing = sorted(set(by_id) - seen)[:5]
@@ -115,17 +132,22 @@ def recompute_policy_metrics(policy: dict, data: list[dict], epsilon: float) -> 
     token_fraction = total_tokens / full_tokens if full_tokens else 0.0
     false_positive_risk = mean(fp_values)
     false_negative_risk = mean(fn_values)
+    max_realized_risk = max(false_positive_risk, false_negative_risk)
+    unsolvable_token_fraction = (
+        unsolvable_tokens / unsolvable_full_tokens if unsolvable_full_tokens else 0.0
+    )
     return {
         "accuracy": correct / n if n else 0.0,
+        "solvable_accuracy": solvable_correct / solvable_count if solvable_count else 0.0,
         "token_fraction": token_fraction,
         "token_savings": 1.0 - token_fraction,
+        "unsolvable_token_savings": 1.0 - unsolvable_token_fraction,
         "false_positive_risk": false_positive_risk,
         "false_negative_risk": false_negative_risk,
-        "risk_excess": max(
-            0.0,
-            max(false_positive_risk, false_negative_risk) - epsilon,
-        ),
+        "max_realized_risk": max_realized_risk,
+        "risk_excess": max(0.0, max_realized_risk - epsilon),
         "defer_fraction": reasons["defer"] / n if n else 0.0,
+        "defer_precision": defer_unsolvable / defer_count if defer_count else 0.0,
         "exit_budget_fraction": reasons["budget"] / n if n else 0.0,
     }
 

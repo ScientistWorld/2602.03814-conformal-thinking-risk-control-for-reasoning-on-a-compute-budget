@@ -10,6 +10,7 @@
 - Continuation audit on 2026-06-07 reran `bash scripts/reproduce.sh` and confirmed the evaluation reads saved baseline/method artifacts, `eval/` does not import from `method/`, and generated scores remain consistent with the reference contract.
 - Tightened the evaluator during the continuation audit: method and baseline artifacts now include per-example stopping decisions, and `eval/` recomputes accuracy, token use, false-positive risk, and false-negative risk from those decisions plus held-out labels instead of trusting aggregate metrics reported by the method.
 - Added scaled Figure 6-style solvable:unsolvable mix experiments at 3:1, 1:1, and 1:3. The reproduction script now regenerates each fixed split, runs upper-only and dual-threshold policies, and evaluates each saved artifact.
+- Continuation audit on 2026-06-07 extended the reusable evaluator to emit all metrics declared in `scoring/reference.json`, including solvable accuracy, unsolvable token savings, max realized risk, and defer precision.
 
 ## Results
 
@@ -26,6 +27,8 @@ Additional solvable:unsolvable mix results:
 
 This supports `core_claim_plus` on the scaled synthetic benchmark: the dual-threshold method improves token efficiency and accuracy while keeping risk within tolerance, and the lower-threshold contribution grows as unsolvable trajectories become more common.
 
+`scoring/reference.json` is a scaled benchmark reference for this runnable gym. The paper markdown reports the relevant outcomes mainly as curves in figures, not exact scalar tables; the paper-reported numerical setup is documented in `briefing/evaluation.md`.
+
 ## Remaining
 
 - Higher milestones would require secondary robustness settings, such as repeated split trials, validation-size ablations, distribution-shift tests, or real LLM trajectory data.
@@ -40,6 +43,7 @@ This supports `core_claim_plus` on the scaled synthetic benchmark: the dual-thre
 - The expanded `reference.json` uses scalar operating targets from the fixed scaled benchmark because the paper reports the relevant results as figures/curves without tabulated coordinates.
 - Continuation audit fix: the previous evaluator copied aggregate metric fields from method outputs. This has been corrected so scored metrics are recomputed independently from per-example decisions in the output artifacts.
 - Final verification cleanup: public-facing scoring and evaluation documentation now use generic answer/defer/budget terminology so from-scratch agents can understand the task without seeing the paper's implementation details.
+- Continuation audit fix: `scores.json` now includes every metric family declared by `reference.json`; missing values such as `solvable_accuracy`, `unsolvable_token_savings`, `max_realized_risk`, and `defer_precision` are recomputed in `eval/`.
 
 ## Deviations from Paper
 

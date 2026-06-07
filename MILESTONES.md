@@ -24,5 +24,9 @@
 - Completed final verification of folder structure, method/evaluation separation, reusable scoring, and train/test split wiring.
 - Cleaned public-facing experiment and metric names so from-scratch documentation stays method-agnostic, then reran `python validate.py --compare`.
 
+### [2026-06-07 12:16] - core_claim_plus
+- Extended the main reusable evaluator so `scores.json` includes the full metric set declared by `reference.json`, including solvable accuracy, unsolvable token savings, maximum realized risk, and defer precision.
+- Reran `bash scripts/reproduce.sh`; the scaled benchmark still passes `python validate.py --compare`.
+
 ## Stop Justification
 - Completed at milestone `core_claim_plus`.

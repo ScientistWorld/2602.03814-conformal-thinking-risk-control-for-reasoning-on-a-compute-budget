@@ -9,6 +9,7 @@ The workspace started at `core_claim_plus`. That milestone was justified: the me
 - Minor: public-facing scoring names and documentation used method-specific terms, which could leak implementation details to from-scratch scientist agents.
 - Minor: a generated core dump and Python cache were present during verification and did not belong in the reusable workspace.
 - Limitation: the reproduction is on deterministic synthetic reasoning trajectories rather than the paper's full large-model benchmark suite.
+- Limitation: the paper markdown gives most result values as plotted curves rather than scalar tables, so the local `reference.json` is a scaled benchmark reference rather than a direct transcription of exact paper coordinates.
 
 ## Fixes Applied
 
@@ -16,6 +17,7 @@ The workspace started at `core_claim_plus`. That milestone was justified: the me
 - Rewrote or tightened `briefing/evaluation.md`, `scoring/EXPERIMENTS.md`, `scoring/TARGETS.md`, `scoring/CONSTRAINTS.md`, and `scoring/DIRECTION.md` so the problem-facing documentation is method-agnostic.
 - Removed the generated core dump and Python cache.
 - Reran `bash scripts/reproduce.sh` and `python validate.py --compare`; validation passes.
+- Extended `eval/evaluate_reasoning.py` so `scores.json` now includes all metric families declared in `reference.json`, recomputed from saved per-example stopping decisions.
 
 ## Final Judgment
 
