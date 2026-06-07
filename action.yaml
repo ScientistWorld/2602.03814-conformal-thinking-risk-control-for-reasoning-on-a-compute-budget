@@ -3,4 +3,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim_plus
-notes: "Buffered stratified train/test split; 120 train metrics, 120 test metrics; conformal token-savings gaps within 0.014 and risk-control max_realized_risk improves from 0.203 train to 0.136 test; no nulls or method-key mismatches."
+notes: "Audited downloads and paths; no external artifacts required, removed hardcoded /home/user script roots, and validated fresh-clone checks."
