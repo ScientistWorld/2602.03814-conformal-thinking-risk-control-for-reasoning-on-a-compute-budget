@@ -28,7 +28,8 @@ def make_instance(rng: random.Random, idx: int, split: str) -> dict:
     gold = f"ans_{idx % 97}"
 
     solvable = rng.random() < (0.58 if split == "test" else 0.60)
-    solve_step = rng.randint(4, max(5, total_steps - 2)) if solvable else total_steps + 1
+    latest_solve_step = max(4, int(total_steps * 0.58))
+    solve_step = rng.randint(3, latest_solve_step) if solvable else total_steps + 1
     false_confident = (not solvable) and rng.random() < 0.18
 
     steps = []
@@ -38,7 +39,7 @@ def make_instance(rng: random.Random, idx: int, split: str) -> dict:
         noise = rng.gauss(0.0, 0.035)
 
         if solvable:
-            confidence = 0.13 + 0.80 * sigmoid(9.0 * (frac - solve_step / total_steps)) + noise
+            confidence = 0.18 + 0.76 * sigmoid(10.0 * (frac - solve_step / total_steps)) + noise
             correct = t >= solve_step
             if t < solve_step and rng.random() < 0.06:
                 correct = True

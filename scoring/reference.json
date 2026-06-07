@@ -1,7 +1,7 @@
 {
   "experiments": {
     "dual_threshold_efficiency": {
-      "description": "Core claim: adding the lower threshold to the standard upper-threshold rule should reduce token use while maintaining controlled risks.",
+      "description": "Core claim: adding a lower no-progress threshold to upper-threshold adaptive reasoning should improve the accuracy-token trade-off while controlling early-stopping risks.",
       "weight": 0.65,
       "primary_metric": "token_savings",
       "metrics": {
@@ -15,26 +15,26 @@
       "results": {
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.0,
-          "token_fraction": 1.0,
-          "token_savings": 0.0,
+          "accuracy": 0.31,
+          "token_fraction": 0.61,
+          "token_savings": 0.39,
           "false_positive_risk": 0.32,
-          "false_negative_risk": 0.0,
-          "risk_excess": 0.0
+          "false_negative_risk": 0.01,
+          "risk_excess": 0.02
         },
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.0,
-          "token_fraction": 1.0,
-          "token_savings": 0.0,
-          "false_positive_risk": 0.32,
-          "false_negative_risk": 0.32,
-          "risk_excess": 0.0
+          "accuracy": 0.40,
+          "token_fraction": 0.34,
+          "token_savings": 0.66,
+          "false_positive_risk": 0.17,
+          "false_negative_risk": 0.01,
+          "risk_excess": 0.00
         }
       }
     },
     "risk_control": {
-      "description": "Risk-control claim: finite-sample-adjusted calibration should keep realized risks at or below the requested operating risk.",
+      "description": "Risk-control claim: finite-sample-adjusted calibration should keep realized risks at or below the requested operating risk more reliably than naive validation tuning.",
       "weight": 0.35,
       "primary_metric": "risk_excess",
       "metrics": {
@@ -48,21 +48,21 @@
       "results": {
         "naive_or_uncalibrated": {
           "type": "baseline",
-          "accuracy": 0.0,
-          "token_fraction": 1.0,
-          "token_savings": 0.0,
-          "false_positive_risk": 0.32,
-          "false_negative_risk": 0.32,
-          "risk_excess": 0.0
+          "accuracy": 0.31,
+          "token_fraction": 0.61,
+          "token_savings": 0.39,
+          "false_positive_risk": 0.34,
+          "false_negative_risk": 0.00,
+          "risk_excess": 0.02
         },
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.0,
-          "token_fraction": 1.0,
-          "token_savings": 0.0,
-          "false_positive_risk": 0.32,
-          "false_negative_risk": 0.32,
-          "risk_excess": 0.0
+          "accuracy": 0.40,
+          "token_fraction": 0.34,
+          "token_savings": 0.66,
+          "false_positive_risk": 0.17,
+          "false_negative_risk": 0.01,
+          "risk_excess": 0.00
         }
       }
     }

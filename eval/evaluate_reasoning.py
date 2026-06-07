@@ -58,7 +58,7 @@ def main() -> None:
             "risk_control": {
                 "results": {
                     "naive_or_uncalibrated": metrics(
-                        baseline_point["policies"]["lower_only"], method_point["epsilon"]
+                        baseline_point["policies"]["upper_only"], method_point["epsilon"]
                     ),
                     "conformal_thinking": metrics(
                         method_point["policies"]["conformal_thinking"], method_point["epsilon"]

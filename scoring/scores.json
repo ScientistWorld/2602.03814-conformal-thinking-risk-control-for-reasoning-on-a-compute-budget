@@ -3,19 +3,19 @@
     "dual_threshold_efficiency": {
       "results": {
         "upper_only": {
-          "accuracy": 0.4166666666666667,
-          "token_fraction": 0.6646844802629005,
-          "token_savings": 0.3353155197370995,
-          "false_positive_risk": 0.31666666666666665,
+          "accuracy": 0.30833333333333335,
+          "token_fraction": 0.6107269041413264,
+          "token_savings": 0.38927309585867365,
+          "false_positive_risk": 0.3388888888888889,
           "false_negative_risk": 0.0,
-          "risk_excess": 0.0
+          "risk_excess": 0.0188888888888889
         },
         "conformal_thinking": {
-          "accuracy": 0.31666666666666665,
-          "token_fraction": 0.3720232273497013,
-          "token_savings": 0.6279767726502987,
-          "false_positive_risk": 0.13055555555555556,
-          "false_negative_risk": 0.09824261726835257,
+          "accuracy": 0.4027777777777778,
+          "token_fraction": 0.34289603243556327,
+          "token_savings": 0.6571039675644368,
+          "false_positive_risk": 0.16944444444444445,
+          "false_negative_risk": 0.007760472552139219,
           "risk_excess": 0.0
         }
       }
@@ -23,19 +23,19 @@
     "risk_control": {
       "results": {
         "naive_or_uncalibrated": {
-          "accuracy": 0.43333333333333335,
-          "token_fraction": 0.6432623360364842,
-          "token_savings": 0.3567376639635158,
-          "false_positive_risk": 0.0,
-          "false_negative_risk": 0.09670992927733124,
-          "risk_excess": 0.0
+          "accuracy": 0.30833333333333335,
+          "token_fraction": 0.6107269041413264,
+          "token_savings": 0.38927309585867365,
+          "false_positive_risk": 0.3388888888888889,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.0188888888888889
         },
         "conformal_thinking": {
-          "accuracy": 0.31666666666666665,
-          "token_fraction": 0.3720232273497013,
-          "token_savings": 0.6279767726502987,
-          "false_positive_risk": 0.13055555555555556,
-          "false_negative_risk": 0.09824261726835257,
+          "accuracy": 0.4027777777777778,
+          "token_fraction": 0.34289603243556327,
+          "token_savings": 0.6571039675644368,
+          "false_positive_risk": 0.16944444444444445,
+          "false_negative_risk": 0.007760472552139219,
           "risk_excess": 0.0
         }
       }
