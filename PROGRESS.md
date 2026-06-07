@@ -7,6 +7,7 @@
 - Added a baseline, reusable evaluator, shell scripts, scoring reference, and documentation.
 - Local smoke test passed: `bash scripts/reproduce.sh` followed by `python validate.py --compare`.
 - Scheduler job `0a166eb2-90f` passed the same end-to-end reproduction pipeline in the compute environment.
+- Continuation audit on 2026-06-07 reran `bash scripts/reproduce.sh` and confirmed the evaluation reads saved baseline/method artifacts, `eval/` does not import from `method/`, and generated scores remain consistent with the reference contract.
 
 ## Results
 

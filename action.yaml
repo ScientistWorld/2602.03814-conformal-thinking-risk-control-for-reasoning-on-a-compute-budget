@@ -5,4 +5,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim
-notes: "Reproduced the core Conformal Thinking claim on the packaged scaled benchmark. Prior scheduler job 0a166eb2-90f and local reproduce/validate runs passed end-to-end."
+notes: "Continuation audit restored core_claim. Reviewed method/eval/scripts/docs, reran bash scripts/reproduce.sh, and confirmed prior scheduler job 0a166eb2-90f plus local validation pass end-to-end."
