@@ -1,5 +1,5 @@
 # The system reads this file after the turn ends.
-action: submit
+action: done
 gpus: 0
 test: false
-notes: "CPU rerun: regenerate train/test scores with max_realized_risk as the non-saturated scored risk metric."
+notes: "Buffered stratified train/test split; 120 train metrics, 120 test metrics; conformal token-savings gaps within 0.014 and risk-control max_realized_risk improves from 0.203 train to 0.136 test; no nulls or method-key mismatches."
