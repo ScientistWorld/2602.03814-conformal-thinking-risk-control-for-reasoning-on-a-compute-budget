@@ -1,0 +1,159 @@
+{
+  "_metadata": {
+    "slice": "train",
+    "split": "deterministic stratified buffered two-fifths of original test examples",
+    "split_seed": "conformal-thinking-anti-shortcut-v2"
+  },
+  "experiments": {
+    "dual_threshold_efficiency": {
+      "results": {
+        "upper_only": {
+          "accuracy": 0.25675675675675674,
+          "solvable_accuracy": 0.3958333333333333,
+          "token_fraction": 0.6290064449154376,
+          "token_savings": 0.37099355508456244,
+          "unsolvable_token_savings": 0.044642857142857095,
+          "false_positive_risk": 0.38513513513513514,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.06513513513513514,
+          "exit_lower_fraction": 0.0,
+          "lower_exit_precision": 0.0,
+          "exit_budget_fraction": 0.3716216216216216
+        },
+        "conformal_thinking": {
+          "accuracy": 0.35135135135135137,
+          "solvable_accuracy": 0.5416666666666666,
+          "token_fraction": 0.3417102815865738,
+          "token_savings": 0.6582897184134262,
+          "unsolvable_token_savings": 0.6838420390182505,
+          "false_positive_risk": 0.20270270270270271,
+          "false_negative_risk": 0.008156689406689406,
+          "risk_excess": 0.0,
+          "exit_lower_fraction": 0.44594594594594594,
+          "lower_exit_precision": 0.7878787878787878,
+          "exit_budget_fraction": 0.0
+        }
+      }
+    },
+    "risk_control": {
+      "results": {
+        "naive_or_uncalibrated": {
+          "accuracy": 0.25675675675675674,
+          "solvable_accuracy": 0.3958333333333333,
+          "token_fraction": 0.6290064449154376,
+          "token_savings": 0.37099355508456244,
+          "unsolvable_token_savings": 0.044642857142857095,
+          "false_positive_risk": 0.38513513513513514,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.06513513513513514,
+          "exit_lower_fraction": 0.0,
+          "lower_exit_precision": 0.0,
+          "exit_budget_fraction": 0.3716216216216216
+        },
+        "conformal_thinking": {
+          "accuracy": 0.35135135135135137,
+          "solvable_accuracy": 0.5416666666666666,
+          "token_fraction": 0.3417102815865738,
+          "token_savings": 0.6582897184134262,
+          "unsolvable_token_savings": 0.6838420390182505,
+          "false_positive_risk": 0.20270270270270271,
+          "false_negative_risk": 0.008156689406689406,
+          "risk_excess": 0.0,
+          "exit_lower_fraction": 0.44594594594594594,
+          "lower_exit_precision": 0.7878787878787878,
+          "exit_budget_fraction": 0.0
+        }
+      }
+    },
+    "lower_threshold_ratio_3_1": {
+      "results": {
+        "upper_only": {
+          "accuracy": 0.4589041095890411,
+          "solvable_accuracy": 0.6090909090909091,
+          "token_fraction": 0.5232364242731821,
+          "token_savings": 0.47676357572681793,
+          "unsolvable_token_savings": 0.0428853400322986,
+          "false_positive_risk": 0.2945205479452055,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.0,
+          "exit_lower_fraction": 0.0,
+          "lower_exit_precision": 0.0,
+          "exit_budget_fraction": 0.2465753424657534
+        },
+        "conformal_thinking": {
+          "accuracy": 0.547945205479452,
+          "solvable_accuracy": 0.7272727272727273,
+          "token_fraction": 0.3293264699485246,
+          "token_savings": 0.6706735300514755,
+          "unsolvable_token_savings": 0.7462168789999402,
+          "false_positive_risk": 0.14383561643835616,
+          "false_negative_risk": 0.012818003913894324,
+          "risk_excess": 0.0,
+          "exit_lower_fraction": 0.3082191780821918,
+          "lower_exit_precision": 0.8,
+          "exit_budget_fraction": 0.0
+        }
+      }
+    },
+    "lower_threshold_ratio_1_1": {
+      "results": {
+        "upper_only": {
+          "accuracy": 0.272108843537415,
+          "solvable_accuracy": 0.49382716049382713,
+          "token_fraction": 0.6850195252998034,
+          "token_savings": 0.31498047470019663,
+          "unsolvable_token_savings": 0.04978937699933483,
+          "false_positive_risk": 0.2857142857142857,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.0,
+          "exit_lower_fraction": 0.0,
+          "lower_exit_precision": 0.0,
+          "exit_budget_fraction": 0.4421768707482993
+        },
+        "conformal_thinking": {
+          "accuracy": 0.272108843537415,
+          "solvable_accuracy": 0.49382716049382713,
+          "token_fraction": 0.34588860885700834,
+          "token_savings": 0.6541113911429917,
+          "unsolvable_token_savings": 0.655148386279416,
+          "false_positive_risk": 0.17006802721088435,
+          "false_negative_risk": 0.006180094415388534,
+          "risk_excess": 0.0,
+          "exit_lower_fraction": 0.5578231292517006,
+          "lower_exit_precision": 0.8048780487804879,
+          "exit_budget_fraction": 0.0
+        }
+      }
+    },
+    "lower_threshold_ratio_1_3": {
+      "results": {
+        "upper_only": {
+          "accuracy": 0.08783783783783784,
+          "solvable_accuracy": 0.23214285714285715,
+          "token_fraction": 0.7855042332891083,
+          "token_savings": 0.21449576671089166,
+          "unsolvable_token_savings": 0.04706220434148278,
+          "false_positive_risk": 0.3108108108108108,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.0,
+          "exit_lower_fraction": 0.0,
+          "lower_exit_precision": 0.0,
+          "exit_budget_fraction": 0.6216216216216216
+        },
+        "conformal_thinking": {
+          "accuracy": 0.14864864864864866,
+          "solvable_accuracy": 0.39285714285714285,
+          "token_fraction": 0.3466783384169277,
+          "token_savings": 0.6533216615830724,
+          "unsolvable_token_savings": 0.6557540121137098,
+          "false_positive_risk": 0.12837837837837837,
+          "false_negative_risk": 0.009576337701337702,
+          "risk_excess": 0.0,
+          "exit_lower_fraction": 0.722972972972973,
+          "lower_exit_precision": 0.8504672897196262,
+          "exit_budget_fraction": 0.0
+        }
+      }
+    }
+  }
+}
