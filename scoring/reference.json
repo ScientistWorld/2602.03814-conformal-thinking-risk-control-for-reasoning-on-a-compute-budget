@@ -12,7 +12,8 @@
         "unsolvable_token_savings": {"higher_is_better": true, "coefficient": 0.5, "description": "Token savings restricted to examples not solved within the full reasoning budget."},
         "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping with a confident answer that is wrong."},
         "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping for likely failure before later trajectory steps become correct."},
-        "risk_excess": {"higher_is_better": false, "coefficient": -2.0, "description": "Amount by which the larger realized risk exceeds the configured tolerance."},
+        "max_realized_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Larger of the realized false-positive and false-negative risks at the selected operating point."},
+        "risk_excess": {"higher_is_better": false, "coefficient": 0.0, "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."},
         "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.1, "description": "Fraction of examples stopped by the lower-threshold likely-failure exit."},
         "lower_exit_precision": {"higher_is_better": true, "coefficient": 0.2, "description": "Fraction of lower-threshold exits that occur on examples unsolved by the full budget."},
         "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2, "description": "Fraction of examples that still consume the full reasoning budget."}
@@ -45,7 +46,7 @@
     "risk_control": {
       "description": "Risk-control target: finite-sample-adjusted calibration should keep realized risks at or below the requested operating risk more reliably than naive validation tuning.",
       "weight": 0.20,
-      "primary_metric": "risk_excess",
+      "primary_metric": "max_realized_risk",
       "metrics": {
         "accuracy": {"higher_is_better": true, "coefficient": 0.3, "description": "Overall answer accuracy at the selected stopping point."},
         "solvable_accuracy": {"higher_is_better": true, "coefficient": 0.3, "description": "Accuracy restricted to examples that can be solved within the full reasoning budget."},
@@ -54,7 +55,8 @@
         "unsolvable_token_savings": {"higher_is_better": true, "coefficient": 0.2, "description": "Token savings restricted to examples not solved within the full reasoning budget."},
         "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping with a confident answer that is wrong."},
         "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping for likely failure before later trajectory steps become correct."},
-        "risk_excess": {"higher_is_better": false, "coefficient": -2.0, "description": "Amount by which the larger realized risk exceeds the configured tolerance."},
+        "max_realized_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Larger of the realized false-positive and false-negative risks at the selected operating point."},
+        "risk_excess": {"higher_is_better": false, "coefficient": 0.0, "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."},
         "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.1, "description": "Fraction of examples stopped by the lower-threshold likely-failure exit."},
         "lower_exit_precision": {"higher_is_better": true, "coefficient": 0.1, "description": "Fraction of lower-threshold exits that occur on examples unsolved by the full budget."},
         "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2, "description": "Fraction of examples that still consume the full reasoning budget."}
@@ -96,7 +98,8 @@
         "unsolvable_token_savings": {"higher_is_better": true, "coefficient": 0.7, "description": "Token savings restricted to examples not solved within the full reasoning budget."},
         "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping with a confident answer that is wrong."},
         "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping for likely failure before later trajectory steps become correct."},
-        "risk_excess": {"higher_is_better": false, "coefficient": -2.0, "description": "Amount by which the larger realized risk exceeds the configured tolerance."},
+        "max_realized_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Larger of the realized false-positive and false-negative risks at the selected operating point."},
+        "risk_excess": {"higher_is_better": false, "coefficient": 0.0, "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."},
         "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.2, "description": "Fraction of examples stopped by the lower-threshold likely-failure exit."},
         "lower_exit_precision": {"higher_is_better": true, "coefficient": 0.3, "description": "Fraction of lower-threshold exits that occur on examples unsolved by the full budget."},
         "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2, "description": "Fraction of examples that still consume the full reasoning budget."}
@@ -138,7 +141,8 @@
         "unsolvable_token_savings": {"higher_is_better": true, "coefficient": 0.7, "description": "Token savings restricted to examples not solved within the full reasoning budget."},
         "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping with a confident answer that is wrong."},
         "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping for likely failure before later trajectory steps become correct."},
-        "risk_excess": {"higher_is_better": false, "coefficient": -2.0, "description": "Amount by which the larger realized risk exceeds the configured tolerance."},
+        "max_realized_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Larger of the realized false-positive and false-negative risks at the selected operating point."},
+        "risk_excess": {"higher_is_better": false, "coefficient": 0.0, "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."},
         "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.2, "description": "Fraction of examples stopped by the lower-threshold likely-failure exit."},
         "lower_exit_precision": {"higher_is_better": true, "coefficient": 0.3, "description": "Fraction of lower-threshold exits that occur on examples unsolved by the full budget."},
         "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2, "description": "Fraction of examples that still consume the full reasoning budget."}
@@ -180,7 +184,8 @@
         "unsolvable_token_savings": {"higher_is_better": true, "coefficient": 0.7, "description": "Token savings restricted to examples not solved within the full reasoning budget."},
         "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping with a confident answer that is wrong."},
         "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Risk of stopping for likely failure before later trajectory steps become correct."},
-        "risk_excess": {"higher_is_better": false, "coefficient": -2.0, "description": "Amount by which the larger realized risk exceeds the configured tolerance."},
+        "max_realized_risk": {"higher_is_better": false, "coefficient": -1.0, "description": "Larger of the realized false-positive and false-negative risks at the selected operating point."},
+        "risk_excess": {"higher_is_better": false, "coefficient": 0.0, "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."},
         "exit_lower_fraction": {"higher_is_better": true, "coefficient": 0.2, "description": "Fraction of examples stopped by the lower-threshold likely-failure exit."},
         "lower_exit_precision": {"higher_is_better": true, "coefficient": 0.3, "description": "Fraction of lower-threshold exits that occur on examples unsolved by the full budget."},
         "exit_budget_fraction": {"higher_is_better": false, "coefficient": -0.2, "description": "Fraction of examples that still consume the full reasoning budget."}

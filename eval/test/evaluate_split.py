@@ -177,6 +177,7 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
     token_fraction = total_tokens / full_tokens if full_tokens else 0.0
     false_positive_risk = mean(fp_values)
     false_negative_risk = mean(fn_values)
+    max_realized_risk = max(false_positive_risk, false_negative_risk)
     unsolvable_token_fraction = (
         unsolvable_tokens / unsolvable_full_tokens if unsolvable_full_tokens else 0.0
     )
@@ -188,7 +189,8 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
         "unsolvable_token_savings": 1.0 - unsolvable_token_fraction,
         "false_positive_risk": false_positive_risk,
         "false_negative_risk": false_negative_risk,
-        "risk_excess": max(0.0, max(false_positive_risk, false_negative_risk) - epsilon),
+        "max_realized_risk": max_realized_risk,
+        "risk_excess": max(0.0, max_realized_risk - epsilon),
         "exit_lower_fraction": reasons["lower"] / n if n else 0.0,
         "lower_exit_precision": lower_exit_unsolvable / lower_exit_count if lower_exit_count else 0.0,
         "exit_budget_fraction": reasons["budget"] / n if n else 0.0,

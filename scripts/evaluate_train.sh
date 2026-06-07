@@ -3,7 +3,7 @@
 #
 # Mirrors scripts/evaluate.sh's artifact-reading contract, but writes
 # scoring/scores_train.json and evaluates only eval/train/'s deterministic
-# half-slice of the original paper test examples.
+# buffered visible slice of the original paper test examples.
 
 set -e
 
