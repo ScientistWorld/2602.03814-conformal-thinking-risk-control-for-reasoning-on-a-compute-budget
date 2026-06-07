@@ -1,8 +1,8 @@
 # IMPORTANT: Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends. Sleeping blocks the entire pipeline.
-action: pending
-gpus: 1
+action: done
+gpus: 0
 test: false
-milestone: method_runs
-notes: ""
+milestone: core_claim
+notes: "Reproduced the core Conformal Thinking claim on the packaged scaled benchmark. Prior scheduler job 0a166eb2-90f and local reproduce/validate runs passed end-to-end."
