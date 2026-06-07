@@ -46,7 +46,7 @@
     "risk_control": {
       "description": "Risk-control target: finite-sample-adjusted calibration should keep realized risks at or below the requested operating risk more reliably than naive validation tuning.",
       "weight": 0.20,
-      "primary_metric": "max_realized_risk",
+      "primary_metric": "false_positive_risk",
       "metrics": {
         "accuracy": {"higher_is_better": true, "coefficient": 0.3, "description": "Overall answer accuracy at the selected stopping point."},
         "solvable_accuracy": {"higher_is_better": true, "coefficient": 0.3, "description": "Accuracy restricted to examples that can be solved within the full reasoning budget."},
