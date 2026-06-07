@@ -8,7 +8,7 @@ The benchmark asks whether a system can allocate reasoning effort adaptively acr
 
 ## Why It Matters
 
-Reasoning models are expensive at inference time. A useful stopping policy should save tokens without turning opaque threshold tuning into a hidden accuracy failure mode, especially on hard datasets where many examples may never become answerable within the allowed budget.
+Reasoning models are expensive at inference time. A useful stopping policy should save tokens without turning operating-point selection into a hidden accuracy failure mode, especially on hard datasets where many examples may never become answerable within the allowed budget.
 
 ## Success Criteria
 
@@ -16,5 +16,5 @@ A successful solution should:
 
 - Keep realized early-stopping risk at or below a user-selected tolerance on held-out test data.
 - Reduce token usage relative to a full-budget or uniform-budget policy at comparable task accuracy.
-- Work across multiple stopping signals, datasets, and difficulty mixes without relying on test-set labels for threshold selection.
+- Work across multiple stopping signals, datasets, and difficulty mixes without relying on test-set labels for operating-point selection.
 - Report both benefit metrics, such as accuracy and token reduction, and constraint metrics, such as false positive and false negative risk.

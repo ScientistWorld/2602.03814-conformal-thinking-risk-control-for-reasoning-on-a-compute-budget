@@ -20,5 +20,9 @@
 - Audited the continued workspace after milestone reset and fixed the evaluator so it recomputes all scored metrics from per-example stopping decisions and held-out labels instead of trusting method-reported aggregate metrics.
 - Reran `bash scripts/reproduce.sh`; the corrected evaluator reproduced the same five-experiment score contract and `python validate.py --compare` passed.
 
+### [2026-06-07 12:12] - core_claim_plus
+- Completed final verification of folder structure, method/evaluation separation, reusable scoring, and train/test split wiring.
+- Cleaned public-facing experiment and metric names so from-scratch documentation stays method-agnostic, then reran `python validate.py --compare`.
+
 ## Stop Justification
 - Completed at milestone `core_claim_plus`.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluate Conformal Thinking artifacts without importing method code."""
+"""Evaluate adaptive reasoning-budget artifacts without importing method code."""
 
 from __future__ import annotations
 
@@ -29,14 +29,27 @@ def mean(values: list[float]) -> float:
     return sum(values) / len(values) if values else 0.0
 
 
+def canonical_reason(reason: str) -> str:
+    aliases = {
+        "upper": "answer",
+        "answer": "answer",
+        "lower": "defer",
+        "defer": "defer",
+        "budget": "budget",
+    }
+    if reason not in aliases:
+        raise ValueError(f"Invalid exit reason {reason!r}")
+    return aliases[reason]
+
+
 def fp_loss(instance: dict, exit_idx: int, reason: str) -> float:
-    if reason != "upper":
+    if canonical_reason(reason) != "answer":
         return 0.0
     return 0.0 if instance["steps"][exit_idx]["prediction"] == instance["gold"] else 1.0
 
 
 def fn_loss(instance: dict, exit_idx: int, reason: str) -> float:
-    if reason != "lower":
+    if canonical_reason(reason) != "defer":
         return 0.0
     future = instance["steps"][exit_idx:]
     if not future:
@@ -69,7 +82,7 @@ def recompute_policy_metrics(policy: dict, data: list[dict], epsilon: float) -> 
     correct = 0
     fp_values: list[float] = []
     fn_values: list[float] = []
-    reasons = {"upper": 0, "lower": 0, "budget": 0}
+    reasons = {"answer": 0, "defer": 0, "budget": 0}
 
     seen: set[str] = set()
     for decision in decisions:
@@ -82,9 +95,7 @@ def recompute_policy_metrics(policy: dict, data: list[dict], epsilon: float) -> 
 
         instance = by_id[instance_id]
         exit_idx = int(decision["exit_idx"])
-        reason = decision["reason"]
-        if reason not in reasons:
-            raise ValueError(f"Invalid exit reason {reason!r} for {instance_id}")
+        reason = canonical_reason(decision["reason"])
         if exit_idx < 0 or exit_idx >= len(instance["steps"]):
             raise ValueError(f"Invalid exit_idx {exit_idx} for {instance_id}")
 
@@ -92,7 +103,7 @@ def recompute_policy_metrics(policy: dict, data: list[dict], epsilon: float) -> 
         reasons[reason] += 1
         total_tokens += step["tokens"]
         full_tokens += instance["steps"][-1]["tokens"]
-        correct += int(step["prediction"] == instance["gold"] and reason != "lower")
+        correct += int(step["prediction"] == instance["gold"] and reason != "defer")
         fp_values.append(fp_loss(instance, exit_idx, reason))
         fn_values.append(fn_loss(instance, exit_idx, reason))
 
@@ -114,7 +125,7 @@ def recompute_policy_metrics(policy: dict, data: list[dict], epsilon: float) -> 
             0.0,
             max(false_positive_risk, false_negative_risk) - epsilon,
         ),
-        "exit_lower_fraction": reasons["lower"] / n if n else 0.0,
+        "defer_fraction": reasons["defer"] / n if n else 0.0,
         "exit_budget_fraction": reasons["budget"] / n if n else 0.0,
     }
 
@@ -162,7 +173,7 @@ def main() -> None:
     baseline_point = select_operating_point(baseline_result, args.epsilon)
 
     scores = {"experiments": {}}
-    scores["experiments"]["dual_threshold_efficiency"] = {
+    scores["experiments"]["adaptive_budget_efficiency"] = {
         "results": {
             "upper_only": recompute_policy_metrics(
                 baseline_point["policies"]["upper_only"], baseline_data, method_point["epsilon"]
@@ -185,7 +196,7 @@ def main() -> None:
     for ratio in ("3_1", "1_1", "1_3"):
         add_policy_comparison(
             scores,
-            f"lower_threshold_ratio_{ratio}",
+            f"difficulty_mix_{ratio}",
             Path(f"outputs/conformal_thinking/ratio_{ratio}.json"),
             Path(f"outputs/baseline/ratio_{ratio}.json"),
             args.epsilon,

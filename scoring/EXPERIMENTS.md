@@ -1,21 +1,21 @@
 # Experiment Overview
 
-## dual_threshold_efficiency
+## adaptive_budget_efficiency
 
-Tests the paper's central compute-efficiency claim in a compact benchmark setting. The experiment compares an adaptive policy that can stop for both confident success and likely failure against the standard confident-success-only adaptive baseline, then measures whether the added stopping option saves more reasoning tokens while keeping error-risk metrics within the requested operating tolerance.
+Tests the central compute-efficiency question in a compact benchmark setting. The experiment compares a candidate adaptive stopping policy against a reference adaptive baseline and measures whether the candidate uses fewer reasoning tokens while keeping answer-error and premature-defer risk within the requested tolerance.
 
 ## risk_control
 
-Tests the reliability side of the claim. The experiment measures whether the deployed stopping outputs stay within the configured risk budget on held-out examples, so improvements in token savings are penalized if they come from excessive incorrect early answers or premature deferrals.
+Tests the reliability side of the benchmark. The experiment measures whether deployed stopping decisions stay within the configured risk budget on held-out examples, so token savings are penalized if they come from too many incorrect early answers or premature deferrals.
 
-## lower_threshold_ratio_3_1
+## difficulty_mix_3_1
 
-Tests the lower-threshold efficiency claim when most examples are solvable within the full budget. The expected benefit is present but smaller because confident-success exits already handle many examples.
+Tests efficiency when most examples are solvable within the full budget. The expected opportunity for extra savings is present but modest because many examples can be answered before the budget is exhausted.
 
-## lower_threshold_ratio_1_1
+## difficulty_mix_1_1
 
-Tests the same stopping policies when solvable and unsolvable examples are balanced. This setting should expose more wasted full-budget runs for an upper-only baseline and more useful early deferrals for a dual-exit policy.
+Tests the same decision problem when solvable and unsolvable examples are balanced. This setting exposes more wasted full-budget runs and gives useful policies more room to save compute.
 
-## lower_threshold_ratio_1_3
+## difficulty_mix_1_3
 
-Tests the high-unsolvable regime emphasized by the paper. A useful policy should avoid spending nearly the full budget on many examples that do not improve, while still respecting the configured early-stopping risk.
+Tests a high-unsolvable regime. A useful policy should avoid spending nearly the full budget on many examples that do not improve, while still respecting the configured answer-error and premature-defer risks.

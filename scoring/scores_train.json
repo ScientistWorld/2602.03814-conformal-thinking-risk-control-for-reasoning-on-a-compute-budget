@@ -2,10 +2,10 @@
   "_metadata": {
     "slice": "train",
     "split": "deterministic stratified buffered two-fifths of original test examples",
-    "split_seed": "conformal-thinking-anti-shortcut-v2"
+    "split_seed": "adaptive-reasoning-budget-anti-shortcut-v2"
   },
   "experiments": {
-    "dual_threshold_efficiency": {
+    "adaptive_budget_efficiency": {
       "results": {
         "upper_only": {
           "accuracy": 0.25675675675675674,
@@ -17,8 +17,8 @@
           "false_negative_risk": 0.0,
           "max_realized_risk": 0.38513513513513514,
           "risk_excess": 0.06513513513513514,
-          "exit_lower_fraction": 0.0,
-          "lower_exit_precision": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
           "exit_budget_fraction": 0.3716216216216216
         },
         "conformal_thinking": {
@@ -31,8 +31,8 @@
           "false_negative_risk": 0.008156689406689406,
           "max_realized_risk": 0.20270270270270271,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.44594594594594594,
-          "lower_exit_precision": 0.7878787878787878,
+          "defer_fraction": 0.44594594594594594,
+          "defer_precision": 0.7878787878787878,
           "exit_budget_fraction": 0.0
         }
       }
@@ -49,8 +49,8 @@
           "false_negative_risk": 0.0,
           "max_realized_risk": 0.38513513513513514,
           "risk_excess": 0.06513513513513514,
-          "exit_lower_fraction": 0.0,
-          "lower_exit_precision": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
           "exit_budget_fraction": 0.3716216216216216
         },
         "conformal_thinking": {
@@ -63,13 +63,13 @@
           "false_negative_risk": 0.008156689406689406,
           "max_realized_risk": 0.20270270270270271,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.44594594594594594,
-          "lower_exit_precision": 0.7878787878787878,
+          "defer_fraction": 0.44594594594594594,
+          "defer_precision": 0.7878787878787878,
           "exit_budget_fraction": 0.0
         }
       }
     },
-    "lower_threshold_ratio_3_1": {
+    "difficulty_mix_3_1": {
       "results": {
         "upper_only": {
           "accuracy": 0.4589041095890411,
@@ -81,8 +81,8 @@
           "false_negative_risk": 0.0,
           "max_realized_risk": 0.2945205479452055,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.0,
-          "lower_exit_precision": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
           "exit_budget_fraction": 0.2465753424657534
         },
         "conformal_thinking": {
@@ -95,13 +95,13 @@
           "false_negative_risk": 0.012818003913894324,
           "max_realized_risk": 0.14383561643835616,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.3082191780821918,
-          "lower_exit_precision": 0.8,
+          "defer_fraction": 0.3082191780821918,
+          "defer_precision": 0.8,
           "exit_budget_fraction": 0.0
         }
       }
     },
-    "lower_threshold_ratio_1_1": {
+    "difficulty_mix_1_1": {
       "results": {
         "upper_only": {
           "accuracy": 0.272108843537415,
@@ -113,8 +113,8 @@
           "false_negative_risk": 0.0,
           "max_realized_risk": 0.2857142857142857,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.0,
-          "lower_exit_precision": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
           "exit_budget_fraction": 0.4421768707482993
         },
         "conformal_thinking": {
@@ -127,13 +127,13 @@
           "false_negative_risk": 0.006180094415388534,
           "max_realized_risk": 0.17006802721088435,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.5578231292517006,
-          "lower_exit_precision": 0.8048780487804879,
+          "defer_fraction": 0.5578231292517006,
+          "defer_precision": 0.8048780487804879,
           "exit_budget_fraction": 0.0
         }
       }
     },
-    "lower_threshold_ratio_1_3": {
+    "difficulty_mix_1_3": {
       "results": {
         "upper_only": {
           "accuracy": 0.08783783783783784,
@@ -145,8 +145,8 @@
           "false_negative_risk": 0.0,
           "max_realized_risk": 0.3108108108108108,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.0,
-          "lower_exit_precision": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
           "exit_budget_fraction": 0.6216216216216216
         },
         "conformal_thinking": {
@@ -159,8 +159,8 @@
           "false_negative_risk": 0.009576337701337702,
           "max_realized_risk": 0.12837837837837837,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.722972972972973,
-          "lower_exit_precision": 0.8504672897196262,
+          "defer_fraction": 0.722972972972973,
+          "defer_precision": 0.8504672897196262,
           "exit_budget_fraction": 0.0
         }
       }

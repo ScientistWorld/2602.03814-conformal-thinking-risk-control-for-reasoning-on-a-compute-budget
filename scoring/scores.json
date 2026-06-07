@@ -1,6 +1,6 @@
 {
   "experiments": {
-    "dual_threshold_efficiency": {
+    "adaptive_budget_efficiency": {
       "results": {
         "upper_only": {
           "accuracy": 0.30833333333333335,
@@ -9,7 +9,7 @@
           "false_positive_risk": 0.3388888888888889,
           "false_negative_risk": 0.0,
           "risk_excess": 0.0188888888888889,
-          "exit_lower_fraction": 0.0,
+          "defer_fraction": 0.0,
           "exit_budget_fraction": 0.35833333333333334
         },
         "conformal_thinking": {
@@ -19,7 +19,7 @@
           "false_positive_risk": 0.16944444444444445,
           "false_negative_risk": 0.007760472552139219,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.42777777777777776,
+          "defer_fraction": 0.42777777777777776,
           "exit_budget_fraction": 0.0
         }
       }
@@ -33,7 +33,7 @@
           "false_positive_risk": 0.3388888888888889,
           "false_negative_risk": 0.0,
           "risk_excess": 0.0188888888888889,
-          "exit_lower_fraction": 0.0,
+          "defer_fraction": 0.0,
           "exit_budget_fraction": 0.35833333333333334
         },
         "conformal_thinking": {
@@ -43,12 +43,12 @@
           "false_positive_risk": 0.16944444444444445,
           "false_negative_risk": 0.007760472552139219,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.42777777777777776,
+          "defer_fraction": 0.42777777777777776,
           "exit_budget_fraction": 0.0
         }
       }
     },
-    "lower_threshold_ratio_3_1": {
+    "difficulty_mix_3_1": {
       "results": {
         "upper_only": {
           "accuracy": 0.46111111111111114,
@@ -57,7 +57,7 @@
           "false_positive_risk": 0.2972222222222222,
           "false_negative_risk": 0.0,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.0,
+          "defer_fraction": 0.0,
           "exit_budget_fraction": 0.24166666666666667
         },
         "conformal_thinking": {
@@ -67,12 +67,12 @@
           "false_positive_risk": 0.20555555555555555,
           "false_negative_risk": 0.007467964134630801,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.2916666666666667,
+          "defer_fraction": 0.2916666666666667,
           "exit_budget_fraction": 0.0
         }
       }
     },
-    "lower_threshold_ratio_1_1": {
+    "difficulty_mix_1_1": {
       "results": {
         "upper_only": {
           "accuracy": 0.28888888888888886,
@@ -81,7 +81,7 @@
           "false_positive_risk": 0.3,
           "false_negative_risk": 0.0,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.0,
+          "defer_fraction": 0.0,
           "exit_budget_fraction": 0.41388888888888886
         },
         "conformal_thinking": {
@@ -91,12 +91,12 @@
           "false_positive_risk": 0.17222222222222222,
           "false_negative_risk": 0.0067642102813671445,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.5333333333333333,
+          "defer_fraction": 0.5333333333333333,
           "exit_budget_fraction": 0.0
         }
       }
     },
-    "lower_threshold_ratio_1_3": {
+    "difficulty_mix_1_3": {
       "results": {
         "upper_only": {
           "accuracy": 0.07777777777777778,
@@ -105,7 +105,7 @@
           "false_positive_risk": 0.3138888888888889,
           "false_negative_risk": 0.0,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.0,
+          "defer_fraction": 0.0,
           "exit_budget_fraction": 0.625
         },
         "conformal_thinking": {
@@ -115,7 +115,7 @@
           "false_positive_risk": 0.13333333333333333,
           "false_negative_risk": 0.011075395646474077,
           "risk_excess": 0.0,
-          "exit_lower_fraction": 0.7194444444444444,
+          "defer_fraction": 0.7194444444444444,
           "exit_budget_fraction": 0.0
         }
       }

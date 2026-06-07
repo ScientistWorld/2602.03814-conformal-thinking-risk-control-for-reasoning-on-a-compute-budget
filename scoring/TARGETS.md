@@ -1,46 +1,46 @@
 # Evaluation Targets
 
-## Primary: dual_threshold_efficiency
+## Primary: adaptive_budget_efficiency
 
-Tests whether a risk-calibrated adaptive stopping policy can reduce reasoning-token use compared with an upper-threshold-only adaptive baseline.
+Tests whether an adaptive reasoning-budget policy can reduce token use compared with a reference adaptive baseline while preserving bounded stopping risk.
 
 - **Primary metric**: `token_savings` (higher is better)
-- **Benefit metrics**: `accuracy` (higher is better), `token_fraction` (lower is better)
-- **Constraint metrics**: `false_positive_risk`, `false_negative_risk`, and `risk_excess` (all lower is better)
-- **Evaluation**: run `bash scripts/reproduce.sh`, which generates fixed reasoning trajectories, runs the baseline and method, and writes `scoring/scores.json`
+- **Benefit metrics**: `accuracy`, `token_savings`, and `defer_fraction`
+- **Constraint metrics**: `false_positive_risk`, `false_negative_risk`, `risk_excess`, and `exit_budget_fraction`
+- **Evaluation**: run `bash scripts/reproduce.sh`; the evaluator reads saved decisions from `outputs/*/results.json` and writes `scoring/scores.json`
 
 ## Constraint: risk_control
 
-Tests whether the selected operating point respects the requested false-positive and false-negative risk tolerance while still saving compute.
+Tests whether the selected operating point respects the requested answer-error and premature-defer risk tolerance while still saving compute.
 
-- **Primary metric**: `risk_excess` (lower is better)
-- **Benefit metrics**: `token_savings` (higher is better), `token_fraction` (lower is better), `accuracy` (higher is better)
-- **Constraint metrics**: `false_positive_risk` and `false_negative_risk` must remain at or below the configured tolerance
-- **Evaluation**: run `bash scripts/evaluate.sh` after method artifacts exist; the evaluator reads saved method and baseline outputs rather than recalibrating the method itself
+- **Primary metric**: `false_positive_risk` (lower is better)
+- **Benefit metrics**: `token_savings`, `token_fraction`, and `accuracy`
+- **Constraint metrics**: `false_positive_risk`, `false_negative_risk`, and `risk_excess`
+- **Evaluation**: run `bash scripts/evaluate.sh` after method artifacts exist; the evaluator recomputes metrics from saved decisions and labels
 
-## Additional: lower_threshold_ratio_3_1
+## Additional: difficulty_mix_3_1
 
-Tests the lower-threshold claim on a synthetic split with a 3:1 solvable:unsolvable mix.
+Tests the policy on a synthetic split with a 3:1 solvable:unsolvable mix.
 
 - **Primary metric**: `token_savings` (higher is better)
-- **Benefit metrics**: `accuracy`, `exit_lower_fraction`, and `token_fraction`
+- **Benefit metrics**: `accuracy`, `defer_fraction`, and `token_fraction`
 - **Constraint metrics**: `false_positive_risk`, `false_negative_risk`, and `risk_excess`
 - **Evaluation**: run `bash scripts/reproduce.sh`; the evaluator reads `outputs/*/ratio_3_1.json`
 
-## Additional: lower_threshold_ratio_1_1
+## Additional: difficulty_mix_1_1
 
-Tests whether lower-threshold savings increase when the mix has equal solvable and unsolvable trajectories.
+Tests the policy when solvable and unsolvable trajectories are balanced.
 
 - **Primary metric**: `token_savings` (higher is better)
-- **Benefit metrics**: `accuracy`, `exit_lower_fraction`, and `token_fraction`
+- **Benefit metrics**: `accuracy`, `defer_fraction`, and `token_fraction`
 - **Constraint metrics**: `false_positive_risk`, `false_negative_risk`, and `risk_excess`
 - **Evaluation**: run `bash scripts/reproduce.sh`; the evaluator reads `outputs/*/ratio_1_1.json`
 
-## Additional: lower_threshold_ratio_1_3
+## Additional: difficulty_mix_1_3
 
-Tests the paper's strongest lower-threshold setting: most trajectories are unsolvable within the full budget, so upper-only policies tend to waste tokens at the budget limit.
+Tests a setting where most trajectories are unsolvable within the full budget, so policies that wait to the budget limit tend to waste tokens.
 
 - **Primary metric**: `token_savings` (higher is better)
-- **Benefit metrics**: `accuracy`, `exit_lower_fraction`, and `token_fraction`
+- **Benefit metrics**: `accuracy`, `defer_fraction`, and `token_fraction`
 - **Constraint metrics**: `false_positive_risk`, `false_negative_risk`, and `risk_excess`
 - **Evaluation**: run `bash scripts/reproduce.sh`; the evaluator reads `outputs/*/ratio_1_3.json`

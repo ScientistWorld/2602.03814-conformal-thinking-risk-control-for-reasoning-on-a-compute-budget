@@ -3,4 +3,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim_plus
-notes: "Audited downloads and paths; no external artifacts required, removed hardcoded /home/user script roots, and validated fresh-clone checks."
+notes: "Final verification passed; cleaned method-agnostic docs and scoring names, then validated reproduce/compare."

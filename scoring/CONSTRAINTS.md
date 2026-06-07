@@ -12,11 +12,11 @@ Do not replace a scored model with a larger or stronger model to improve accurac
 
 Use the same datasets and splits supplied by the gym for each experiment. The paper evaluates AIME 1983-2025, DeepScaleR with AIME removed, GPQA-Diamond, and MathVision. If the reproduction uses a smaller or substitute accessible subset, that subset becomes the fixed benchmark for future submissions.
 
-Do not add external labeled examples to calibrate thresholds, train probes, or choose operating points. Additional unlabeled reasoning trajectories from the same fixed prompts are allowed only if the benchmark explicitly permits regenerating trajectories under the same base model and decoding settings.
+Do not add external labeled examples to calibrate stopping decisions, train auxiliary predictors, or choose operating points. Additional unlabeled reasoning trajectories from the same fixed prompts are allowed only if the benchmark explicitly permits regenerating trajectories under the same base model and decoding settings.
 
 ## Validation and Test Separation
 
-Validation labels may be used only for selecting stopping configurations. Test labels must be used only by the evaluator. Reusing test labels to tune risk tolerances, thresholds, signal choices, or curve operating points invalidates the score.
+Validation labels may be used only for selecting stopping configurations. Test labels must be used only by the evaluator. Reusing test labels to tune risk tolerances, signal choices, or operating points invalidates the score.
 
 Repeated split experiments must use the provided split seeds. If a new split suite is added, it must be committed as benchmark data before scoring and used unchanged by all methods.
 
@@ -37,7 +37,7 @@ Do not score wall-clock speed as a primary result. Use machine-independent quant
 - [ ] Exact base model checkpoint is unchanged for each scored experiment
 - [ ] No larger model or external solver is used to generate answers
 - [ ] Only the benchmark's allowed validation data is used for calibration
-- [ ] Test labels are not used for selecting thresholds, signals, tolerances, or operating points
+- [ ] Test labels are not used for selecting signals, tolerances, or operating points
 - [ ] Prompt, decoding settings, chunking, answer extraction, and maximum budget match the benchmark definition
 - [ ] Reported improvements include risk metrics as well as token-efficiency metrics
 - [ ] Token savings are measured with generated token counts, not wall-clock time

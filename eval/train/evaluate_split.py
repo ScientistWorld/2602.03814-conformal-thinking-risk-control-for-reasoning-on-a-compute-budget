@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Visible train-slice evaluator for Conformal Thinking artifacts.
+"""Visible train-slice evaluator for adaptive reasoning-budget artifacts.
 
 This evaluator reads method output artifacts and recomputes the benchmark
 metrics on a visible buffered slice of the paper's original test split. It
@@ -16,16 +16,16 @@ from pathlib import Path
 
 
 SLICE = "train"
-SPLIT_SEED = "conformal-thinking-anti-shortcut-v2"
+SPLIT_SEED = "adaptive-reasoning-budget-anti-shortcut-v2"
 SLICE_MODULUS = 5
 SLICE_RESIDUES = {0, 1}
 CONTROL_POLICIES = {"full_budget", "lower_only", "upper_only"}
 EXPERIMENT_FILES = {
-    "dual_threshold_efficiency": "results.json",
+    "adaptive_budget_efficiency": "results.json",
     "risk_control": "results.json",
-    "lower_threshold_ratio_3_1": "ratio_3_1.json",
-    "lower_threshold_ratio_1_1": "ratio_1_1.json",
-    "lower_threshold_ratio_1_3": "ratio_1_3.json",
+    "difficulty_mix_3_1": "ratio_3_1.json",
+    "difficulty_mix_1_1": "ratio_1_1.json",
+    "difficulty_mix_1_3": "ratio_1_3.json",
 }
 FALLBACK_DATA = {
     "results.json": Path("data/synthetic_reasoning.jsonl"),
@@ -56,14 +56,27 @@ def mean(values: list[float]) -> float:
     return sum(values) / len(values) if values else 0.0
 
 
+def canonical_reason(reason: str) -> str:
+    aliases = {
+        "upper": "answer",
+        "answer": "answer",
+        "lower": "defer",
+        "defer": "defer",
+        "budget": "budget",
+    }
+    if reason not in aliases:
+        raise ValueError(f"Invalid exit reason {reason!r}")
+    return aliases[reason]
+
+
 def fp_loss(instance: dict, exit_idx: int, reason: str) -> float:
-    if reason != "upper":
+    if canonical_reason(reason) != "answer":
         return 0.0
     return 0.0 if instance["steps"][exit_idx]["prediction"] == instance["gold"] else 1.0
 
 
 def fn_loss(instance: dict, exit_idx: int, reason: str) -> float:
-    if reason != "lower":
+    if canonical_reason(reason) != "defer":
         return 0.0
     future = instance["steps"][exit_idx:]
     if not future:
@@ -124,13 +137,13 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
     correct = 0
     fp_values: list[float] = []
     fn_values: list[float] = []
-    reasons = {"upper": 0, "lower": 0, "budget": 0}
+    reasons = {"answer": 0, "defer": 0, "budget": 0}
     solvable_count = 0
     solvable_correct = 0
     unsolvable_tokens = 0
     unsolvable_full_tokens = 0
-    lower_exit_count = 0
-    lower_exit_unsolvable = 0
+    defer_count = 0
+    defer_unsolvable = 0
 
     seen: set[str] = set()
     for decision in decisions:
@@ -143,9 +156,7 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
 
         instance = by_id[instance_id]
         exit_idx = int(decision["exit_idx"])
-        reason = decision["reason"]
-        if reason not in reasons:
-            raise ValueError(f"Invalid exit reason {reason!r} for {instance_id}")
+        reason = canonical_reason(decision["reason"])
         if exit_idx < 0 or exit_idx >= len(instance["steps"]):
             raise ValueError(f"Invalid exit_idx {exit_idx} for {instance_id}")
 
@@ -154,7 +165,7 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
         reasons[reason] += 1
         total_tokens += step["tokens"]
         full_tokens += instance["steps"][-1]["tokens"]
-        is_correct = step["prediction"] == instance["gold"] and reason != "lower"
+        is_correct = step["prediction"] == instance["gold"] and reason != "defer"
         correct += int(is_correct)
         fp_values.append(fp_loss(instance, exit_idx, reason))
         fn_values.append(fn_loss(instance, exit_idx, reason))
@@ -164,9 +175,9 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
         else:
             unsolvable_tokens += step["tokens"]
             unsolvable_full_tokens += instance["steps"][-1]["tokens"]
-        if reason == "lower":
-            lower_exit_count += 1
-            lower_exit_unsolvable += int(not is_solvable)
+        if reason == "defer":
+            defer_count += 1
+            defer_unsolvable += int(not is_solvable)
 
     if seen != eval_ids:
         missing = sorted(eval_ids - seen)[:5]
@@ -190,8 +201,8 @@ def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str],
         "false_negative_risk": false_negative_risk,
         "max_realized_risk": max_realized_risk,
         "risk_excess": max(0.0, max_realized_risk - epsilon),
-        "exit_lower_fraction": reasons["lower"] / n if n else 0.0,
-        "lower_exit_precision": lower_exit_unsolvable / lower_exit_count if lower_exit_count else 0.0,
+        "defer_fraction": reasons["defer"] / n if n else 0.0,
+        "defer_precision": defer_unsolvable / defer_count if defer_count else 0.0,
         "exit_budget_fraction": reasons["budget"] / n if n else 0.0,
     }
 
