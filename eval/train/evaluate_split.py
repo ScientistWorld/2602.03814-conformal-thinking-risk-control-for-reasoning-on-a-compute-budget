@@ -2,8 +2,8 @@
 """Visible train-slice evaluator for Conformal Thinking artifacts.
 
 This evaluator reads method output artifacts and recomputes the benchmark
-metrics on a deterministic half of the paper's original test split. It does
-not import from method/ or rerun the algorithm.
+metrics on a visible buffered slice of the paper's original test split. It
+does not import from method/ or rerun the algorithm.
 """
 
 from __future__ import annotations
@@ -205,8 +205,22 @@ def unique_paths(paths: list[Path]) -> list[Path]:
     return out
 
 
+def expand_method_roots(provided: list[str] | None) -> list[Path]:
+    paths: list[Path] = []
+    for item in provided or []:
+        path = Path(item)
+        if path.is_dir():
+            paths.extend(sorted(path.glob("*/results.json")))
+            direct_result = path / "results.json"
+            if direct_result.exists():
+                paths.append(direct_result)
+        else:
+            paths.append(path)
+    return paths
+
+
 def discover_method_results(provided: list[str] | None, baseline_path: Path) -> list[Path]:
-    paths = [Path(item) for item in provided or []]
+    paths = expand_method_roots(provided)
     paths.extend(sorted(Path("outputs").glob("*/results.json")))
     return [
         path
@@ -255,7 +269,7 @@ def build_scores(args: argparse.Namespace) -> dict:
     scores = {
         "_metadata": {
             "slice": SLICE,
-            "split": "deterministic stratified half of original test examples",
+            "split": "deterministic stratified buffered two-fifths of original test examples",
             "split_seed": SPLIT_SEED,
         },
         "experiments": {},
