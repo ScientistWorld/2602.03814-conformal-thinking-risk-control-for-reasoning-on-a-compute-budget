@@ -10,5 +10,10 @@ set -e
 
 cd /home/user
 
-# TODO: run the paper's method
-# TODO: call scripts/evaluate.sh to score
+python method/conformal_thinking.py \
+  --data data/synthetic_reasoning.jsonl \
+  --output outputs/conformal_thinking/results.json \
+  --calibration ucb \
+  --epsilons 0.18 0.25 0.32 0.40
+
+bash scripts/evaluate.sh

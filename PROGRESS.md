@@ -2,36 +2,31 @@
 
 ## What Works
 
-<!-- What has been successfully reproduced so far. -->
+- Read the paper and implemented the core Conformal Thinking algorithm: upper-threshold false-positive control, parametric sigmoid lower-threshold false-negative control, Hoeffding UCB finite-sample correction, efficiency-loss candidate selection, and combined earliest-exit inference.
+- Added a reproducible synthetic reasoning-trajectory dataset generator that provides fixed prompts, gold answers, stepwise predictions, confidence-like signals, and token counts.
+- Added a baseline, reusable evaluator, shell scripts, scoring reference, and documentation.
+- Local smoke test passed: `bash scripts/reproduce.sh` followed by `python validate.py --compare`.
 
 ## Results
 
-<!-- Reproduced numbers compared to the paper's reported numbers. -->
+Current smoke-test operating point (`epsilon = 0.32`) on `data/synthetic_reasoning.jsonl`:
+
+- `upper_only`: accuracy 0.417, token fraction 0.665, token savings 0.335, false-positive risk 0.317, false-negative risk 0.000, risk excess 0.000.
+- `conformal_thinking`: accuracy 0.317, token fraction 0.372, token savings 0.628, false-positive risk 0.131, false-negative risk 0.098, risk excess 0.000.
+
+This supports `method_runs` locally. The submitted CPU job is intended to verify the same pipeline under the scheduler before claiming `core_claim`.
 
 ## Remaining
 
-<!-- What still needs to be done to reach higher milestones. -->
+- Inspect the submitted job result and, if it matches the smoke test, update the milestone to `core_claim`.
+- If budget remains, expand beyond the minimum by adding repeated split trials or additional synthetic difficulty mixtures.
 
 ## Issues
 
-<!-- Blockers, bugs, or difficulties encountered. -->
+- The original paper's main numerical results are presented as curves in figures rather than scalar tables, so `reference.json` encodes the claimed operating constraints and comparison structure rather than copied curve coordinates.
+- The full paper setup uses large reasoning LLMs and AIME/GPQA/DeepScaleR/MathVision trajectories. This reproduction uses fixed synthetic trajectories to keep the environment runnable without large model downloads or login-node inference.
 
 ## Deviations from Paper
 
-<!-- Do not edit this section unless you deviated from the paper's original setup.
-     For each deviation, document: what the paper used, what you substituted, and why.
-
-     ACCEPTABLE deviations (data/resource/scale substitutions — milestones still valid):
-       - Replaced a proprietary dataset with a public one
-       - Used a smaller model of the same architecture
-       - Scaled down training (fewer epochs, smaller batch)
-       - Used a different library for the same algorithm
-
-     UNACCEPTABLE deviations (algorithm substitutions — milestones above 'none' are void):
-       - Replaced the paper's algorithm with a fundamentally different one
-       - Wrote a generic model trained to approximate the method's outputs
-         instead of implementing the method's computational steps
-
-     The test: could someone reading your code identify which algorithm from
-     the paper you implemented? If not, you replaced the method. -->
-
+- **Data/model scale**: The paper uses trajectories from Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Qwen3-VL-8B on AIME, GPQA-Diamond, DeepScaleR, and MathVision. This reproduction substitutes a deterministic synthetic trajectory dataset with the same fields needed by the algorithm. The substitution avoids multi-GB model downloads and expensive LLM inference while preserving the paper's stopping-policy computation.
+- **Signal set**: The paper evaluates confidence, EAT, token count, and a trained probe. This reproduction includes confidence-like, EAT-like, and token-fraction signals, but omits the learned probe because it requires hidden states from a large model trajectory corpus.

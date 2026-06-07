@@ -1,0 +1,44 @@
+{
+  "experiments": {
+    "dual_threshold_efficiency": {
+      "results": {
+        "upper_only": {
+          "accuracy": 0.4166666666666667,
+          "token_fraction": 0.6646844802629005,
+          "token_savings": 0.3353155197370995,
+          "false_positive_risk": 0.31666666666666665,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.0
+        },
+        "conformal_thinking": {
+          "accuracy": 0.31666666666666665,
+          "token_fraction": 0.3720232273497013,
+          "token_savings": 0.6279767726502987,
+          "false_positive_risk": 0.13055555555555556,
+          "false_negative_risk": 0.09824261726835257,
+          "risk_excess": 0.0
+        }
+      }
+    },
+    "risk_control": {
+      "results": {
+        "naive_or_uncalibrated": {
+          "accuracy": 0.43333333333333335,
+          "token_fraction": 0.6432623360364842,
+          "token_savings": 0.3567376639635158,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.09670992927733124,
+          "risk_excess": 0.0
+        },
+        "conformal_thinking": {
+          "accuracy": 0.31666666666666665,
+          "token_fraction": 0.3720232273497013,
+          "token_savings": 0.6279767726502987,
+          "false_positive_risk": 0.13055555555555556,
+          "false_negative_risk": 0.09824261726835257,
+          "risk_excess": 0.0
+        }
+      }
+    }
+  }
+}

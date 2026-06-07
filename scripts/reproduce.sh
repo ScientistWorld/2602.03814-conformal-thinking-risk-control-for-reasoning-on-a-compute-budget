@@ -18,7 +18,7 @@ set -e
 
 cd /home/user
 
-# TODO: implement full reproduction pipeline
-# e.g.:
-#   bash scripts/baseline.sh
-#   bash scripts/method.sh
+python data/generate_synthetic_reasoning.py --output data/synthetic_reasoning.jsonl
+bash scripts/baseline.sh
+bash scripts/method.sh
+python validate.py --compare

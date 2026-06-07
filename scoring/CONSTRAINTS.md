@@ -1,78 +1,43 @@
 # Scientist Constraints
 
-<!-- Do not edit this unless you decide to stop -->
-
-<!--
-A scientist agent will attempt to improve on your reproduced results.
-These constraints define what the scientist must hold fixed, so that
-any improvement reflects genuine methodological innovation — not just
-throwing more resources at the problem.
-
-CONTEXT: Your reproduction becomes a benchmark environment. The scientist
-gets your code, data, evaluation pipeline, and these constraints. They
-must beat your scores while respecting every constraint listed here.
-Without good constraints, a scientist can trivially "improve" by swapping
-in a larger model, using a richer dataset that is simply publicly avaliable, or more 
-— none of which demonstrate real scientific insight.
-
-Your job is to act as a judge: distinguish between flexible innovation
-and non-genuine improvement. Constraints should block trivial gains
-(e.g. just swapping in a bigger model) while leaving room for creative
-methodology (e.g. a clever augmentation strategy, a better loss
-function, a novel use of existing tools). When in doubt, ask: "does
-this require insight, or just more resources?" Lock down the resources,
-leave the insight open. Do not block innovation.
-
-For example, if a scientist downloads online IMDB reviews to supplement a
-sentiment dataset, that's resource scaling. But if they use an LLM to
-augment the existing training data, that's methodology — they designed
-that pipeline. This is just an example, but keep this kind of distinction 
-in mind when writing constraints.
-
-Be SPECIFIC to this paper. Generic constraints are useless. Name the
-exact model, the exact dataset, the exact splits. Explain the reasoning
-so the scientist understands the intent behind each constraint, not
-just the rule — this helps them judge edge cases on their own.
-
-Think about at least:
-- Model: architecture, size, pretrained weights
-- Data: which datasets, which splits, whether external data is allowed
-
-You may add other constraint categories if relevant to this paper
-(e.g. training procedure, evaluation protocol, problem formulation).
-
-Example for a sentiment analysis paper:
+These constraints define what future scientist agents must hold fixed when trying to improve the benchmark. The goal is to improve adaptive reasoning-budget control, not to win by changing the task, scaling the model, or using extra labels.
 
 ## Model
-The scientist must use BERT-base-uncased (110M parameters, HuggingFace
-`bert-base-uncased`). The paper's contribution is a novel fine-tuning
-strategy, not architecture design. Switching to a larger model (e.g.
-DeBERTa-v3-large, 304M params) would improve accuracy but would not
-demonstrate any methodological insight. The scientist may modify the
-fine-tuning procedure, add adapter layers, change the classification
-head, or alter the training loop — but the base encoder must remain
-BERT-base-uncased with its standard pretrained weights.
+
+Use the same base reasoning model for a given experiment as the benchmark run. The paper's main settings use Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Qwen3-VL-8B; a reproduced gym may implement a subset, but each scored experiment must name the exact model and checkpoint.
+
+Do not replace a scored model with a larger or stronger model to improve accuracy or calibration. Model swaps change the underlying reasoning trajectories and make token-efficiency comparisons invalid. A scientist may add lightweight stopping, calibration, or signal-processing components around the fixed model, but the base model weights used to generate answers must remain fixed.
 
 ## Data
-The scientist must use only the provided SST-2 binary sentiment
-dataset (67,349 training examples, 872 validation, 1,821 test).
-No external sentiment corpora or additional human-labeled data.
-The test split must not be used for training or validation.
 
-Delete this comment block and fill in your actual constraints below.
+Use the same datasets and splits supplied by the gym for each experiment. The paper evaluates AIME 1983-2025, DeepScaleR with AIME removed, GPQA-Diamond, and MathVision. If the reproduction uses a smaller or substitute accessible subset, that subset becomes the fixed benchmark for future submissions.
 
-At the very end, write a compliance checklist for the scientist agent.
-Each item should be a concrete, verifiable condition the scientist can
-check off before submitting. These should mirror your constraints above
-but phrased as yes/no checks.
+Do not add external labeled examples to calibrate thresholds, train probes, or choose operating points. Additional unlabeled reasoning trajectories from the same fixed prompts are allowed only if the benchmark explicitly permits regenerating trajectories under the same base model and decoding settings.
 
-Example checklist (for the sentiment analysis example above):
+## Validation and Test Separation
+
+Validation labels may be used only for selecting stopping configurations. Test labels must be used only by the evaluator. Reusing test labels to tune risk tolerances, thresholds, signal choices, or curve operating points invalidates the score.
+
+Repeated split experiments must use the provided split seeds. If a new split suite is added, it must be committed as benchmark data before scoring and used unchanged by all methods.
+
+## Generation Protocol
+
+Use the same prompt format, maximum reasoning budget, chunking rule, answer-extraction rule, and decoding configuration for all compared policies within an experiment. The paper chunks trajectories by blank-line-delimited reasoning segments and elicits boxed final answers; a reproduced benchmark should keep its chosen equivalent fixed.
+
+Do not reduce token use by changing the model prompt to suppress reasoning, using a different decoding strategy, shortening the maximum budget, or changing answer formatting unless every baseline and candidate policy is regenerated under the same changed benchmark definition.
+
+## Metrics
+
+Report both compute benefit and risk constraints. A submission that improves token savings while exceeding the target false positive or false negative risk should score worse, not better.
+
+Do not score wall-clock speed as a primary result. Use machine-independent quantities such as generated token count, stopping chunk index, risk, accuracy, and normalized efficiency loss.
 
 ## Compliance Checklist
-- [ ] Model is BERT-base-uncased (110M params), not a larger variant
-- [ ] No external sentiment datasets used beyond SST-2
-- [ ] Test split not used for training or validation
 
-ONLY WRITE ABOUT WHAT TO RESTRICT. NEVER WRITE ABOUT WHAT REMAINS OPEN.
-
--->
+- [ ] Exact base model checkpoint is unchanged for each scored experiment
+- [ ] No larger model or external solver is used to generate answers
+- [ ] Only the benchmark's allowed validation data is used for calibration
+- [ ] Test labels are not used for selecting thresholds, signals, tolerances, or operating points
+- [ ] Prompt, decoding settings, chunking, answer extraction, and maximum budget match the benchmark definition
+- [ ] Reported improvements include risk metrics as well as token-efficiency metrics
+- [ ] Token savings are measured with generated token counts, not wall-clock time

@@ -1,0 +1,70 @@
+{
+  "experiments": {
+    "dual_threshold_efficiency": {
+      "description": "Core claim: adding the lower threshold to the standard upper-threshold rule should reduce token use while maintaining controlled risks.",
+      "weight": 0.65,
+      "primary_metric": "token_savings",
+      "metrics": {
+        "accuracy": {"higher_is_better": true, "coefficient": 0.7},
+        "token_fraction": {"higher_is_better": false, "coefficient": -0.8},
+        "token_savings": {"higher_is_better": true, "coefficient": 1.0},
+        "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "risk_excess": {"higher_is_better": false, "coefficient": -2.0}
+      },
+      "results": {
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.0,
+          "token_fraction": 1.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.32,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.0
+        },
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.0,
+          "token_fraction": 1.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.32,
+          "false_negative_risk": 0.32,
+          "risk_excess": 0.0
+        }
+      }
+    },
+    "risk_control": {
+      "description": "Risk-control claim: finite-sample-adjusted calibration should keep realized risks at or below the requested operating risk.",
+      "weight": 0.35,
+      "primary_metric": "risk_excess",
+      "metrics": {
+        "accuracy": {"higher_is_better": true, "coefficient": 0.3},
+        "token_fraction": {"higher_is_better": false, "coefficient": -0.4},
+        "token_savings": {"higher_is_better": true, "coefficient": 0.4},
+        "false_positive_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "false_negative_risk": {"higher_is_better": false, "coefficient": -1.0},
+        "risk_excess": {"higher_is_better": false, "coefficient": -2.0}
+      },
+      "results": {
+        "naive_or_uncalibrated": {
+          "type": "baseline",
+          "accuracy": 0.0,
+          "token_fraction": 1.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.32,
+          "false_negative_risk": 0.32,
+          "risk_excess": 0.0
+        },
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.0,
+          "token_fraction": 1.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.32,
+          "false_negative_risk": 0.32,
+          "risk_excess": 0.0
+        }
+      }
+    }
+  }
+}

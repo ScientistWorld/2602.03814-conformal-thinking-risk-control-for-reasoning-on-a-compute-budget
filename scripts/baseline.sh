@@ -17,4 +17,8 @@ set -e
 
 cd /home/user
 
-# TODO: run baseline
+python baseline/upper_only.py \
+  --data data/synthetic_reasoning.jsonl \
+  --output outputs/baseline/results.json \
+  --calibration naive \
+  --epsilons 0.18 0.25 0.32 0.40
