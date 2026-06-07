@@ -3,4 +3,4 @@ action: done
 gpus: 0
 test: false
 milestone: core_claim_plus
-notes: "Core scaled reproduction verified. Extended eval to recompute the full score metric set from saved decisions, reran reproduce/validate locally, and committed the cleanup."
+notes: "Final verification passed: scoring metadata, method-agnostic docs, train/test wiring, and validation are ready for gym use."

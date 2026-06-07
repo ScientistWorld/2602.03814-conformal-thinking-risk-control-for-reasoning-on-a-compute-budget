@@ -28,5 +28,9 @@
 - Extended the main reusable evaluator so `scores.json` includes the full metric set declared by `reference.json`, including solvable accuracy, unsolvable token savings, maximum realized risk, and defer precision.
 - Reran `bash scripts/reproduce.sh`; the scaled benchmark still passes `python validate.py --compare`.
 
+### [2026-06-07 12:20] - core_claim_plus
+- Completed final gym verification of scoring metadata, method-agnostic documentation, train/test split wiring, download portability, and repository hygiene.
+- Added explicit scaled-reference notes in `reference.json`, aligned `scoring/TARGETS.md` with the scored metric set, and removed stale transcript artifacts from the tracked workspace.
+
 ## Stop Justification
 - Completed at milestone `core_claim_plus`.

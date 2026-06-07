@@ -2,22 +2,25 @@
 
 ## Initial Assessment
 
-The workspace started at `core_claim_plus`. That milestone was justified: the method implementation contains the paper's actual risk-controlled adaptive stopping computation, the reproduced results come from saved method and baseline artifacts, and the existing scripts already completed the scaled synthetic benchmark.
+The workspace started at `core_claim_plus`. That milestone is justified for the scaled benchmark: the method implementation contains the paper's actual risk-controlled adaptive stopping computation, the reproduced results come from saved method and baseline artifacts, and the reusable evaluator recomputes scores from per-example outputs.
 
 ## Issues Found
 
-- Minor: public-facing scoring names and documentation used method-specific terms, which could leak implementation details to from-scratch scientist agents.
-- Minor: a generated core dump and Python cache were present during verification and did not belong in the reusable workspace.
+- Minor: root `README.md` and `manifest.json` are system-owned device placeholders in this live workspace, while the repository tracks them as empty placeholder files. They are not gym artifacts and cannot be removed from this session.
+- Minor: stale empty `trajectory/turn_*_raw.jsonl` transcript artifacts were still tracked even though `trajectory/` is ignored.
+- Minor: `reference.json` used scaled synthetic reference values but did not explicitly say that those are benchmark-local scalar operating points rather than paper table entries.
+- Minor: `scoring/TARGETS.md` did not list the full scored metric set and classified `token_fraction` inconsistently with its lower-is-better coefficient.
 - Limitation: the reproduction is on deterministic synthetic reasoning trajectories rather than the paper's full large-model benchmark suite.
-- Limitation: the paper markdown gives most result values as plotted curves rather than scalar tables, so the local `reference.json` is a scaled benchmark reference rather than a direct transcription of exact paper coordinates.
+- Limitation: the paper markdown gives most result values as plotted curves rather than scalar tables, so the local `reference.json` is a scaled benchmark reference, with notes, rather than a direct transcription of exact paper coordinates.
 
 ## Fixes Applied
 
-- Renamed public experiment and metric keys to generic adaptive-budget and answer/defer terminology, while keeping the evaluator compatible with the saved artifacts.
-- Rewrote or tightened `briefing/evaluation.md`, `scoring/EXPERIMENTS.md`, `scoring/TARGETS.md`, `scoring/CONSTRAINTS.md`, and `scoring/DIRECTION.md` so the problem-facing documentation is method-agnostic.
-- Removed the generated core dump and Python cache.
-- Reran `bash scripts/reproduce.sh` and `python validate.py --compare`; validation passes.
-- Extended `eval/evaluate_reasoning.py` so `scores.json` now includes all metric families declared in `reference.json`, recomputed from saved per-example stopping decisions.
+- Added explicit notes to each `reference.json` experiment explaining the scaled synthetic reference values.
+- Updated `scoring/TARGETS.md` so benefit, constraint, and diagnostic metrics match the scored metric definitions.
+- Removed the root Python cache and staged removal of stale empty trajectory transcript files.
+- Marked the live session's system-owned `README.md` and `manifest.json` device placeholders as skip-worktree locally; the repository continues to track empty placeholder files.
+- Rechecked folder structure, method/evaluation separation, shared-path references, train/test wiring, and scoring coefficients.
+- Reran `python validate.py --compare`; validation passes.
 
 ## Final Judgment
 

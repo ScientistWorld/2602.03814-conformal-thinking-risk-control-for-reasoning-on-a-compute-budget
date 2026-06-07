@@ -2,6 +2,7 @@
   "experiments": {
     "adaptive_budget_efficiency": {
       "description": "Core scaled target: an adaptive stopping policy should save more reasoning tokens than a reference adaptive baseline while satisfying answer-error and premature-defer risk constraints.",
+      "notes": "Scaled synthetic benchmark reference. The paper reports the corresponding outcomes primarily as plotted curves over risk levels and task mixes rather than exact scalar table entries, so these values document this gym's reproduced operating point.",
       "weight": 0.3,
       "primary_metric": "token_savings",
       "metrics": {
@@ -93,6 +94,7 @@
     },
     "risk_control": {
       "description": "Risk-control target: validation-selected operating points should keep realized risks at or below the requested operating risk more reliably than naive validation tuning.",
+      "notes": "Scaled synthetic benchmark reference. The paper reports risk-control behavior as empirical curves; this gym records the reproduced scalar operating point used for scoring.",
       "weight": 0.2,
       "primary_metric": "false_positive_risk",
       "metrics": {
@@ -184,6 +186,7 @@
     },
     "difficulty_mix_3_1": {
       "description": "Scaled difficulty-mix setting with a 3:1 solvable:unsolvable mix. Useful policies should add modest token savings while maintaining risk constraints.",
+      "notes": "Scaled synthetic benchmark reference for the paper's solvable:unsolvable mix axis. The paper presents this axis as a curve, so this entry records the reproduced scalar mix used by the gym.",
       "weight": 0.15,
       "primary_metric": "token_savings",
       "metrics": {
@@ -275,6 +278,7 @@
     },
     "difficulty_mix_1_1": {
       "description": "Scaled difficulty-mix setting with a 1:1 solvable:unsolvable mix. Useful policies should save more tokens as unsolved trajectories become more common.",
+      "notes": "Scaled synthetic benchmark reference for the paper's solvable:unsolvable mix axis. The paper presents this axis as a curve, so this entry records the reproduced scalar mix used by the gym.",
       "weight": 0.15,
       "primary_metric": "token_savings",
       "metrics": {
@@ -366,6 +370,7 @@
     },
     "difficulty_mix_1_3": {
       "description": "Scaled difficulty-mix setting with a 1:3 solvable:unsolvable mix. Useful policies should avoid spending nearly the full budget on many examples that do not improve.",
+      "notes": "Scaled synthetic benchmark reference for the paper's solvable:unsolvable mix axis. The paper presents this axis as a curve, so this entry records the reproduced scalar mix used by the gym.",
       "weight": 0.2,
       "primary_metric": "token_savings",
       "metrics": {
