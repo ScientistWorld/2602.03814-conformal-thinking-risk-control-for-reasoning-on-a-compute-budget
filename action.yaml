@@ -5,4 +5,4 @@ action: submit
 gpus: 0
 test: false
 milestone: core_claim_plus
-notes: "Hardening audit: score reference, baselines, honest variants and shortcut probes through the new hidden test (and train side), then rerun the reference end to end (scripts/run.sh). CPU only, stdlib Python."
+notes: "Final reference reproduction from the final code (scripts/run.sh with AUDIT=none: register reference + baselines, evaluate train and hidden test, validate). Audit evidence already in redteam/hardening/."
