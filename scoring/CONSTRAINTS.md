@@ -1,43 +1,38 @@
 # Scientist Constraints
 
-These constraints define what future scientist agents must hold fixed when trying to improve the benchmark. The goal is to improve adaptive reasoning-budget control, not to win by changing the task, scaling the model, or using extra labels.
+These constraints define what future scientist agents must hold fixed when trying to improve the benchmark. The goal is to improve risk-controlled adaptive stopping, not to win by changing the task or by using information the deployed policy would not have.
 
-## Model
+## Interface
 
-Use the same base reasoning model for a given experiment as the benchmark run. The paper's main settings use Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Qwen3-VL-8B; a reproduced gym may implement a subset, but each scored experiment must name the exact model and checkpoint.
+A method is a stopping-policy program registered in `outputs/<method>/policy.json` and scored through the online protocol in `briefing/evaluation.md`. The evaluators own the trajectories, the gold answers, the calibration draws, the target risks `epsilon`, the confidence `delta`, the calibration and test sizes, the exit semantics and token accounting, and the failure gate. Do not modify `eval/`, the generator in `data/`, or the experiment definitions to change a score.
 
-Do not replace a scored model with a larger or stronger model to improve accuracy or calibration. Model swaps change the underlying reasoning trajectories and make token-efficiency comparisons invalid. A scientist may add lightweight stopping, calibration, or signal-processing components around the fixed model, but the base model weights used to generate answers must remain fixed.
+## Calibration data
 
-## Data
+Within one calibration call, a policy may use only the calibration instances the evaluator sends in that call (plus any fixed design choices made in advance). In particular, do not:
 
-Use the same datasets and splits supplied by the gym for each experiment. The paper evaluates AIME 1983-2025, DeepScaleR with AIME removed, GPQA-Diamond, and MathVision. If the reproduction uses a smaller or substitute accessible subset, that subset becomes the fixed benchmark for future submissions.
+- read, import or execute anything under `eval/test/`, or search the filesystem for held-out data;
+- calibrate on extra labelled data, including trajectories generated from the public simulator in `data/`, instead of or in addition to the supplied calibration set;
+- persist calibration sets or test observations to disk (or any channel) and reuse them in another calibration call, experiment or evaluation run;
+- fit the public simulator's parameters to the calibration set and calibrate on synthetic samples from it.
 
-Do not add external labeled examples to calibrate stopping decisions, train auxiliary predictors, or choose operating points. Additional unlabeled reasoning trajectories from the same fixed prompts are allowed only if the benchmark explicitly permits regenerating trajectories under the same base model and decoding settings.
+Fixed design choices (signal transformations, candidate grids, model families) may be developed on the public development profiles; the operating point itself must come from the supplied calibration set and `epsilon`/`delta`.
 
-## Validation and Test Separation
+## Held-out instances
 
-Validation labels may be used only for selecting stopping configurations. Test labels must be used only by the evaluator. Reusing test labels to tune risk tolerances, signal choices, or operating points invalidates the score.
+A policy decides from the chunks revealed so far. It must not try to obtain later chunks, labels or solvability information by any route other than the protocol, and must answer every step message with exactly one action.
 
-Repeated split experiments must use the provided split seeds. If a new split suite is added, it must be committed as benchmark data before scoring and used unchanged by all methods.
+## Risk targets
 
-## Generation Protocol
-
-Use the same prompt format, maximum reasoning budget, chunking rule, answer-extraction rule, and decoding configuration for all compared policies within an experiment. The paper chunks trajectories by blank-line-delimited reasoning segments and elicits boxed final answers; a reproduced benchmark should keep its chosen equivalent fixed.
-
-Do not reduce token use by changing the model prompt to suppress reasoning, using a different decoding strategy, shortening the maximum budget, or changing answer formatting unless every baseline and candidate policy is regenerated under the same changed benchmark definition.
+Use the `epsilon` and `delta` sent by the evaluator. Calibrating to a looser tolerance trades a constraint failure for savings and is scored as a failure; calibrating to a stricter one leaves allowed risk unused and costs tokens.
 
 ## Metrics
 
-Report both compute benefit and risk constraints. A submission that improves token savings while exceeding the target false positive or false negative risk should score worse, not better.
-
-Do not score wall-clock speed as a primary result. Use machine-independent quantities such as generated token count, stopping chunk index, risk, accuracy, and normalized efficiency loss.
+Do not score wall-clock time. Token use is charged by the evaluator up to the chunk where the policy stopped; budget exits, early answers and defers are derived by the evaluator from where the policy stopped.
 
 ## Compliance Checklist
 
-- [ ] Exact base model checkpoint is unchanged for each scored experiment
-- [ ] No larger model or external solver is used to generate answers
-- [ ] Only the benchmark's allowed validation data is used for calibration
-- [ ] Test labels are not used for selecting signals, tolerances, or operating points
-- [ ] Prompt, decoding settings, chunking, answer extraction, and maximum budget match the benchmark definition
-- [ ] Reported improvements include risk metrics as well as token-efficiency metrics
-- [ ] Token savings are measured with generated token counts, not wall-clock time
+- [ ] The method is a policy program registered in `outputs/<method>/policy.json`; `eval/` and `data/` are unchanged
+- [ ] Each operating point is set only from the calibration instances of that call, `epsilon` and `delta`
+- [ ] No access to `eval/test/`, no extra simulated or external labelled data, no state shared across calibration calls through disk
+- [ ] Decisions use only chunks revealed so far
+- [ ] Improvements are reported with the realized risks and violation rates, not only token savings

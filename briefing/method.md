@@ -19,6 +19,8 @@ It also defines matching efficiency losses that measure wasted reasoning after a
 
 Calibration enumerates candidate signals and threshold parameters on a labeled validation set. For each candidate, it computes empirical risk and then applies a finite-sample upper confidence correction. Candidates whose adjusted risk is at most the user-specified tolerance are feasible, and the method selects the feasible candidate with the lowest efficiency loss.
 
+In this benchmark the calibrated policy is deployed online: the evaluator sends a labelled calibration set with the target risk and confidence level, the policy runs the calibration above (upper threshold over the confidence, EAT-style and token-fraction signals; lower threshold over confidence with a grid of sigmoid shapes; Hoeffding correction with the supplied delta), and then decides continue/answer/defer chunk by chunk. If no candidate is feasible the corresponding exit is disabled, so the policy falls back to the full budget.
+
 The upper threshold exits at the first chunk where the transformed confidence signal exceeds a calibrated value. The lower threshold exits at the first chunk where the signal falls below a calibrated time-dependent sigmoid curve, parameterized by a shape value and scaled by token usage. When both thresholds are used, the method calibrates the upper threshold first, then calibrates the lower threshold under that upper bound, and exits at the earliest of the upper exit, lower exit, or maximum budget.
 
 ## Main Claims

@@ -1,28 +1,20 @@
 #!/bin/bash
-# Run a baseline method from the paper.
+# Register the baseline stopping policies so every evaluator scores them:
+#   upper_only         - single risk-controlled upper ("stop when confident") threshold
+#   naive_calibration  - thresholds tuned on raw validation risk, no finite-sample correction
+# The always-full-budget control (full_budget) is built into the evaluators.
 #
-# Baselines are simple reference methods the paper compares against. 
-# Implement this only if applicable, i.e. the paper has baselines.
-# You do not need to implement all baselines to begin — 
-# just enough to validate that the evaluation pipeline works 
-# and provide a reference point. You can decide to expand more baselines later.
-# Each baseline must be actually run and scored through evaluate.sh
-# so the numbers are verified, not self-reported.
-# You can decide what this baseline script should do yourself.
-#
-# Usage:
-#   bash scripts/baseline.sh [data_jsonl] [output_json]
+# Usage: bash scripts/baseline.sh
 
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-DATA_PATH="${1:-data/synthetic_reasoning.jsonl}"
-OUTPUT_PATH="${2:-outputs/baseline/results.json}"
-
-python baseline/upper_only.py \
-  --data "$DATA_PATH" \
-  --output "$OUTPUT_PATH" \
-  --calibration naive \
-  --epsilons 0.18 0.25 0.32 0.40
+mkdir -p outputs/upper_only outputs/naive_calibration
+cat > outputs/upper_only/policy.json <<'JSON'
+{"command": ["python", "baseline/upper_only.py"]}
+JSON
+cat > outputs/naive_calibration/policy.json <<'JSON'
+{"command": ["python", "baseline/naive_calibration.py"]}
+JSON

@@ -1,379 +1,422 @@
 #!/usr/bin/env python3
-"""Held-out test-slice evaluator for adaptive reasoning-budget artifacts.
+"""Hidden-test evaluator for risk-controlled adaptive reasoning budgets.
 
-This evaluator reads method output artifacts and recomputes the benchmark
-metrics on the held-out buffered slice of the paper's original test split. It
-does not import from method/ or rerun the algorithm. When scoring/scores_train.json
-is present, this script enforces the same method keys for each experiment.
+Every method on disk is a stopping-policy program registered by a manifest
+``outputs/<method>/policy.json`` (``{"command": [...]}``). For each experiment
+this evaluator, and only this evaluator, owns:
+
+* the held-out trajectories, gold answers, token counts and solvability labels
+  (generated here from private profiles and seeds, see ``hidden_tasks.py``);
+* the labelled calibration draws, the target risk levels ``epsilon``, the
+  confidence ``delta``, the calibration size and the test size;
+* the stopping semantics: chunks are revealed one at a time, the exit type is
+  derived from where the policy actually stopped, and tokens are charged up to
+  that chunk;
+* every scored number, recomputed from per-instance outcomes;
+* the feasibility gate: a policy whose realized test risk exceeds the target
+  at more than ``MAX_VIOLATION_RATE`` of operating points in any experiment,
+  or that breaks the protocol, is scored as failed (failure values in every
+  experiment).
+
+The method never sees held-out labels; it never reports a number that is
+scored. Run with no arguments to score every method in ``outputs/``.
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-from collections import defaultdict
+import os
+import random
+import subprocess
+import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import hidden_tasks  # noqa: E402
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 SLICE = "test"
-SPLIT_SEED = "adaptive-reasoning-budget-anti-shortcut-v2"
-SLICE_MODULUS = 5
-SLICE_RESIDUES = {3, 4}
-CONTROL_POLICIES = {"full_budget", "lower_only", "upper_only"}
-EXPERIMENT_FILES = {
-    "adaptive_budget_efficiency": "results.json",
-    "risk_control": "results.json",
-    "difficulty_mix_3_1": "ratio_3_1.json",
-    "difficulty_mix_1_1": "ratio_1_1.json",
-    "difficulty_mix_1_3": "ratio_1_3.json",
+DELTA = 0.1
+MAX_VIOLATION_RATE = 0.15
+POOL_SIZE = 1000
+TEST_SIZE = 1000
+RUN_TIMEOUT_SECONDS = 3 * 3600
+ACTIONS = {"continue", "answer", "defer"}
+
+# Fixed by the evaluator: calibration-set size, number of calibration draws per
+# profile, and the target risk levels. The 1:3 mix uses tighter tolerances
+# because there deferring everything immediately already has a false-negative
+# risk of only about 0.18. ``group`` selects a disjoint set of profiles and
+# pools, so calibration data seen in one experiment never helps another.
+EXPERIMENTS = {
+    "adaptive_budget_efficiency": {"group": 0, "setting": "natural", "calibration_size": 400, "draws": 4, "epsilons": [0.10, 0.15, 0.20]},
+    "risk_control": {"group": 1, "setting": "natural", "calibration_size": 50, "draws": 10, "epsilons": [0.05, 0.10, 0.20, 0.25]},
+    "difficulty_mix_3_1": {"group": 0, "setting": "ratio_3_1", "calibration_size": 400, "draws": 4, "epsilons": [0.10, 0.15, 0.20]},
+    "difficulty_mix_1_1": {"group": 0, "setting": "ratio_1_1", "calibration_size": 400, "draws": 4, "epsilons": [0.10, 0.15, 0.20]},
+    "difficulty_mix_1_3": {"group": 0, "setting": "ratio_1_3", "calibration_size": 400, "draws": 4, "epsilons": [0.05, 0.10, 0.125]},
 }
-FALLBACK_DATA = {
-    "results.json": Path("data/synthetic_reasoning.jsonl"),
-    "ratio_3_1.json": Path("data/synthetic_ratio_3_1.jsonl"),
-    "ratio_1_1.json": Path("data/synthetic_ratio_1_1.jsonl"),
-    "ratio_1_3.json": Path("data/synthetic_ratio_1_3.jsonl"),
+
+METRICS = [
+    "accuracy",
+    "token_savings",
+    "solvable_accuracy",
+    "unsolvable_token_savings",
+    "false_positive_risk",
+    "false_negative_risk",
+    "violation_rate",
+    "constraint_satisfied",
+    "defer_fraction",
+    "defer_precision",
+    "budget_exit_fraction",
+]
+FAILED_VALUES = {
+    "accuracy": 0.0,
+    "token_savings": 0.0,
+    "solvable_accuracy": 0.0,
+    "unsolvable_token_savings": 0.0,
+    "false_positive_risk": 1.0,
+    "false_negative_risk": 1.0,
+    "violation_rate": 1.0,
+    "constraint_satisfied": 0.0,
+    "defer_fraction": 0.0,
+    "defer_precision": 0.0,
+    "budget_exit_fraction": 1.0,
 }
+FULL_BUDGET_KEY = "full_budget"
 
 
-def load(path: Path) -> dict:
-    with path.open("r", encoding="utf-8") as handle:
-        return json.load(handle)
+class PolicyError(RuntimeError):
+    pass
 
 
-def load_jsonl(path: Path) -> list[dict]:
-    with path.open("r", encoding="utf-8") as handle:
-        return [json.loads(line) for line in handle if line.strip()]
+# ── policy process ───────────────────────────────────────────────────────────
 
 
-def select_operating_point(result: dict, epsilon: float) -> dict:
-    points = result.get("epsilons", [])
-    if not points:
-        raise ValueError(f"No epsilon results found in {result}")
-    return min(points, key=lambda item: abs(item["epsilon"] - epsilon))
-
-
-def mean(values: list[float]) -> float:
-    return sum(values) / len(values) if values else 0.0
-
-
-def canonical_reason(reason: str) -> str:
-    aliases = {
-        "upper": "answer",
-        "answer": "answer",
-        "lower": "defer",
-        "defer": "defer",
-        "budget": "budget",
-    }
-    if reason not in aliases:
-        raise ValueError(f"Invalid exit reason {reason!r}")
-    return aliases[reason]
-
-
-def fp_loss(instance: dict, exit_idx: int, reason: str) -> float:
-    if canonical_reason(reason) != "answer":
-        return 0.0
-    return 0.0 if instance["steps"][exit_idx]["prediction"] == instance["gold"] else 1.0
-
-
-def fn_loss(instance: dict, exit_idx: int, reason: str) -> float:
-    if canonical_reason(reason) != "defer":
-        return 0.0
-    future = instance["steps"][exit_idx:]
-    if not future:
-        return 0.0
-    return sum(1.0 for step in future if step["prediction"] == instance["gold"]) / len(future)
-
-
-def data_path_for(result: dict, fallback: Path) -> Path:
-    configured = result.get("config", {}).get("data")
-    return Path(configured) if configured else fallback
-
-
-def difficulty_bucket(instance: dict) -> str:
-    steps = len(instance["steps"])
-    if steps <= 12:
-        return "short"
-    if steps <= 15:
-        return "medium"
-    return "long"
-
-
-def stable_key(instance_id: str) -> str:
-    return hashlib.sha256(f"{SPLIT_SEED}:{instance_id}".encode("utf-8")).hexdigest()
-
-
-def slice_ids(data: list[dict]) -> set[str]:
-    groups: dict[tuple[bool, str], list[str]] = defaultdict(list)
-    for instance in data:
-        if instance.get("split") != "test":
-            continue
-        key = (bool(instance.get("solvable_under_budget")), difficulty_bucket(instance))
-        groups[key].append(instance["id"])
-
-    selected: set[str] = set()
-    for ids in groups.values():
-        ordered = sorted(ids, key=stable_key)
-        for index, instance_id in enumerate(ordered):
-            if index % SLICE_MODULUS in SLICE_RESIDUES:
-                selected.add(instance_id)
-    return selected
-
-
-def recompute_policy_metrics(policy: dict, data: list[dict], eval_ids: set[str], epsilon: float) -> dict[str, float]:
-    decisions = policy.get("decisions")
-    if decisions is None:
-        raise ValueError(
-            f"Policy {policy.get('name', '<unnamed>')} has no per-example decisions; "
-            "evaluation must recompute metrics from raw stopping decisions."
+class PolicyProcess:
+    def __init__(self, command: list[str], log_path: Path) -> None:
+        resolved = [sys.executable if part in {"python", "python3"} and i == 0 else part for i, part in enumerate(command)]
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        self._log = log_path.open("w", encoding="utf-8")
+        self.proc = subprocess.Popen(
+            resolved,
+            cwd=str(REPO_ROOT),
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=self._log,
+            text=True,
+            bufsize=1,
         )
+        self._timer = threading.Timer(RUN_TIMEOUT_SECONDS, self.proc.kill)
+        self._timer.daemon = True
+        self._timer.start()
 
-    by_id = {instance["id"]: instance for instance in data if instance.get("id") in eval_ids}
-    if set(by_id) != eval_ids:
-        missing = sorted(eval_ids - set(by_id))[:5]
-        raise ValueError(f"Evaluation slice references missing examples: {missing}")
+    def request(self, message: dict) -> dict:
+        try:
+            self.proc.stdin.write(json.dumps(message, separators=(",", ":")) + "\n")
+            self.proc.stdin.flush()
+        except (BrokenPipeError, OSError) as exc:
+            raise PolicyError(f"policy stopped accepting input: {exc}") from exc
+        line = self.proc.stdout.readline()
+        if not line:
+            raise PolicyError("policy exited or timed out without replying")
+        try:
+            reply = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise PolicyError(f"policy replied with non-JSON output: {line[:200]!r}") from exc
+        if not isinstance(reply, dict):
+            raise PolicyError(f"policy reply must be a JSON object, got {line[:200]!r}")
+        if "error" in reply:
+            raise PolicyError(f"policy reported an error: {str(reply['error'])[:200]}")
+        return reply
 
-    total_tokens = 0
-    full_tokens = 0
-    correct = 0
-    fp_values: list[float] = []
-    fn_values: list[float] = []
-    reasons = {"answer": 0, "defer": 0, "budget": 0}
-    solvable_count = 0
-    solvable_correct = 0
-    unsolvable_tokens = 0
-    unsolvable_full_tokens = 0
-    defer_count = 0
-    defer_unsolvable = 0
+    def close(self) -> None:
+        self._timer.cancel()
+        try:
+            self.proc.stdin.write(json.dumps({"type": "shutdown"}) + "\n")
+            self.proc.stdin.flush()
+            self.proc.stdin.close()
+        except (BrokenPipeError, OSError, ValueError):
+            pass
+        try:
+            self.proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            self.proc.kill()
+            self.proc.wait()
+        self._log.close()
 
-    seen: set[str] = set()
-    for decision in decisions:
-        instance_id = decision["id"]
-        if instance_id not in eval_ids:
-            continue
-        if instance_id in seen:
-            raise ValueError(f"Duplicate decision for {instance_id}")
-        seen.add(instance_id)
 
-        instance = by_id[instance_id]
-        exit_idx = int(decision["exit_idx"])
-        reason = canonical_reason(decision["reason"])
-        if exit_idx < 0 or exit_idx >= len(instance["steps"]):
-            raise ValueError(f"Invalid exit_idx {exit_idx} for {instance_id}")
+# ── per-instance outcomes and metrics ────────────────────────────────────────
 
-        step = instance["steps"][exit_idx]
-        is_solvable = bool(instance.get("solvable_under_budget"))
-        reasons[reason] += 1
-        total_tokens += step["tokens"]
-        full_tokens += instance["steps"][-1]["tokens"]
-        is_correct = step["prediction"] == instance["gold"] and reason != "defer"
-        correct += int(is_correct)
-        fp_values.append(fp_loss(instance, exit_idx, reason))
-        fn_values.append(fn_loss(instance, exit_idx, reason))
-        if is_solvable:
-            solvable_count += 1
-            solvable_correct += int(is_correct)
-        else:
-            unsolvable_tokens += step["tokens"]
-            unsolvable_full_tokens += instance["steps"][-1]["tokens"]
-        if reason == "defer":
-            defer_count += 1
-            defer_unsolvable += int(not is_solvable)
 
-    if seen != eval_ids:
-        missing = sorted(eval_ids - seen)[:5]
-        raise ValueError(f"Missing decisions for {SLICE} examples: {missing}")
-
-    n = len(eval_ids)
-    token_fraction = total_tokens / full_tokens if full_tokens else 0.0
-    false_positive_risk = mean(fp_values)
-    false_negative_risk = mean(fn_values)
-    max_realized_risk = max(false_positive_risk, false_negative_risk)
-    unsolvable_token_fraction = (
-        unsolvable_tokens / unsolvable_full_tokens if unsolvable_full_tokens else 0.0
-    )
+def public_step(step: dict) -> dict:
     return {
-        "accuracy": correct / n if n else 0.0,
-        "solvable_accuracy": solvable_correct / solvable_count if solvable_count else 0.0,
-        "token_fraction": token_fraction,
-        "token_savings": 1.0 - token_fraction,
-        "unsolvable_token_savings": 1.0 - unsolvable_token_fraction,
-        "false_positive_risk": false_positive_risk,
-        "false_negative_risk": false_negative_risk,
-        "max_realized_risk": max_realized_risk,
-        "risk_excess": max(0.0, max_realized_risk - epsilon),
-        "defer_fraction": reasons["defer"] / n if n else 0.0,
-        "defer_precision": defer_unsolvable / defer_count if defer_count else 0.0,
-        "exit_budget_fraction": reasons["budget"] / n if n else 0.0,
+        "step": step["step"],
+        "tokens": step["tokens"],
+        "prediction": step["prediction"],
+        "signals": dict(step["signals"]),
     }
 
 
-def unique_paths(paths: list[Path]) -> list[Path]:
-    out: list[Path] = []
-    seen: set[Path] = set()
-    for path in paths:
-        normalized = path
-        if normalized not in seen:
-            seen.add(normalized)
-            out.append(normalized)
-    return out
+def calibration_view(instance: dict, index: int) -> dict:
+    return {
+        "id": f"cal{index:05d}",
+        "gold": instance["gold"],
+        "budget_tokens": instance["budget_tokens"],
+        "steps": [public_step(step) for step in instance["steps"]],
+    }
 
 
-def expand_method_roots(provided: list[str] | None) -> list[Path]:
-    paths: list[Path] = []
-    for item in provided or []:
-        path = Path(item)
-        if path.is_dir():
-            paths.extend(sorted(path.glob("*/results.json")))
-            direct_result = path / "results.json"
-            if direct_result.exists():
-                paths.append(direct_result)
+def run_instance(policy: PolicyProcess | None, instance: dict, query_id: str) -> tuple[str, int]:
+    """Reveal chunks one at a time; return (exit kind, stopping chunk index)."""
+    steps = instance["steps"]
+    last = len(steps) - 1
+    if policy is None:  # evaluator-owned full-budget control
+        return "budget", last
+    policy.request({"type": "begin", "id": query_id, "budget_tokens": instance["budget_tokens"]})
+    for index, step in enumerate(steps):
+        reply = policy.request({"type": "step", "step": public_step(step)})
+        action = reply.get("action")
+        if action not in ACTIONS:
+            raise PolicyError(f"invalid action {action!r}; expected one of {sorted(ACTIONS)}")
+        if action == "defer":
+            return "defer", index
+        if action == "answer":
+            # An answer at the final chunk is not an early exit: the budget is spent.
+            return ("answer", index) if index < last else ("budget", last)
+    return "budget", last
+
+
+def point_metrics(test: list[dict], outcomes: list[tuple[str, int]], epsilon: float) -> dict:
+    n = len(test)
+    correct = fp = fn = 0.0
+    used = full = 0
+    solvable_n = solvable_correct = 0
+    unsolvable_used = unsolvable_full = 0
+    defers = defers_unsolvable = budget_exits = 0
+    for instance, (kind, index) in zip(test, outcomes):
+        steps = instance["steps"]
+        gold = instance["gold"]
+        is_correct_step = [step["prediction"] == gold for step in steps]
+        solvable = is_correct_step[-1]  # the full-budget answer is correct
+        tokens = steps[index]["tokens"]
+        used += tokens
+        full += instance["budget_tokens"]
+        answered_correct = kind != "defer" and is_correct_step[index]
+        correct += answered_correct
+        if kind == "answer" and not is_correct_step[index]:
+            fp += 1.0
+        if kind == "defer":
+            future = is_correct_step[index:]
+            fn += sum(future) / len(future)
+            defers += 1
+            defers_unsolvable += int(not solvable)
+        if kind == "budget":
+            budget_exits += 1
+        if solvable:
+            solvable_n += 1
+            solvable_correct += answered_correct
         else:
-            paths.append(path)
-    return paths
+            unsolvable_used += tokens
+            unsolvable_full += instance["budget_tokens"]
+    fp_risk = fp / n
+    fn_risk = fn / n
+    return {
+        "accuracy": correct / n,
+        "token_savings": 1.0 - used / full,
+        "solvable_accuracy": solvable_correct / solvable_n if solvable_n else 0.0,
+        "unsolvable_token_savings": 1.0 - unsolvable_used / unsolvable_full if unsolvable_full else 0.0,
+        "false_positive_risk": fp_risk,
+        "false_negative_risk": fn_risk,
+        "violation": float(fp_risk > epsilon or fn_risk > epsilon),
+        "defer_fraction": defers / n,
+        "defer_precision": defers_unsolvable / defers if defers else 0.0,
+        "budget_exit_fraction": budget_exits / n,
+    }
 
 
-def discover_method_results(provided: list[str] | None, baseline_path: Path) -> list[Path]:
-    paths = expand_method_roots(provided)
-    paths.extend(sorted(Path("outputs").glob("*/results.json")))
-    return [
-        path
-        for path in unique_paths(paths)
-        if path.exists() and path != baseline_path and path.parent.name != "baseline"
-    ]
+def aggregate(points: list[dict]) -> dict:
+    keys = [k for k in points[0] if k != "violation"]
+    out = {key: sum(point[key] for point in points) / len(points) for key in keys}
+    out["violation_rate"] = sum(point["violation"] for point in points) / len(points)
+    out["constraint_satisfied"] = float(out["violation_rate"] <= MAX_VIOLATION_RATE)
+    return {metric: out[metric] for metric in METRICS}
 
 
-def method_policy_entries(result: dict, artifact_path: Path, epsilon: float) -> list[tuple[str, str]]:
-    policies = select_operating_point(result, epsilon).get("policies", {})
-    directory_name = artifact_path.parent.name
-    usable = sorted(name for name in policies if name not in CONTROL_POLICIES)
-    if directory_name in usable:
-        return [(directory_name, directory_name)]
-    if len(usable) == 1:
-        return [(directory_name, usable[0])]
-    return [(name, name) for name in usable]
+def draw_indices(experiment: str, profile_index: int, draw: int, size: int) -> list[int]:
+    rng = random.Random(hidden_tasks.derived_seed("draw", experiment, profile_index, draw))
+    return rng.sample(range(POOL_SIZE), size)
 
 
-def companion_artifact(main_artifact: Path, filename: str) -> Path:
-    return main_artifact if filename == "results.json" else main_artifact.with_name(filename)
+def run_experiment(
+    experiment: str,
+    config: dict,
+    tasks: list[dict],
+    command: list[str] | None,
+    log_dir: Path,
+    outcome_path: Path | None = None,
+) -> tuple[dict, str | None]:
+    policy = PolicyProcess(command, log_dir / f"{experiment}.log") if command is not None else None
+    points = []
+    saved = []
+    try:
+        for profile_index, task in enumerate(tasks):
+            for draw in range(config["draws"]):
+                indices = draw_indices(experiment, profile_index, draw, config["calibration_size"])
+                calibration = [calibration_view(task["pool"][i], j) for j, i in enumerate(indices)]
+                calibration_id = f"{experiment}/{profile_index}/{draw}"
+                for epsilon in config["epsilons"]:
+                    if policy is not None:
+                        policy.request(
+                            {
+                                "type": "calibrate",
+                                "calibration_id": calibration_id,
+                                "epsilon": epsilon,
+                                "delta": DELTA,
+                                "instances": calibration,
+                            }
+                        )
+                    outcomes = [
+                        run_instance(policy, instance, f"q{qi:05d}") for qi, instance in enumerate(task["test"])
+                    ]
+                    points.append(point_metrics(task["test"], outcomes, epsilon))
+                    if outcome_path is not None:
+                        saved.append(
+                            {
+                                "profile": profile_index,
+                                "draw": draw,
+                                "epsilon": epsilon,
+                                "outcomes": "".join(f"{kind[0]}{index}," for kind, index in outcomes),
+                            }
+                        )
+                    if policy is None:
+                        break  # the full-budget control does not depend on calibration
+                if policy is None:
+                    break
+    except PolicyError as exc:
+        return dict(FAILED_VALUES), f"protocol failure: {exc}"
+    finally:
+        if policy is not None:
+            policy.close()
+    if outcome_path is not None:
+        outcome_path.parent.mkdir(parents=True, exist_ok=True)
+        outcome_path.write_text(json.dumps(saved), encoding="utf-8")
+    metrics = aggregate(points)
+    if not metrics["constraint_satisfied"]:
+        failed = dict(FAILED_VALUES)
+        return failed, (
+            f"risk constraint failed: realized risk exceeded epsilon at {metrics['violation_rate']:.3f} of "
+            f"operating points (allowed {MAX_VIOLATION_RATE}); measured FP={metrics['false_positive_risk']:.4f}, "
+            f"FN={metrics['false_negative_risk']:.4f}, savings={metrics['token_savings']:.4f}, "
+            f"accuracy={metrics['accuracy']:.4f}"
+        )
+    return metrics, None
 
 
-def expected_methods(train_scores_path: Path) -> dict[str, set[str]]:
-    if not train_scores_path.exists():
-        return {}
-    train_scores = load(train_scores_path)
-    experiments = train_scores.get("experiments", train_scores)
-    expected: dict[str, set[str]] = {}
-    for experiment_name, experiment in experiments.items():
-        if experiment_name.startswith("_") or not isinstance(experiment, dict):
+# ── discovery and driver ─────────────────────────────────────────────────────
+
+
+def discover_methods(outputs_root: Path) -> dict[str, list[str]]:
+    methods: dict[str, list[str]] = {}
+    for manifest in sorted(outputs_root.glob("*/policy.json")):
+        name = manifest.parent.name
+        if name.startswith("_") or name == FULL_BUDGET_KEY:
             continue
-        results = experiment.get("results", experiment)
-        if isinstance(results, dict):
-            expected[experiment_name] = {name for name in results if not name.startswith("_")}
-    return expected
-
-
-def add_result(
-    results: dict[str, dict[str, float]],
-    method_name: str,
-    artifact_path: Path,
-    policy_name: str,
-    fallback_data: Path,
-    epsilon: float,
-    allowed_methods: set[str] | None,
-) -> None:
-    if allowed_methods is not None and method_name not in allowed_methods:
-        return
-    if method_name in results:
-        raise ValueError(f"Multiple artifacts produced the same method key {method_name!r}")
-    result = load(artifact_path)
-    point = select_operating_point(result, epsilon)
-    policies = point.get("policies", {})
-    if policy_name not in policies:
-        raise ValueError(f"{artifact_path} has no policy {policy_name!r}")
-    data = load_jsonl(data_path_for(result, fallback_data))
-    results[method_name] = recompute_policy_metrics(policies[policy_name], data, slice_ids(data), point["epsilon"])
+        try:
+            spec = json.loads(manifest.read_text(encoding="utf-8"))
+            command = spec["command"]
+            if not (isinstance(command, list) and command and all(isinstance(part, str) for part in command)):
+                raise ValueError("command must be a non-empty list of strings")
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            methods[name] = []
+            print(f"[{SLICE}] invalid manifest {manifest}: {exc}", file=sys.stderr)
+            continue
+        methods[name] = command
+    return methods
 
 
 def build_scores(args: argparse.Namespace) -> dict:
-    baseline_path = Path(args.baseline_results)
-    method_paths = discover_method_results(args.method_results, baseline_path)
-    expected_by_experiment = expected_methods(Path(args.train_scores))
-    scores = {
+    outputs_root = Path(args.outputs)
+    if not outputs_root.is_absolute():
+        outputs_root = REPO_ROOT / outputs_root
+    methods = discover_methods(outputs_root)
+    settings = {(config["setting"], config["group"]) for config in EXPERIMENTS.values()}
+    tasks = hidden_tasks.build_tasks(settings, POOL_SIZE, TEST_SIZE)
+    log_root = REPO_ROOT / "logs" / f"eval_{SLICE}"
+
+    jobs = [(name, experiment) for name in [FULL_BUDGET_KEY, *methods] for experiment in EXPERIMENTS]
+
+    def work(job: tuple[str, str]) -> tuple[str, str, dict, str | None]:
+        name, experiment = job
+        config = EXPERIMENTS[experiment]
+        if name == FULL_BUDGET_KEY:
+            command = None
+        else:
+            command = methods[name]
+            if not command:
+                return name, experiment, dict(FAILED_VALUES), "invalid policy manifest"
+        outcome_path = Path(args.save_outcomes) / name / f"{experiment}.json" if args.save_outcomes else None
+        try:
+            metrics, failure = run_experiment(
+                experiment, config, tasks[(config["setting"], config["group"])], command, log_root / name, outcome_path
+            )
+        except OSError as exc:
+            metrics, failure = dict(FAILED_VALUES), f"could not start policy: {exc}"
+        print(f"[{SLICE}] {name} / {experiment}: " + (failure or "ok"), file=sys.stderr, flush=True)
+        return name, experiment, metrics, failure
+
+    workers = max(1, args.workers or min(16, len(os.sched_getaffinity(0))))
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        results = list(pool.map(work, jobs))
+
+    scores: dict = {
         "_metadata": {
             "slice": SLICE,
-            "split": "deterministic stratified buffered two-fifths of original test examples",
-            "split_seed": SPLIT_SEED,
-            "matched_train_scores": str(args.train_scores),
+            "delta": DELTA,
+            "max_violation_rate": MAX_VIOLATION_RATE,
+            "test_size_per_profile": TEST_SIZE,
+            "profiles": hidden_tasks.NUM_PROFILES,
+            "experiments": EXPERIMENTS,
         },
         "experiments": {},
     }
-
-    for experiment_name, filename in EXPERIMENT_FILES.items():
-        fallback_data = FALLBACK_DATA[filename]
-        experiment_results: dict[str, dict[str, float]] = {}
-        allowed_methods = expected_by_experiment.get(experiment_name)
-
-        baseline_artifact = baseline_path if filename == "results.json" else baseline_path.with_name(filename)
-        if baseline_artifact.exists():
-            baseline_key = "naive_or_uncalibrated" if experiment_name == "risk_control" else "upper_only"
-            add_result(
-                experiment_results,
-                baseline_key,
-                baseline_artifact,
-                "upper_only",
-                fallback_data,
-                args.epsilon,
-                allowed_methods,
-            )
-
-        for main_artifact in method_paths:
-            artifact = companion_artifact(main_artifact, filename)
-            if not artifact.exists():
-                continue
-            result = load(artifact)
-            for method_name, policy_name in method_policy_entries(result, artifact, args.epsilon):
-                add_result(
-                    experiment_results,
-                    method_name,
-                    artifact,
-                    policy_name,
-                    fallback_data,
-                    args.epsilon,
-                    allowed_methods,
-                )
-
-        if allowed_methods is not None and set(experiment_results) != allowed_methods:
-            missing = sorted(allowed_methods - set(experiment_results))
-            extra = sorted(set(experiment_results) - allowed_methods)
-            raise ValueError(
-                f"Test slice method keys for {experiment_name} do not match train slice; "
-                f"missing={missing}, extra={extra}"
-            )
-        if experiment_results:
-            scores["experiments"][experiment_name] = {"results": experiment_results}
-
+    # A policy that breaks its risk constraint (or the protocol) in any experiment
+    # has failed the task: the whole run is scored with the failure values, so a
+    # failed method can never outrank one that solves the task on other metrics.
+    failed_in: dict[str, list[str]] = {}
+    for name, experiment, _, failure in results:
+        if failure:
+            failed_in.setdefault(name, []).append(experiment)
+    for name, experiment, metrics, failure in results:
+        entry = scores["experiments"].setdefault(experiment, {"results": {}, "_failures": {}})
+        if name in failed_in:
+            entry["results"][name] = dict(FAILED_VALUES)
+            entry["_failures"][name] = failure or ("run failed in " + ", ".join(sorted(failed_in[name])))
+        else:
+            entry["results"][name] = metrics
+    for experiment in EXPERIMENTS:
+        entry = scores["experiments"].get(experiment)
+        if entry is not None:
+            entry["results"] = dict(sorted(entry["results"].items()))
     return scores
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--method-results", action="append", default=None)
-    parser.add_argument("method_artifacts", nargs="*")
-    parser.add_argument("--baseline-results", default="outputs/baseline/results.json")
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--outputs", default="outputs", help="directory holding <method>/policy.json manifests")
     parser.add_argument("--scores", default="scoring/scores_test.json")
-    parser.add_argument("--epsilon", type=float, default=0.32)
-    parser.add_argument("--train-scores", default="scoring/scores_train.json")
+    parser.add_argument("--workers", type=int, default=0)
+    parser.add_argument("--save-outcomes", default="", help="optional directory for per-instance outcomes")
     args = parser.parse_args()
-    if args.method_artifacts:
-        args.method_results = (args.method_results or []) + args.method_artifacts
-
     scores = build_scores(args)
     out = Path(args.scores)
+    if not out.is_absolute():
+        out = REPO_ROOT / out
     out.parent.mkdir(parents=True, exist_ok=True)
-    with out.open("w", encoding="utf-8") as handle:
-        json.dump(scores, handle, indent=2)
-        handle.write("\n")
+    out.write_text(json.dumps(scores, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

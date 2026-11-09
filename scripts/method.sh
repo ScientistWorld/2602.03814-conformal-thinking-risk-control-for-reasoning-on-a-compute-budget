@@ -1,24 +1,22 @@
 #!/bin/bash
-# Run the paper's proposed method.
+# Register the paper's method (risk-controlled dual-threshold early exit).
 #
-# This script trains/runs the paper's method using code in method/.
+# The method needs no training: its deliverable is a stopping-policy program
+# that calibrates on whatever labelled calibration set the evaluator sends and
+# then stops held-out trajectories online. This script registers that program
+# in outputs/conformal_thinking/policy.json, which the evaluators discover.
 #
-# Usage:
-#   bash scripts/method.sh [data_jsonl] [output_json]
+# Usage: bash scripts/method.sh
 
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-DATA_PATH="${1:-data/synthetic_reasoning.jsonl}"
-OUTPUT_PATH="${2:-outputs/conformal_thinking/results.json}"
-
-python method/conformal_thinking.py \
-  --data "$DATA_PATH" \
-  --output "$OUTPUT_PATH" \
-  --calibration ucb \
-  --epsilons 0.18 0.25 0.32 0.40
+mkdir -p outputs/conformal_thinking
+cat > outputs/conformal_thinking/policy.json <<'JSON'
+{"command": ["python", "method/conformal_thinking.py", "serve"]}
+JSON
 
 if [ "${SKIP_EVAL:-0}" != "1" ]; then
   bash scripts/evaluate.sh

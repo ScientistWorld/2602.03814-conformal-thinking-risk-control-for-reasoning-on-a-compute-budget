@@ -1,47 +1,21 @@
 #!/bin/bash
-# Reproduce the paper's results end-to-end.
+# Reproduce the paper's results end-to-end on this scaled benchmark.
 #
-# This script runs inside the compute container and should call
-# scripts/baseline.sh and scripts/method.sh to run baselines and
-# the paper's method, each of which calls scripts/evaluate.sh.
-#
-# Assumes:
-#   - Container is built (environment/container.sif)
-#   - Data and models are downloaded (via scripts/download.sh)
-#   - Working directory is the repository root
-#
-# This is the "gold standard" reproduction — 
-# You do not need to run this, but keep this in good shape
-# so other agents can easily run a full loop of reproduction and get the paper's numbers.
+# 1. Register the reference method and the baselines (no training needed:
+#    each is a stopping-policy program calibrated online by the evaluator).
+# 2. Score them on the visible train profiles (scores_train.json and
+#    scores.json) and on the held-out test profiles (scores_test.json).
+# 3. Validate the workspace.
 
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-python data/generate_synthetic_reasoning.py --output data/synthetic_reasoning.jsonl
-python data/generate_synthetic_reasoning.py \
-  --output data/synthetic_ratio_3_1.jsonl \
-  --solvable-probability 0.75 \
-  --seed 260203815
-python data/generate_synthetic_reasoning.py \
-  --output data/synthetic_ratio_1_1.jsonl \
-  --solvable-probability 0.50 \
-  --seed 260203816
-python data/generate_synthetic_reasoning.py \
-  --output data/synthetic_ratio_1_3.jsonl \
-  --solvable-probability 0.25 \
-  --seed 260203817
+SKIP_EVAL=1 bash scripts/method.sh
+bash scripts/baseline.sh
 
-bash scripts/baseline.sh data/synthetic_reasoning.jsonl outputs/baseline/results.json
-SKIP_EVAL=1 bash scripts/method.sh data/synthetic_reasoning.jsonl outputs/conformal_thinking/results.json
-
-for ratio in 3_1 1_1 1_3; do
-  bash scripts/baseline.sh "data/synthetic_ratio_${ratio}.jsonl" "outputs/baseline/ratio_${ratio}.json"
-  SKIP_EVAL=1 bash scripts/method.sh \
-    "data/synthetic_ratio_${ratio}.jsonl" \
-    "outputs/conformal_thinking/ratio_${ratio}.json"
-done
-
-bash scripts/evaluate.sh
+bash scripts/evaluate_train.sh
+cp scoring/scores_train.json scoring/scores.json
+bash scripts/evaluate_test.sh
 python validate.py --compare

@@ -1,51 +1,29 @@
 # Evaluation Targets
 
-## Primary: adaptive_budget_efficiency
+All targets are measured by `scripts/evaluate_test.sh` (held-out profiles) and `scripts/evaluate_train.sh` / `scripts/evaluate.sh` (public development profiles), which run every policy registered under `outputs/<method>/policy.json` through the online stopping protocol in `briefing/evaluation.md`. Every number is recomputed by the evaluator from per-instance stopping decisions on trajectories it owns.
 
-Tests whether an adaptive reasoning-budget policy can reduce token use compared with a reference adaptive baseline while preserving bounded stopping risk.
+Every experiment has the same metric structure:
 
-- **Primary metric**: `token_savings` (higher is better)
-- **Benefit metrics**: `accuracy`, `solvable_accuracy`, `token_savings`, `unsolvable_token_savings`, `defer_fraction`, and `defer_precision`
-- **Constraint metrics**: `token_fraction`, `false_positive_risk`, `false_negative_risk`, `max_realized_risk`, and `exit_budget_fraction`
-- **Diagnostic metric**: `risk_excess` is reported but has zero scoring coefficient
-- **Evaluation**: run `bash scripts/reproduce.sh`; the evaluator reads saved decisions from `outputs/*/results.json` and writes `scoring/scores.json`
+- **Scored benefit metrics**: `token_savings` (primary, coefficient 1.0, higher is better) and `accuracy` (coefficient 0.5, higher is better), averaged over the experiment's operating points.
+- **Constraint metrics** (coefficient 0, enforced by the gate): `false_positive_risk`, `false_negative_risk`, `violation_rate` (fraction of operating points with realized risk above the target). If `violation_rate > 0.15` in any experiment, or the protocol is broken, the whole run receives the failure values (accuracy 0, savings 0, risks 1).
+- **Diagnostics** (coefficient 0): `solvable_accuracy`, `unsolvable_token_savings`, `constraint_satisfied`, `defer_fraction`, `defer_precision`, `budget_exit_fraction`.
 
-## Constraint: risk_control
+## Primary: adaptive_budget_efficiency (weight 0.3)
 
-Tests whether the selected operating point respects the requested answer-error and premature-defer risk tolerance while still saving compute.
+Natural mix (~58% solvable), 400 calibration examples, 4 draws per profile, target risks 0.10 / 0.15 / 0.20. Target: save tokens relative to running every instance to the full budget, at accuracy comparable to the confident-stop baseline, with no constraint failure.
 
-- **Primary metric**: `false_positive_risk` (lower is better)
-- **Benefit metrics**: `accuracy`, `solvable_accuracy`, `token_savings`, `unsolvable_token_savings`, `defer_fraction`, and `defer_precision`
-- **Constraint metrics**: `token_fraction`, `false_positive_risk`, `false_negative_risk`, `max_realized_risk`, and `exit_budget_fraction`
-- **Diagnostic metric**: `risk_excess` is reported but has zero scoring coefficient
-- **Evaluation**: run `bash scripts/evaluate.sh` after method artifacts exist; the evaluator recomputes metrics from saved decisions and labels
+## Constraint: risk_control (weight 0.2)
 
-## Additional: difficulty_mix_3_1
+Natural mix on separate held-out profiles, 50 calibration examples, 10 draws per profile, target risks 0.05 / 0.10 / 0.20 / 0.25. Target: realized risks within tolerance on at least 85% of operating points (the paper's claim is that finite-sample-corrected calibration achieves this while naive validation tuning does not), with as many tokens saved as the scarce calibration data allows.
 
-Tests the policy on a synthetic split with a 3:1 solvable:unsolvable mix.
+## Additional: difficulty_mix_3_1 (weight 0.15)
 
-- **Primary metric**: `token_savings` (higher is better)
-- **Benefit metrics**: `accuracy`, `solvable_accuracy`, `token_savings`, `unsolvable_token_savings`, `defer_fraction`, and `defer_precision`
-- **Constraint metrics**: `token_fraction`, `false_positive_risk`, `false_negative_risk`, `max_realized_risk`, and `exit_budget_fraction`
-- **Diagnostic metric**: `risk_excess` is reported but has zero scoring coefficient
-- **Evaluation**: run `bash scripts/reproduce.sh`; the evaluator reads `outputs/*/ratio_3_1.json`
+3:1 solvable:unsolvable, 400 calibration examples, 4 draws, target risks 0.10 / 0.15 / 0.20. Target: savings beyond the confident-stop baseline at comparable accuracy.
 
-## Additional: difficulty_mix_1_1
+## Additional: difficulty_mix_1_1 (weight 0.15)
 
-Tests the policy when solvable and unsolvable trajectories are balanced.
+1:1 mix, same calibration and tolerances. Target: a larger savings gain over the confident-stop baseline than in the 3:1 mix.
 
-- **Primary metric**: `token_savings` (higher is better)
-- **Benefit metrics**: `accuracy`, `solvable_accuracy`, `token_savings`, `unsolvable_token_savings`, `defer_fraction`, and `defer_precision`
-- **Constraint metrics**: `token_fraction`, `false_positive_risk`, `false_negative_risk`, `max_realized_risk`, and `exit_budget_fraction`
-- **Diagnostic metric**: `risk_excess` is reported but has zero scoring coefficient
-- **Evaluation**: run `bash scripts/reproduce.sh`; the evaluator reads `outputs/*/ratio_1_1.json`
+## Additional: difficulty_mix_1_3 (weight 0.2)
 
-## Additional: difficulty_mix_1_3
-
-Tests a setting where most trajectories are unsolvable within the full budget, so policies that wait to the budget limit tend to waste tokens.
-
-- **Primary metric**: `token_savings` (higher is better)
-- **Benefit metrics**: `accuracy`, `solvable_accuracy`, `token_savings`, `unsolvable_token_savings`, `defer_fraction`, and `defer_precision`
-- **Constraint metrics**: `token_fraction`, `false_positive_risk`, `false_negative_risk`, `max_realized_risk`, and `exit_budget_fraction`
-- **Diagnostic metric**: `risk_excess` is reported but has zero scoring coefficient
-- **Evaluation**: run `bash scripts/reproduce.sh`; the evaluator reads `outputs/*/ratio_1_3.json`
+1:3 mix, 400 calibration examples, 4 draws, target risks 0.05 / 0.10 / 0.125. Target: substantial savings where a confident-stop policy runs most instances to the budget.

@@ -1,73 +1,92 @@
 {
+  "_note": "Scaled synthetic benchmark. The paper reports its results only as curves (risk vs. epsilon, accuracy vs. tokens) on real LLM trajectories, so it has no scalar values on this benchmark's scale; its findings are recorded verbatim under each experiment's '_paper_reported'. 'results' holds this gym's reference numbers on the held-out test (scripts/evaluate_test.sh), not paper numbers. Ranking: token_savings and accuracy are scored; risk metrics are constraints enforced by the evaluator's gate (a run whose realized risk exceeds the target at more than 15% of operating points is scored as failed), so they carry coefficient 0.",
   "experiments": {
     "adaptive_budget_efficiency": {
-      "description": "Core scaled target: an adaptive stopping policy should save more reasoning tokens than a reference adaptive baseline while satisfying answer-error and premature-defer risk constraints.",
-      "notes": "Scaled synthetic benchmark reference. The paper reports the corresponding outcomes primarily as plotted curves over risk levels and task mixes rather than exact scalar table entries, so these values document this gym's reproduced operating point.",
+      "description": "Natural solvable mix (about 58% of instances solvable within budget); 400 labelled calibration examples per draw, 4 draws per profile, target risks 0.10/0.15/0.20. Adaptive stopping should save reasoning tokens while realized risks stay within the target.",
       "weight": 0.3,
       "primary_metric": "token_savings",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "_paper_reported": "Paper (Sec. 5.3, Fig. 5-6): at a fixed risk tolerance, risk-controlled adaptive stopping reaches comparable accuracy with fewer total tokens; adding the lower threshold shifts the accuracy-vs-tokens curve left. Reported only as curves (Qwen3-8B/30B, R1-Distill-32B, Qwen3-VL-8B on AIME, DeepScaleR, GPQA, MathVision); no scalar values.",
       "metrics": {
         "accuracy": {
           "higher_is_better": true,
-          "coefficient": 0.7,
-          "description": "Overall answer accuracy at the selected stopping point."
-        },
-        "solvable_accuracy": {
-          "higher_is_better": true,
           "coefficient": 0.5,
-          "description": "Accuracy restricted to examples that can be solved within the full reasoning budget."
-        },
-        "token_fraction": {
-          "higher_is_better": false,
-          "coefficient": -0.8,
-          "description": "Fraction of full-budget reasoning tokens consumed by the stopping policy."
+          "description": "Fraction of held-out questions answered correctly at the stopping point (a defer/abstain counts as incorrect), averaged over calibration draws, profiles and target risk levels."
         },
         "token_savings": {
           "higher_is_better": true,
           "coefficient": 1.0,
-          "description": "Reduction in reasoning tokens relative to always using the full budget."
+          "description": "One minus the fraction of full-budget reasoning tokens consumed, with tokens charged up to the chunk where the policy stopped; averaged over operating points."
+        },
+        "solvable_accuracy": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: accuracy on instances whose full-budget answer is correct."
         },
         "unsolvable_token_savings": {
           "higher_is_better": true,
-          "coefficient": 0.5,
-          "description": "Token savings restricted to examples not solved within the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: token savings on instances whose full-budget answer is wrong."
         },
         "false_positive_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of stopping with an emitted answer that is wrong."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): fraction of instances where the policy stopped before the budget and emitted a wrong answer."
         },
         "false_negative_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of deferring or abstaining before later trajectory steps would become correct."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): premature-defer loss, i.e. for deferred instances the fraction of remaining chunks whose answer would have been correct, averaged over all instances."
         },
-        "max_realized_risk": {
-          "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Larger of the realized answer-error and premature-defer risks at the selected operating point."
-        },
-        "risk_excess": {
+        "violation_rate": {
           "higher_is_better": false,
           "coefficient": 0.0,
-          "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."
+          "description": "Constraint (gated, unscored): fraction of operating points where realized false-positive or false-negative risk exceeds the target epsilon. Above 0.15 the experiment is scored as failed."
+        },
+        "constraint_satisfied": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: 1 if the violation rate is within the allowed 0.15, else 0 (failed runs receive the failure values for every metric)."
         },
         "defer_fraction": {
           "higher_is_better": true,
-          "coefficient": 0.1,
-          "description": "Fraction of examples for which the policy defers or abstains before the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances deferred/abstained."
         },
         "defer_precision": {
           "higher_is_better": true,
-          "coefficient": 0.2,
-          "description": "Fraction of defer/abstain decisions that occur on examples unsolved by the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of defers on instances whose full-budget answer is wrong."
         },
-        "exit_budget_fraction": {
+        "budget_exit_fraction": {
           "higher_is_better": false,
-          "coefficient": -0.2,
-          "description": "Fraction of examples that still consume the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances that consumed the whole budget."
         }
       },
       "results": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.512,
+          "token_savings": 0.446
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.551,
+          "token_savings": 0.27
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.477,
+          "token_savings": 0.598
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.553,
+          "token_savings": 0.0
+        }
+      },
+      "_iteration10_values_obsolete_setup": {
         "upper_only": {
           "type": "baseline",
           "accuracy": 0.308,
@@ -93,73 +112,91 @@
       }
     },
     "risk_control": {
-      "description": "Risk-control target: validation-selected operating points should keep realized risks at or below the requested operating risk more reliably than naive validation tuning.",
-      "notes": "Scaled synthetic benchmark reference. The paper reports risk-control behavior as empirical curves; this gym records the reproduced scalar operating point used for scoring.",
+      "description": "Small-calibration regime: 50 labelled calibration examples per draw, 10 draws per profile, target risks 0.05/0.10/0.20/0.25, on held-out profiles disjoint from the other experiments. Realized risk must stay within the target across calibration draws (gate), and the policy should still save tokens.",
       "weight": 0.2,
-      "primary_metric": "false_positive_risk",
+      "primary_metric": "token_savings",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "_paper_reported": "Paper (Sec. 5.2, Fig. 4, Fig. 7): over 40 random validation/test splits with 50 validation examples, UCB-calibrated thresholds keep realized test risk below epsilon, while naive validation tuning frequently exceeds it; the gap widens for smaller validation sets (8/16/40). Reported only as curves.",
       "metrics": {
         "accuracy": {
           "higher_is_better": true,
-          "coefficient": 0.3,
-          "description": "Overall answer accuracy at the selected stopping point."
-        },
-        "solvable_accuracy": {
-          "higher_is_better": true,
-          "coefficient": 0.3,
-          "description": "Accuracy restricted to examples that can be solved within the full reasoning budget."
-        },
-        "token_fraction": {
-          "higher_is_better": false,
-          "coefficient": -0.4,
-          "description": "Fraction of full-budget reasoning tokens consumed by the stopping policy."
+          "coefficient": 0.5,
+          "description": "Fraction of held-out questions answered correctly at the stopping point (a defer/abstain counts as incorrect), averaged over calibration draws, profiles and target risk levels."
         },
         "token_savings": {
           "higher_is_better": true,
-          "coefficient": 0.4,
-          "description": "Reduction in reasoning tokens relative to always using the full budget."
+          "coefficient": 1.0,
+          "description": "One minus the fraction of full-budget reasoning tokens consumed, with tokens charged up to the chunk where the policy stopped; averaged over operating points."
+        },
+        "solvable_accuracy": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: accuracy on instances whose full-budget answer is correct."
         },
         "unsolvable_token_savings": {
           "higher_is_better": true,
-          "coefficient": 0.2,
-          "description": "Token savings restricted to examples not solved within the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: token savings on instances whose full-budget answer is wrong."
         },
         "false_positive_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of stopping with an emitted answer that is wrong."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): fraction of instances where the policy stopped before the budget and emitted a wrong answer."
         },
         "false_negative_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of deferring or abstaining before later trajectory steps would become correct."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): premature-defer loss, i.e. for deferred instances the fraction of remaining chunks whose answer would have been correct, averaged over all instances."
         },
-        "max_realized_risk": {
-          "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Larger of the realized answer-error and premature-defer risks at the selected operating point."
-        },
-        "risk_excess": {
+        "violation_rate": {
           "higher_is_better": false,
           "coefficient": 0.0,
-          "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."
+          "description": "Constraint (gated, unscored): fraction of operating points where realized false-positive or false-negative risk exceeds the target epsilon. Above 0.15 the experiment is scored as failed."
+        },
+        "constraint_satisfied": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: 1 if the violation rate is within the allowed 0.15, else 0 (failed runs receive the failure values for every metric)."
         },
         "defer_fraction": {
           "higher_is_better": true,
-          "coefficient": 0.1,
-          "description": "Fraction of examples for which the policy defers or abstains before the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances deferred/abstained."
         },
         "defer_precision": {
           "higher_is_better": true,
-          "coefficient": 0.1,
-          "description": "Fraction of defer/abstain decisions that occur on examples unsolved by the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of defers on instances whose full-budget answer is wrong."
         },
-        "exit_budget_fraction": {
+        "budget_exit_fraction": {
           "higher_is_better": false,
-          "coefficient": -0.2,
-          "description": "Fraction of examples that still consume the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances that consumed the whole budget."
         }
       },
       "results": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.526,
+          "token_savings": 0.208
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.55,
+          "token_savings": 0.142
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.0,
+          "token_savings": 0.0
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.553,
+          "token_savings": 0.0
+        }
+      },
+      "_iteration10_values_obsolete_setup": {
         "naive_or_uncalibrated": {
           "type": "baseline",
           "accuracy": 0.308,
@@ -185,73 +222,91 @@
       }
     },
     "difficulty_mix_3_1": {
-      "description": "Scaled difficulty-mix setting with a 3:1 solvable:unsolvable mix. Useful policies should add modest token savings while maintaining risk constraints.",
-      "notes": "Scaled synthetic benchmark reference for the paper's solvable:unsolvable mix axis. The paper presents this axis as a curve, so this entry records the reproduced scalar mix used by the gym.",
+      "description": "3:1 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.10/0.15/0.20.",
       "weight": 0.15,
       "primary_metric": "token_savings",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "_paper_reported": "Paper (Fig. 6, 3:1): when solvable instances dominate, UPPER-ONLY captures most savings and adding the lower threshold adds little. Reported only as curves.",
       "metrics": {
         "accuracy": {
           "higher_is_better": true,
-          "coefficient": 0.7,
-          "description": "Overall answer accuracy at the selected stopping point."
-        },
-        "solvable_accuracy": {
-          "higher_is_better": true,
           "coefficient": 0.5,
-          "description": "Accuracy restricted to examples that can be solved within the full reasoning budget."
-        },
-        "token_fraction": {
-          "higher_is_better": false,
-          "coefficient": -0.8,
-          "description": "Fraction of full-budget reasoning tokens consumed by the stopping policy."
+          "description": "Fraction of held-out questions answered correctly at the stopping point (a defer/abstain counts as incorrect), averaged over calibration draws, profiles and target risk levels."
         },
         "token_savings": {
           "higher_is_better": true,
           "coefficient": 1.0,
-          "description": "Reduction in reasoning tokens relative to always using the full budget."
+          "description": "One minus the fraction of full-budget reasoning tokens consumed, with tokens charged up to the chunk where the policy stopped; averaged over operating points."
+        },
+        "solvable_accuracy": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: accuracy on instances whose full-budget answer is correct."
         },
         "unsolvable_token_savings": {
           "higher_is_better": true,
-          "coefficient": 0.7,
-          "description": "Token savings restricted to examples not solved within the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: token savings on instances whose full-budget answer is wrong."
         },
         "false_positive_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of stopping with an emitted answer that is wrong."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): fraction of instances where the policy stopped before the budget and emitted a wrong answer."
         },
         "false_negative_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of deferring or abstaining before later trajectory steps would become correct."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): premature-defer loss, i.e. for deferred instances the fraction of remaining chunks whose answer would have been correct, averaged over all instances."
         },
-        "max_realized_risk": {
-          "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Larger of the realized answer-error and premature-defer risks at the selected operating point."
-        },
-        "risk_excess": {
+        "violation_rate": {
           "higher_is_better": false,
           "coefficient": 0.0,
-          "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."
+          "description": "Constraint (gated, unscored): fraction of operating points where realized false-positive or false-negative risk exceeds the target epsilon. Above 0.15 the experiment is scored as failed."
+        },
+        "constraint_satisfied": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: 1 if the violation rate is within the allowed 0.15, else 0 (failed runs receive the failure values for every metric)."
         },
         "defer_fraction": {
           "higher_is_better": true,
-          "coefficient": 0.2,
-          "description": "Fraction of examples for which the policy defers or abstains before the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances deferred/abstained."
         },
         "defer_precision": {
           "higher_is_better": true,
-          "coefficient": 0.3,
-          "description": "Fraction of defer/abstain decisions that occur on examples unsolved by the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of defers on instances whose full-budget answer is wrong."
         },
-        "exit_budget_fraction": {
+        "budget_exit_fraction": {
           "higher_is_better": false,
-          "coefficient": -0.2,
-          "description": "Fraction of examples that still consume the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances that consumed the whole budget."
         }
       },
       "results": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.7,
+          "token_savings": 0.45
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.735,
+          "token_savings": 0.33
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.64,
+          "token_savings": 0.59
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.75,
+          "token_savings": 0.0
+        }
+      },
+      "_iteration10_values_obsolete_setup": {
         "upper_only": {
           "type": "baseline",
           "accuracy": 0.461,
@@ -277,73 +332,91 @@
       }
     },
     "difficulty_mix_1_1": {
-      "description": "Scaled difficulty-mix setting with a 1:1 solvable:unsolvable mix. Useful policies should save more tokens as unsolved trajectories become more common.",
-      "notes": "Scaled synthetic benchmark reference for the paper's solvable:unsolvable mix axis. The paper presents this axis as a curve, so this entry records the reproduced scalar mix used by the gym.",
+      "description": "1:1 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.10/0.15/0.20.",
       "weight": 0.15,
       "primary_metric": "token_savings",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "_paper_reported": "Paper (Fig. 6, 1:1): UPPER-ONLY stays near the high-token regime; adding the lower threshold gives a clear leftward shift at comparable accuracy. Reported only as curves.",
       "metrics": {
         "accuracy": {
           "higher_is_better": true,
-          "coefficient": 0.7,
-          "description": "Overall answer accuracy at the selected stopping point."
-        },
-        "solvable_accuracy": {
-          "higher_is_better": true,
           "coefficient": 0.5,
-          "description": "Accuracy restricted to examples that can be solved within the full reasoning budget."
-        },
-        "token_fraction": {
-          "higher_is_better": false,
-          "coefficient": -0.8,
-          "description": "Fraction of full-budget reasoning tokens consumed by the stopping policy."
+          "description": "Fraction of held-out questions answered correctly at the stopping point (a defer/abstain counts as incorrect), averaged over calibration draws, profiles and target risk levels."
         },
         "token_savings": {
           "higher_is_better": true,
           "coefficient": 1.0,
-          "description": "Reduction in reasoning tokens relative to always using the full budget."
+          "description": "One minus the fraction of full-budget reasoning tokens consumed, with tokens charged up to the chunk where the policy stopped; averaged over operating points."
+        },
+        "solvable_accuracy": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: accuracy on instances whose full-budget answer is correct."
         },
         "unsolvable_token_savings": {
           "higher_is_better": true,
-          "coefficient": 0.7,
-          "description": "Token savings restricted to examples not solved within the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: token savings on instances whose full-budget answer is wrong."
         },
         "false_positive_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of stopping with an emitted answer that is wrong."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): fraction of instances where the policy stopped before the budget and emitted a wrong answer."
         },
         "false_negative_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of deferring or abstaining before later trajectory steps would become correct."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): premature-defer loss, i.e. for deferred instances the fraction of remaining chunks whose answer would have been correct, averaged over all instances."
         },
-        "max_realized_risk": {
-          "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Larger of the realized answer-error and premature-defer risks at the selected operating point."
-        },
-        "risk_excess": {
+        "violation_rate": {
           "higher_is_better": false,
           "coefficient": 0.0,
-          "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."
+          "description": "Constraint (gated, unscored): fraction of operating points where realized false-positive or false-negative risk exceeds the target epsilon. Above 0.15 the experiment is scored as failed."
+        },
+        "constraint_satisfied": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: 1 if the violation rate is within the allowed 0.15, else 0 (failed runs receive the failure values for every metric)."
         },
         "defer_fraction": {
           "higher_is_better": true,
-          "coefficient": 0.2,
-          "description": "Fraction of examples for which the policy defers or abstains before the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances deferred/abstained."
         },
         "defer_precision": {
           "higher_is_better": true,
-          "coefficient": 0.3,
-          "description": "Fraction of defer/abstain decisions that occur on examples unsolved by the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of defers on instances whose full-budget answer is wrong."
         },
-        "exit_budget_fraction": {
+        "budget_exit_fraction": {
           "higher_is_better": false,
-          "coefficient": -0.2,
-          "description": "Fraction of examples that still consume the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances that consumed the whole budget."
         }
       },
       "results": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.45,
+          "token_savings": 0.42
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.5,
+          "token_savings": 0.2
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.41,
+          "token_savings": 0.59
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.5,
+          "token_savings": 0.0
+        }
+      },
+      "_iteration10_values_obsolete_setup": {
         "upper_only": {
           "type": "baseline",
           "accuracy": 0.289,
@@ -369,73 +442,91 @@
       }
     },
     "difficulty_mix_1_3": {
-      "description": "Scaled difficulty-mix setting with a 1:3 solvable:unsolvable mix. Useful policies should avoid spending nearly the full budget on many examples that do not improve.",
-      "notes": "Scaled synthetic benchmark reference for the paper's solvable:unsolvable mix axis. The paper presents this axis as a curve, so this entry records the reproduced scalar mix used by the gym.",
+      "description": "1:3 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.05/0.10/0.125 (tighter because deferring everything already has false-negative risk of about 0.18 here).",
       "weight": 0.2,
       "primary_metric": "token_savings",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "_paper_reported": "Paper (Fig. 6, 1:3): the lower threshold's gain is largest; unsolvable instances mostly exit via the lower threshold. Reported only as curves.",
       "metrics": {
         "accuracy": {
           "higher_is_better": true,
-          "coefficient": 0.7,
-          "description": "Overall answer accuracy at the selected stopping point."
-        },
-        "solvable_accuracy": {
-          "higher_is_better": true,
           "coefficient": 0.5,
-          "description": "Accuracy restricted to examples that can be solved within the full reasoning budget."
-        },
-        "token_fraction": {
-          "higher_is_better": false,
-          "coefficient": -0.8,
-          "description": "Fraction of full-budget reasoning tokens consumed by the stopping policy."
+          "description": "Fraction of held-out questions answered correctly at the stopping point (a defer/abstain counts as incorrect), averaged over calibration draws, profiles and target risk levels."
         },
         "token_savings": {
           "higher_is_better": true,
           "coefficient": 1.0,
-          "description": "Reduction in reasoning tokens relative to always using the full budget."
+          "description": "One minus the fraction of full-budget reasoning tokens consumed, with tokens charged up to the chunk where the policy stopped; averaged over operating points."
+        },
+        "solvable_accuracy": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: accuracy on instances whose full-budget answer is correct."
         },
         "unsolvable_token_savings": {
           "higher_is_better": true,
-          "coefficient": 0.7,
-          "description": "Token savings restricted to examples not solved within the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: token savings on instances whose full-budget answer is wrong."
         },
         "false_positive_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of stopping with an emitted answer that is wrong."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): fraction of instances where the policy stopped before the budget and emitted a wrong answer."
         },
         "false_negative_risk": {
           "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Risk of deferring or abstaining before later trajectory steps would become correct."
+          "coefficient": 0.0,
+          "description": "Constraint (gated, unscored): premature-defer loss, i.e. for deferred instances the fraction of remaining chunks whose answer would have been correct, averaged over all instances."
         },
-        "max_realized_risk": {
-          "higher_is_better": false,
-          "coefficient": -1.0,
-          "description": "Larger of the realized answer-error and premature-defer risks at the selected operating point."
-        },
-        "risk_excess": {
+        "violation_rate": {
           "higher_is_better": false,
           "coefficient": 0.0,
-          "description": "Unscored diagnostic amount by which the larger realized risk exceeds the configured tolerance."
+          "description": "Constraint (gated, unscored): fraction of operating points where realized false-positive or false-negative risk exceeds the target epsilon. Above 0.15 the experiment is scored as failed."
+        },
+        "constraint_satisfied": {
+          "higher_is_better": true,
+          "coefficient": 0.0,
+          "description": "Diagnostic: 1 if the violation rate is within the allowed 0.15, else 0 (failed runs receive the failure values for every metric)."
         },
         "defer_fraction": {
           "higher_is_better": true,
-          "coefficient": 0.2,
-          "description": "Fraction of examples for which the policy defers or abstains before the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances deferred/abstained."
         },
         "defer_precision": {
           "higher_is_better": true,
-          "coefficient": 0.3,
-          "description": "Fraction of defer/abstain decisions that occur on examples unsolved by the full budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of defers on instances whose full-budget answer is wrong."
         },
-        "exit_budget_fraction": {
+        "budget_exit_fraction": {
           "higher_is_better": false,
-          "coefficient": -0.2,
-          "description": "Fraction of examples that still consume the full reasoning budget."
+          "coefficient": 0.0,
+          "description": "Diagnostic: fraction of instances that consumed the whole budget."
         }
       },
       "results": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.229,
+          "token_savings": 0.28
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.249,
+          "token_savings": 0.067
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.185,
+          "token_savings": 0.603
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.25,
+          "token_savings": 0.0
+        }
+      },
+      "_iteration10_values_obsolete_setup": {
         "upper_only": {
           "type": "baseline",
           "accuracy": 0.078,

@@ -1,21 +1,23 @@
 # Experiment Overview
 
+All experiments score a stopping policy on unseen reasoning trajectories from held-out (model, dataset) profiles. The policy receives labelled calibration data and a target risk level for each operating point, then makes online continue / answer / defer decisions chunk by chunk. Every experiment reports token savings and accuracy (scored) and the realized risks (constraints). A policy that exceeds its target risk too often in any experiment, or breaks the protocol, is scored as failed everywhere.
+
 ## adaptive_budget_efficiency
 
-Tests the central compute-efficiency question in a compact benchmark setting. The experiment compares a candidate adaptive stopping policy against a reference adaptive baseline and measures whether the candidate uses fewer reasoning tokens while keeping answer-error and premature-defer risk within the requested tolerance.
+The central compute-efficiency question on a natural mix of solvable and unsolvable instances, with a moderately large calibration set. It establishes how many reasoning tokens a policy can save, and how much accuracy it keeps, while its realized risks stay within the requested tolerances.
 
 ## risk_control
 
-Tests the reliability side of the benchmark. The experiment measures whether deployed stopping decisions stay within the configured risk budget on held-out examples, so token savings are penalized if they come from too many incorrect early answers or premature deferrals.
+The reliability question in the small-calibration regime: only 50 labelled examples per draw, ten independent draws per profile, and a sweep of tolerances from strict to loose, on profiles not used by any other experiment. It establishes whether realized risk stays within tolerance across calibration draws, and how much compute a policy can still save when its calibration evidence is scarce.
 
 ## difficulty_mix_3_1
 
-Tests efficiency when most examples are solvable within the full budget. The expected opportunity for extra savings is present but modest because many examples can be answered before the budget is exhausted.
+Efficiency when most instances (75%) are solvable within the full budget. Most of the available savings come from stopping solvable instances once they have converged.
 
 ## difficulty_mix_1_1
 
-Tests the same decision problem when solvable and unsolvable examples are balanced. This setting exposes more wasted full-budget runs and gives useful policies more room to save compute.
+Efficiency when solvable and unsolvable instances are balanced, so more runs would otherwise consume the full budget without ever becoming correct.
 
 ## difficulty_mix_1_3
 
-Tests a high-unsolvable regime. A useful policy should avoid spending nearly the full budget on many examples that do not improve, while still respecting the configured answer-error and premature-defer risks.
+Efficiency when most instances (75%) are unsolvable within the full budget. Policies that only stop when confident spend nearly the full budget on most instances; tolerances are tighter here because abstaining on everything immediately would otherwise look almost acceptable.

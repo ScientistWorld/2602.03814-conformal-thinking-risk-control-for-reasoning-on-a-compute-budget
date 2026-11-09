@@ -3,10 +3,19 @@
 
 Implements the paper's actual computational steps:
   * false-positive upper-threshold stopping (Eq. 6, 10)
-  * false-negative lower sigmoid threshold (Eq. 7, 11, 12)
+  * false-negative lower sigmoid threshold scaled by the upper threshold
+    (Eq. 7, 11, 12, Sec. 4.4)
   * Hoeffding UCB finite-sample risk correction (Eq. 25)
-  * efficiency-loss tie-breaking among feasible candidates (Alg. 1)
-  * combined lower+upper stopping (Eq. 17)
+  * efficiency-loss selection among feasible signal/threshold candidates
+    (Alg. 1, Eq. 8, 9, 16)
+  * two-step combination: calibrate the upper threshold first, then the lower
+    threshold under it, and exit at min(tau_+, tau_-, T) (Eq. 17)
+
+The policy is deployed through the benchmark's online stopping protocol
+(``serve``): the evaluator sends a labelled calibration set with the target
+risk ``epsilon`` and confidence ``delta``; the policy calibrates with Alg. 1
+and then receives held-out trajectories one chunk at a time, answering
+``continue``, ``answer`` or ``defer`` after each chunk.
 """
 
 from __future__ import annotations
@@ -14,12 +23,19 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Callable, Iterable
 
 
-FORCING_STRING = "\n **Final Answer**\n \\boxed{"
+SIGNALS = ["confidence", "eat_confidence", "token_fraction"]
+LOWER_SIGNAL = "confidence"
+UPPER_GRID = [i / 100.0 for i in range(5, 101)]
+# Very small c values make the sigmoid lower threshold nearly flat and can
+# trigger at the first chunk. The paper's lower threshold is a progress curve
+# over the token budget, so the grid starts where the curve is low early and
+# rises around the budget midpoint.
+C_GRID = [i / 1000.0 for i in range(8, 81)]
 
 
 @dataclass(frozen=True)
@@ -31,11 +47,6 @@ class Candidate:
     efficiency_loss: float
 
 
-def load_jsonl(path: Path) -> list[dict]:
-    with path.open("r", encoding="utf-8") as handle:
-        return [json.loads(line) for line in handle if line.strip()]
-
-
 def sigmoid(x: float) -> float:
     if x >= 0:
         z = math.exp(-x)
@@ -45,12 +56,17 @@ def sigmoid(x: float) -> float:
 
 
 def ucb(risk: float, n: int, delta: float) -> float:
+    """Hoeffding upper confidence bound for a [0, 1]-bounded loss (Eq. 25)."""
     return risk + math.sqrt(math.log(1.0 / delta) / (2.0 * n))
 
 
-def signal(step: dict, name: str, max_tokens: int) -> float:
+def budget_of(instance: dict) -> int:
+    return int(instance.get("budget_tokens") or instance["steps"][-1]["tokens"])
+
+
+def signal(step: dict, name: str, budget: int) -> float:
     if name == "token_fraction":
-        return step["tokens"] / max_tokens
+        return step["tokens"] / budget
     return step["signals"][name]
 
 
@@ -62,48 +78,35 @@ def first_correct_step(instance: dict) -> int | None:
 
 
 def upper_exit(instance: dict, signal_name: str, threshold: float) -> tuple[int, str]:
-    max_tokens = instance["steps"][-1]["tokens"]
+    budget = budget_of(instance)
     for idx, step in enumerate(instance["steps"]):
-        if signal(step, signal_name, max_tokens) >= threshold:
+        if signal(step, signal_name, budget) >= threshold:
             return idx, "upper"
     return len(instance["steps"]) - 1, "budget"
 
 
 def lower_curve(tokens: int, budget: int, c: float, upper_threshold: float) -> float:
+    """Parametric lower threshold (Eq. 12) bounded by the upper threshold."""
     return upper_threshold * sigmoid(c * (tokens - budget / 2.0))
 
 
-def lower_exit(
-    instance: dict, signal_name: str, c: float, upper_threshold: float = 1.0
-) -> tuple[int, str]:
-    budget = instance["steps"][-1]["tokens"]
+def lower_exit(instance: dict, signal_name: str, c: float, upper_threshold: float = 1.0) -> tuple[int, str]:
+    budget = budget_of(instance)
     for idx, step in enumerate(instance["steps"]):
         if signal(step, signal_name, budget) < lower_curve(step["tokens"], budget, c, upper_threshold):
             return idx, "lower"
     return len(instance["steps"]) - 1, "budget"
 
 
-def dual_exit(instance: dict, signal_name: str, upper_threshold: float, c: float) -> tuple[int, str]:
-    up_idx, up_reason = upper_exit(instance, signal_name, upper_threshold)
-    low_idx, low_reason = lower_exit(instance, signal_name, c, upper_threshold)
-    if low_idx < up_idx:
-        return low_idx, low_reason
-    if up_idx < low_idx:
-        return up_idx, up_reason
-    if up_reason == "upper":
-        return up_idx, "upper"
-    if low_reason == "lower":
-        return low_idx, "lower"
-    return up_idx, "budget"
-
-
 def fp_loss(instance: dict, exit_idx: int, reason: str) -> float:
+    """False positive loss (Eq. 6)."""
     if reason != "upper":
         return 0.0
     return 0.0 if instance["steps"][exit_idx]["prediction"] == instance["gold"] else 1.0
 
 
 def fn_loss(instance: dict, exit_idx: int, reason: str) -> float:
+    """False negative loss (Eq. 7): correctness averaged over remaining steps."""
     if reason != "lower":
         return 0.0
     future = instance["steps"][exit_idx:]
@@ -113,6 +116,7 @@ def fn_loss(instance: dict, exit_idx: int, reason: str) -> float:
 
 
 def upper_efficiency_loss(instance: dict, exit_idx: int) -> float:
+    """Upper-threshold efficiency loss (Eq. 8)."""
     first = first_correct_step(instance)
     if first is None:
         return 0.0
@@ -120,6 +124,7 @@ def upper_efficiency_loss(instance: dict, exit_idx: int) -> float:
 
 
 def lower_efficiency_loss(instance: dict, exit_idx: int) -> float:
+    """Lower-threshold efficiency loss (Eq. 9)."""
     prefix = instance["steps"][: exit_idx + 1]
     return sum(1.0 for step in prefix if step["prediction"] != instance["gold"]) / len(instance["steps"])
 
@@ -129,163 +134,131 @@ def mean(values: Iterable[float]) -> float:
     return sum(values) / len(values) if values else 0.0
 
 
-def calibrate(
+def candidate_statistics(
     validation: list[dict],
     signal_names: list[str],
     thresholds: list[float],
-    epsilon: float,
-    delta: float,
     exit_fn: Callable[[dict, str, float], tuple[int, str]],
     risk_fn: Callable[[dict, int, str], float],
     efficiency_fn: Callable[[dict, int], float],
-    method_name: str,
-) -> Candidate | None:
-    feasible: list[Candidate] = []
+) -> list[tuple[str, float, float, float]]:
+    """Empirical risk (Eq. 14) and efficiency loss (Eq. 16) of every candidate."""
+    stats = []
     for signal_name in signal_names:
         for threshold in thresholds:
             exits = [exit_fn(instance, signal_name, threshold) for instance in validation]
             risk = mean(risk_fn(instance, idx, reason) for instance, (idx, reason) in zip(validation, exits))
-            adjusted = ucb(risk, len(validation), delta) if method_name == "ucb" else risk
-            if adjusted <= epsilon:
-                eff = mean(efficiency_fn(instance, idx) for instance, (idx, _) in zip(validation, exits))
-                feasible.append(Candidate(signal_name, threshold, risk, adjusted, eff))
+            eff = mean(efficiency_fn(instance, idx) for instance, (idx, _) in zip(validation, exits))
+            stats.append((signal_name, threshold, risk, eff))
+    return stats
+
+
+def select(
+    stats: list[tuple[str, float, float, float]], n: int, epsilon: float, delta: float, calibration: str
+) -> Candidate | None:
+    """Alg. 1: keep candidates whose adjusted risk is <= epsilon, pick min efficiency loss."""
+    feasible = []
+    for signal_name, threshold, risk, eff in stats:
+        adjusted = ucb(risk, n, delta) if calibration == "ucb" else risk
+        if adjusted <= epsilon:
+            feasible.append(Candidate(signal_name, threshold, risk, adjusted, eff))
     if not feasible:
         return None
     return min(feasible, key=lambda cand: (cand.efficiency_loss, cand.adjusted_risk))
 
 
-def evaluate_policy(
-    data: list[dict],
-    name: str,
-    exit_fn: Callable[[dict], tuple[int, str]],
-) -> dict:
-    total_tokens = 0
-    full_tokens = 0
-    correct = 0
-    fp = []
-    fn = []
-    reasons = {"upper": 0, "lower": 0, "budget": 0}
-    decisions = []
-    for instance in data:
-        exit_idx, reason = exit_fn(instance)
-        step = instance["steps"][exit_idx]
-        reasons[reason] += 1
-        total_tokens += step["tokens"]
-        full_tokens += instance["steps"][-1]["tokens"]
-        correct += int(step["prediction"] == instance["gold"] and reason != "lower")
-        fp.append(fp_loss(instance, exit_idx, reason))
-        fn.append(fn_loss(instance, exit_idx, reason))
-        decisions.append({"id": instance["id"], "exit_idx": exit_idx, "reason": reason})
+class ConformalThinkingPolicy:
+    """Calibrated dual-threshold (or upper-only) early-exit policy."""
 
-    n = len(data)
-    return {
-        "name": name,
-        "decisions": decisions,
-        "accuracy": correct / n,
-        "false_positive_risk": mean(fp),
-        "false_negative_risk": mean(fn),
-        "tokens_used": total_tokens,
-        "full_budget_tokens": full_tokens,
-        "token_fraction": total_tokens / full_tokens if full_tokens else 0.0,
-        "token_savings": 1.0 - (total_tokens / full_tokens if full_tokens else 0.0),
-        "exit_upper_fraction": reasons["upper"] / n,
-        "exit_lower_fraction": reasons["lower"] / n,
-        "exit_budget_fraction": reasons["budget"] / n,
-    }
+    def __init__(self, variant: str = "dual", calibration: str = "ucb") -> None:
+        self.variant = variant
+        self.calibration = calibration
+        self.upper: Candidate | None = None
+        self.lower: Candidate | None = None
+        self._cache_id: object = None
+        self._upper_stats: list | None = None
+        self._lower_stats: dict[float, list] = {}
+        self.budget = 1
+
+    def calibrate(self, instances: list[dict], epsilon: float, delta: float, calibration_id: object = None) -> None:
+        if calibration_id is None or calibration_id != self._cache_id:
+            self._cache_id = calibration_id
+            self._upper_stats = None
+            self._lower_stats = {}
+        n = len(instances)
+        if self._upper_stats is None:
+            self._upper_stats = candidate_statistics(
+                instances, SIGNALS, UPPER_GRID, upper_exit, fp_loss, upper_efficiency_loss
+            )
+        self.upper = select(self._upper_stats, n, epsilon, delta, self.calibration)
+        self.lower = None
+        if self.variant == "upper_only":
+            return
+        # Sec. 4.4: the lower curve is scaled by the selected upper threshold so the
+        # two thresholds never intersect. Without a feasible upper threshold the
+        # curve is scaled by the maximum signal value.
+        scale = self.upper.threshold if self.upper is not None else 1.0
+        if scale not in self._lower_stats:
+            self._lower_stats[scale] = candidate_statistics(
+                instances,
+                [LOWER_SIGNAL],
+                C_GRID,
+                lambda instance, sig, c: lower_exit(instance, sig, c, scale),
+                fn_loss,
+                lower_efficiency_loss,
+            )
+        self.lower = select(self._lower_stats[scale], n, epsilon, delta, self.calibration)
+
+    def begin(self, budget_tokens: int) -> None:
+        self.budget = max(1, int(budget_tokens))
+
+    def decide(self, step: dict) -> str:
+        """Online Eq. 17: exit at the earliest of the upper and lower exits."""
+        if self.upper is not None and signal(step, self.upper.name, self.budget) >= self.upper.threshold:
+            return "answer"
+        if self.lower is not None:
+            scale = self.upper.threshold if self.upper is not None else 1.0
+            curve = lower_curve(step["tokens"], self.budget, self.lower.threshold, scale)
+            if signal(step, LOWER_SIGNAL, self.budget) < curve:
+                return "defer"
+        return "continue"
 
 
-def run(args: argparse.Namespace) -> dict:
-    all_data = load_jsonl(Path(args.data))
-    validation = [row for row in all_data if row["split"] == "validation"]
-    test = [row for row in all_data if row["split"] == "test"]
-    signal_names = ["confidence", "eat_confidence", "token_fraction"]
-    confidence_signal = ["confidence"]
-    upper_grid = [i / 100.0 for i in range(5, 101)]
-    # Very small c values make the sigmoid lower threshold nearly flat and can
-    # trigger at the first chunk. The paper's lower threshold is a progress
-    # curve over the token budget, so the grid starts where the curve is low
-    # early and rises around the midpoint.
-    c_grid = [i / 1000.0 for i in range(8, 81)]
-
-    results = {"config": vars(args), "epsilons": []}
-    for epsilon in args.epsilons:
-        upper = calibrate(
-            validation,
-            signal_names,
-            upper_grid,
-            epsilon,
-            args.delta,
-            upper_exit,
-            fp_loss,
-            upper_efficiency_loss,
-            args.calibration,
-        )
-        if upper is None:
+def serve(policy: ConformalThinkingPolicy) -> None:
+    """JSON-lines stopping protocol over stdin/stdout."""
+    out = sys.stdout
+    for line in sys.stdin:
+        if not line.strip():
             continue
-
-        lower = calibrate(
-            validation,
-            confidence_signal,
-            c_grid,
-            epsilon,
-            args.delta,
-            lambda instance, sig, c: lower_exit(instance, sig, c, upper.threshold),
-            fn_loss,
-            lower_efficiency_loss,
-            args.calibration,
-        )
-        if lower is None:
-            continue
-
-        upper_only = evaluate_policy(
-            test,
-            "upper_only",
-            lambda instance, cand=upper: upper_exit(instance, cand.name, cand.threshold),
-        )
-        lower_only = evaluate_policy(
-            test,
-            "lower_only",
-            lambda instance, cand=lower, up=upper: lower_exit(instance, cand.name, cand.threshold, up.threshold),
-        )
-        dual = evaluate_policy(
-            test,
-            "conformal_thinking",
-            lambda instance, up=upper, low=lower: dual_exit(instance, up.name, up.threshold, low.threshold),
-        )
-        full_budget = evaluate_policy(
-            test,
-            "full_budget",
-            lambda instance: (len(instance["steps"]) - 1, "budget"),
-        )
-        results["epsilons"].append(
-            {
-                "epsilon": epsilon,
-                "upper_candidate": upper.__dict__,
-                "lower_candidate": lower.__dict__,
-                "policies": {
-                    "full_budget": full_budget,
-                    "upper_only": upper_only,
-                    "lower_only": lower_only,
-                    "conformal_thinking": dual,
-                },
-            }
-        )
-
-    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    with Path(args.output).open("w", encoding="utf-8") as handle:
-        json.dump(results, handle, indent=2)
-    return results
+        message = json.loads(line)
+        kind = message.get("type")
+        if kind == "step":
+            reply = {"action": policy.decide(message["step"])}
+        elif kind == "begin":
+            policy.begin(message["budget_tokens"])
+            reply = {"ok": True}
+        elif kind == "calibrate":
+            policy.calibrate(
+                message["instances"], float(message["epsilon"]), float(message["delta"]), message.get("calibration_id")
+            )
+            reply = {"ok": True}
+        elif kind == "shutdown":
+            return
+        else:
+            reply = {"error": f"unknown message type {kind!r}"}
+        out.write(json.dumps(reply) + "\n")
+        out.flush()
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", default="data/synthetic_reasoning.jsonl")
-    parser.add_argument("--output", default="outputs/conformal_thinking/results.json")
-    parser.add_argument("--calibration", choices=["ucb", "naive"], default="ucb")
-    parser.add_argument("--delta", type=float, default=0.1)
-    parser.add_argument("--epsilons", nargs="+", type=float, default=[0.18, 0.25, 0.32, 0.40])
+    sub = parser.add_subparsers(dest="command", required=True)
+    serve_parser = sub.add_parser("serve", help="run the online stopping protocol on stdin/stdout")
+    serve_parser.add_argument("--variant", choices=["dual", "upper_only"], default="dual")
+    serve_parser.add_argument("--calibration", choices=["ucb", "naive"], default="ucb")
     args = parser.parse_args()
-    run(args)
+    if args.command == "serve":
+        serve(ConformalThinkingPolicy(args.variant, args.calibration))
 
 
 if __name__ == "__main__":

@@ -1,37 +1,27 @@
 #!/bin/bash
 # Download all data and models needed for this environment.
 #
-# Run on a node with internet access BEFORE building the container
-# or submitting compute jobs.
-#
-# This script should be idempotent — safe to run multiple times.
-# It should skip files that already exist.
-#
-# Update the storage estimate below as you add downloads.
-#
 # Estimated total download size: 0 GB
-# Estimated disk usage after extraction: about 6 MB
+# Estimated disk usage: under 10 MB
 #
-# This reproduction has no remote resources. The command below regenerates the
-# tracked synthetic trajectories used for portable smoke tests.
+# This benchmark has no external resources: every trajectory is simulated by
+# the public generator in data/generate_synthetic_reasoning.py (visible
+# development data, generated in memory by eval/train/) or by the held-out
+# generator inside eval/test/. The command below writes an optional local copy
+# of public development data for inspection; it is idempotent.
 
 set -e
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-# This scaled reproduction uses agent-authored synthetic trajectory data stored
-# in git. No external downloads are required for the runnable benchmark.
-python data/generate_synthetic_reasoning.py --output data/synthetic_reasoning.jsonl
-python data/generate_synthetic_reasoning.py \
-  --output data/synthetic_ratio_3_1.jsonl \
-  --solvable-probability 0.75 \
-  --seed 260203815
-python data/generate_synthetic_reasoning.py \
-  --output data/synthetic_ratio_1_1.jsonl \
-  --solvable-probability 0.50 \
-  --seed 260203816
-python data/generate_synthetic_reasoning.py \
-  --output data/synthetic_ratio_1_3.jsonl \
-  --solvable-probability 0.25 \
-  --seed 260203817
+mkdir -p data/downloads
+for profile in public_a public_b public_c; do
+  for setting in natural ratio_3_1 ratio_1_1 ratio_1_3; do
+    target="data/downloads/dev_${profile}_${setting}.jsonl"
+    if [ ! -f "$target" ]; then
+      python data/generate_synthetic_reasoning.py \
+        --profile "$profile" --setting "$setting" --size 500 --output "$target"
+    fi
+  done
+done
