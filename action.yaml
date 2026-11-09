@@ -1,8 +1,3 @@
-# Once you set action to 'submit' or 'done', STOP immediately.
-# Do NOT sleep, poll, or wait for jobs. The system reads this file
-# only after your turn ends.
-action: pending
-gpus: 0
-test: false
+action: done
 milestone: core_claim_plus
-notes: ""
+notes: "Audit committed as ed53e0e: 26 hidden-test attempts; honest quality controls pass, multiple shortcuts win, frozen reference does not reproduce; gym files restored."

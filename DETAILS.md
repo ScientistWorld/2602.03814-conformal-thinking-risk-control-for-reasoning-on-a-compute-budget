@@ -361,6 +361,82 @@ The paper evaluates Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Q
 
 </details>
 
+### Iteration 9: gpt-5.5 (verifier)
+- **Milestone**: `core_claim_plus` | **Status**: done
+- **Working time**: 9m | **GPU**: 0.0h
+- **Jobs**: 3 total (3 completed, 0 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-07 11:30] - method_runs
+- Implemented the paper's upper-threshold false-positive loss, sigmoid lower-threshold false-negative loss, UCB finite-sample correction, efficiency-loss selection, and combined earliest-exit policy.
+- Ran the method end-to-end on fixed synthetic reasoning trajectories.
+
+### [2026-06-07 11:45] - core_claim
+- Reproduced the core scaled claim on one held-out synthetic trajectory split: dual-threshold Conformal Thinking saved more tokens than upper-only stopping while satisfying the configured risk tolerance.
+- Verified the reusable evaluator reads saved method and baseline artifacts and does not import from `method/`.
+
+### [2026-06-07 12:05] - core_claim_plus
+- Added three additional solvable:unsolvable mix experiments matching the paper's Figure 6 axis: 3:1, 1:1, and 1:3.
+- Confirmed lower-threshold exits and token savings increase as unsolvable trajectories become more common, with `risk_excess` remaining zero in the scaled benchmark.
+
+### [2026-06-07 11:40] - core_claim_plus
+- Audited the continued workspace after milestone reset and fixed the evaluator so it recomputes all scored metrics from per-example stopping decisions and held-out labels instead of trusting method-reported aggregate metrics.
+- Reran `bash scripts/reproduce.sh`; the corrected evaluator reproduced the same five-experiment score contract and `python validate.py --compare` passed.
+
+### [2026-06-07 12:12] - core_claim_plus
+- Completed final verification of folder structure, method/evaluation separation, reusable scoring, and train/test split wiring.
+- Cleaned public-facing experiment and metric names so from-scratch documentation stays method-agnostic, then reran `python validate.py --compare`.
+
+### [2026-06-07 12:16] - core_claim_plus
+- Extended the main reusable evaluator so `scores.json` includes the full metric set declared by `reference.json`, including solvable accuracy, unsolvable token savings, maximum realized risk, and defer precision.
+- Reran `bash scripts/reproduce.sh`; the scaled benchmark still passes `python validate.py --compare`.
+
+### [2026-06-07 12:20] - core_claim_plus
+- Completed final gym verification of scoring metadata, method-agnostic documentation, train/test split wiring, download portability, and repository hygiene.
+- Added explicit scaled-reference notes in `reference.json`, aligned `scoring/TARGETS.md` with the scored metric set, and removed stale transcript artifacts from the tracked workspace.
+
+</details>
+
+### Iteration 10: gpt-6.1-sol (redteam)
+- **Milestone**: `core_claim_plus` | **Status**: done
+- **Working time**: 10m | **GPU**: 0.0h
+- **Jobs**: 3 total (3 completed, 0 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-07 11:30] - method_runs
+- Implemented the paper's upper-threshold false-positive loss, sigmoid lower-threshold false-negative loss, UCB finite-sample correction, efficiency-loss selection, and combined earliest-exit policy.
+- Ran the method end-to-end on fixed synthetic reasoning trajectories.
+
+### [2026-06-07 11:45] - core_claim
+- Reproduced the core scaled claim on one held-out synthetic trajectory split: dual-threshold Conformal Thinking saved more tokens than upper-only stopping while satisfying the configured risk tolerance.
+- Verified the reusable evaluator reads saved method and baseline artifacts and does not import from `method/`.
+
+### [2026-06-07 12:05] - core_claim_plus
+- Added three additional solvable:unsolvable mix experiments matching the paper's Figure 6 axis: 3:1, 1:1, and 1:3.
+- Confirmed lower-threshold exits and token savings increase as unsolvable trajectories become more common, with `risk_excess` remaining zero in the scaled benchmark.
+
+### [2026-06-07 11:40] - core_claim_plus
+- Audited the continued workspace after milestone reset and fixed the evaluator so it recomputes all scored metrics from per-example stopping decisions and held-out labels instead of trusting method-reported aggregate metrics.
+- Reran `bash scripts/reproduce.sh`; the corrected evaluator reproduced the same five-experiment score contract and `python validate.py --compare` passed.
+
+### [2026-06-07 12:12] - core_claim_plus
+- Completed final verification of folder structure, method/evaluation separation, reusable scoring, and train/test split wiring.
+- Cleaned public-facing experiment and metric names so from-scratch documentation stays method-agnostic, then reran `python validate.py --compare`.
+
+### [2026-06-07 12:16] - core_claim_plus
+- Extended the main reusable evaluator so `scores.json` includes the full metric set declared by `reference.json`, including solvable accuracy, unsolvable token savings, maximum realized risk, and defer precision.
+- Reran `bash scripts/reproduce.sh`; the scaled benchmark still passes `python validate.py --compare`.
+
+### [2026-06-07 12:20] - core_claim_plus
+- Completed final gym verification of scoring metadata, method-agnostic documentation, train/test split wiring, download portability, and repository hygiene.
+- Added explicit scaled-reference notes in `reference.json`, aligned `scoring/TARGETS.md` with the scored metric set, and removed stale transcript artifacts from the tracked workspace.
+
+</details>
+
 
 ---
 
