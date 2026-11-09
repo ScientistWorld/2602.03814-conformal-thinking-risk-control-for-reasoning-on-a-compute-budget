@@ -32,5 +32,9 @@
 - Completed final gym verification of scoring metadata, method-agnostic documentation, train/test split wiring, download portability, and repository hygiene.
 - Added explicit scaled-reference notes in `reference.json`, aligned `scoring/TARGETS.md` with the scored metric set, and removed stale transcript artifacts from the tracked workspace.
 
+### [2026-11-09] - core_claim_plus (hardening, iteration 11)
+- Rebuilt the measurement as a hidden, online test: held-out profiles, calibration pools and test sets are generated only inside `eval/test/`; methods are stopping-policy programs that see one chunk at a time; exits, tokens and every score are computed by the evaluator; any risk-constraint or protocol failure fails the run.
+- Reproduced on the hidden test: lower+upper thresholds save more tokens than upper-only (gap +0.10 → +0.16 → +0.22 from 3:1 → natural → 1:1 mixes), UCB never violates the risk target while naive calibration fails the gate with 50 calibration examples. Reference is deterministic and reproduces exactly. Details in `HARDENING.md`.
+
 ## Stop Justification
 - Completed at milestone `core_claim_plus`.

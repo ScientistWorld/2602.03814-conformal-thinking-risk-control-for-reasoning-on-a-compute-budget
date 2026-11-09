@@ -1,5 +1,23 @@
 # Progress
 
+## Current state (iteration 11, hardening)
+
+The gym measures risk-controlled adaptive stopping on simulated reasoning trajectories through a hidden, online test (`briefing/evaluation.md`, `HARDENING.md`). Reference (paper's method: upper threshold over an ensemble of signals, sigmoid lower threshold scaled by the upper threshold, Hoeffding UCB, efficiency-loss selection, earliest-exit combination). Hidden-test results, averaged over operating points:
+
+| Experiment | reference acc / savings | upper-only acc / savings | full-budget acc |
+|---|---:|---:|---:|
+| adaptive_budget_efficiency | 0.487 / 0.453 | 0.538 / 0.294 | 0.557 |
+| risk_control (n = 50) | 0.532 / 0.200 | 0.554 / 0.135 | 0.556 |
+| difficulty_mix_3_1 | 0.654 / 0.499 | 0.719 / 0.402 | 0.750 |
+| difficulty_mix_1_1 | 0.415 / 0.489 | 0.487 / 0.266 | 0.500 |
+| difficulty_mix_1_3 | 0.223 / 0.274 | 0.251 / 0.072 | 0.250 |
+
+The reference violates the risk target at 0 operating points. Naive calibration violates at 22.5% in `risk_control` and fails the run.
+
+## History (iterations 1-10)
+
+
+
 ## What Works
 
 - Read the paper and implemented the core Conformal Thinking algorithm: upper-threshold false-positive control, parametric sigmoid lower-threshold false-negative control, Hoeffding UCB finite-sample correction, efficiency-loss candidate selection, and combined earliest-exit inference.
@@ -46,6 +64,8 @@ This supports `core_claim_plus` on the scaled synthetic benchmark: the dual-thre
 - Continuation audit fix: `scores.json` now includes every metric family declared by `reference.json`; missing values such as `solvable_accuracy`, `unsolvable_token_savings`, `max_realized_risk`, and `defer_precision` are recomputed in `eval/`.
 
 ## Deviations from Paper
+
+- (Iteration 11) The data generator now has opaque answers, persistent wrong answers, muted-confidence solvable runs and per-profile signal transforms. Solvability is labelled by the full-budget answer. Calibration happens online through the evaluator's protocol, so calibration size, draws and epsilon are fixed by the benchmark (400 or 50 examples; epsilon grids per experiment).
 
 - **Data/model scale**: The paper uses trajectories from Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Qwen3-VL-8B on AIME, GPQA-Diamond, DeepScaleR, and MathVision. This reproduction substitutes a deterministic synthetic trajectory dataset with the same fields needed by the algorithm. The substitution avoids multi-GB model downloads and expensive LLM inference while preserving the paper's stopping-policy computation.
 - **Signal set**: The paper evaluates confidence, EAT, token count, and a trained probe. This reproduction includes confidence-like, EAT-like, and token-fraction signals, but omits the learned probe because it requires hidden states from a large model trajectory corpus.

@@ -13,6 +13,28 @@
     "weaker_confidence_only",
     "weaker_token_budget"
   ],
+  "rerun_with_isolation": [
+    "better_tighter_bound",
+    "conformal_thinking",
+    "full_budget",
+    "naive_calibration",
+    "shortcut_accumulate_calibration",
+    "shortcut_encoded_answers",
+    "shortcut_test_memory_lookahead",
+    "upper_only",
+    "variant_stricter_calibration",
+    "weaker_confidence_only"
+  ],
+  "identical_after_isolation": {
+    "better_tighter_bound": true,
+    "conformal_thinking": true,
+    "full_budget": true,
+    "naive_calibration": true,
+    "shortcut_encoded_answers": true,
+    "upper_only": true,
+    "variant_stricter_calibration": true,
+    "weaker_confidence_only": true
+  },
   "methods": {
     "better_joint_calibration": {
       "test": {
@@ -81,7 +103,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": 0.5439066170968357,
-      "rank_all_attempts": 0.5926733232187734,
+      "rank_all_attempts": 0.6017585876385243,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.02985848573017264,
         "adaptive_budget_efficiency.token_savings": 0.20475724707338822,
@@ -97,31 +119,31 @@
       "train_rank_vs_train_reference": 0.41103386005788933,
       "paired_noise": {
         "adaptive_budget_efficiency": {
-          "diff_accuracy": -0.029916666666666675,
+          "diff_accuracy": -0.029916666666666668,
           "se_accuracy": 0.0028778824787903333,
-          "diff_token_savings": 0.16425897576827087,
+          "diff_token_savings": 0.16425897576827078,
           "se_token_savings": 0.0029140822815098234
         },
         "risk_control": {
-          "diff_accuracy": -0.007833333333333335,
+          "diff_accuracy": -0.007833333333333333,
           "se_accuracy": 0.0011712415658418017,
-          "diff_token_savings": 0.06827701355547154,
+          "diff_token_savings": 0.06827701355547158,
           "se_token_savings": 0.00112842686899512
         },
         "difficulty_mix_3_1": {
-          "diff_accuracy": 0.015277777777777769,
+          "diff_accuracy": 0.015277777777777782,
           "se_accuracy": 0.0025281583962527368,
-          "diff_token_savings": 0.04044883730492971,
+          "diff_token_savings": 0.04044883730492978,
           "se_token_savings": 0.0024025309003460216
         },
         "difficulty_mix_1_1": {
-          "diff_accuracy": -0.01700000000000001,
+          "diff_accuracy": -0.017,
           "se_accuracy": 0.0030226906806051597,
-          "diff_token_savings": 0.15883211107229972,
+          "diff_token_savings": 0.1588321110722997,
           "se_token_savings": 0.002197955092040895
         },
         "difficulty_mix_1_3": {
-          "diff_accuracy": -0.02111111111111111,
+          "diff_accuracy": -0.021111111111111112,
           "se_accuracy": 0.0025336269323045107,
           "diff_token_savings": 0.23053576650066943,
           "se_token_savings": 0.0018848189086357581
@@ -196,7 +218,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": 0.9925914102515021,
-      "rank_all_attempts": 1.1039452539158598,
+      "rank_all_attempts": 1.1227234821666603,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.05242562350580925,
         "adaptive_budget_efficiency.token_savings": 0.2785134928736948,
@@ -212,27 +234,27 @@
       "train_rank_vs_train_reference": 0.9010831797644906,
       "paired_noise": {
         "adaptive_budget_efficiency": {
-          "diff_accuracy": -0.0525277777777778,
+          "diff_accuracy": -0.05252777777777777,
           "se_accuracy": 0.0034136622969734103,
           "diff_token_savings": 0.22342721310703967,
           "se_token_savings": 0.0032316201815237064
         },
         "risk_control": {
-          "diff_accuracy": -0.020724999999999997,
+          "diff_accuracy": -0.020725,
           "se_accuracy": 0.002130269202471838,
-          "diff_token_savings": 0.2108973157588347,
+          "diff_token_savings": 0.21089731575883466,
           "se_token_savings": 0.0010737207506423252
         },
         "difficulty_mix_3_1": {
           "diff_accuracy": -0.01172222222222222,
           "se_accuracy": 0.0034627056252175955,
-          "diff_token_savings": 0.10919291250242882,
+          "diff_token_savings": 0.1091929125024288,
           "se_token_savings": 0.002499961210191432
         },
         "difficulty_mix_1_1": {
-          "diff_accuracy": -0.03238888888888889,
+          "diff_accuracy": -0.0323888888888889,
           "se_accuracy": 0.0035158788831510753,
-          "diff_token_savings": 0.20621810650626143,
+          "diff_token_savings": 0.2062181065062615,
           "se_token_savings": 0.0026065319670726065
         },
         "difficulty_mix_1_3": {
@@ -311,7 +333,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": 0.421832391639583,
-      "rank_all_attempts": 0.4956002280271353,
+      "rank_all_attempts": 0.505335550893512,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.02040468477010892,
         "adaptive_budget_efficiency.token_savings": 0.05014168969720455,
@@ -327,37 +349,37 @@
       "train_rank_vs_train_reference": 0.3907622583535421,
       "paired_noise": {
         "adaptive_budget_efficiency": {
-          "diff_accuracy": -0.020444444444444453,
+          "diff_accuracy": -0.020444444444444446,
           "se_accuracy": 0.001168692025035987,
-          "diff_token_savings": 0.04022432764004337,
+          "diff_token_savings": 0.040224327640043384,
           "se_token_savings": 0.0005586301822564471
         },
         "risk_control": {
-          "diff_accuracy": -0.022325000000000008,
+          "diff_accuracy": -0.022325,
           "se_accuracy": 0.0017958517593795614,
-          "diff_token_savings": 0.16558377328396232,
+          "diff_token_savings": 0.1655837732839623,
           "se_token_savings": 0.0012727184312090602
         },
         "difficulty_mix_3_1": {
-          "diff_accuracy": -0.030611111111111096,
+          "diff_accuracy": -0.03061111111111111,
           "se_accuracy": 0.0015837046348263206,
-          "diff_token_savings": 0.0596743262583895,
+          "diff_token_savings": 0.05967432625838952,
           "se_token_savings": 0.001269509981922047
         },
         "difficulty_mix_1_1": {
           "diff_accuracy": -0.02080555555555556,
           "se_accuracy": 0.0012540031577923105,
-          "diff_token_savings": 0.050288798578918444,
+          "diff_token_savings": 0.05028879857891841,
           "se_token_savings": 0.0006821218421671517
         },
         "difficulty_mix_1_3": {
-          "diff_accuracy": -0.0326388888888889,
+          "diff_accuracy": -0.03263888888888889,
           "se_accuracy": 0.0017762382657017638,
-          "diff_token_savings": 0.21083880308047964,
-          "se_token_savings": 0.0006825000245586878
+          "diff_token_savings": 0.2108388030804797,
+          "se_token_savings": 0.0006825000245586874
         }
       },
-      "rank_se_quality_plus_self": 0.0038346533863494654
+      "rank_se_quality_plus_self": 0.003834653386349465
     },
     "conformal_thinking": {
       "test": {
@@ -510,7 +532,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": -1.4711913134493864,
-      "rank_all_attempts": -1.5607272511019137,
+      "rank_all_attempts": -1.5769598301304326,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": 0.06980841881947515,
         "adaptive_budget_efficiency.token_savings": -0.5647834788764662,
@@ -526,31 +548,31 @@
       "train_rank_vs_train_reference": -1.6433185034284936,
       "paired_noise": {
         "adaptive_budget_efficiency": {
-          "diff_accuracy": 0.06994444444444446,
+          "diff_accuracy": 0.06994444444444445,
           "se_accuracy": 0.004188880599756019,
-          "diff_token_savings": -0.45307678774289534,
+          "diff_token_savings": -0.4530767877428956,
           "se_token_savings": 0.003000311727259106
         },
         "risk_control": {
-          "diff_accuracy": 0.024058333333333338,
+          "diff_accuracy": 0.024058333333333334,
           "se_accuracy": 0.00201885107246121,
-          "diff_token_savings": -0.19994926095930615,
+          "diff_token_savings": -0.19994926095930612,
           "se_token_savings": 0.0015072341520868762
         },
         "difficulty_mix_3_1": {
           "diff_accuracy": 0.09588888888888888,
           "se_accuracy": 0.004757840183305503,
-          "diff_token_savings": -0.4984547513220129,
+          "diff_token_savings": -0.4984547513220131,
           "se_token_savings": 0.0031211970701834025
         },
         "difficulty_mix_1_1": {
-          "diff_accuracy": 0.08505555555555551,
+          "diff_accuracy": 0.08505555555555555,
           "se_accuracy": 0.004527156910397299,
-          "diff_token_savings": -0.48928651542122525,
+          "diff_token_savings": -0.4892865154212249,
           "se_token_savings": 0.002443126941769908
         },
         "difficulty_mix_1_3": {
-          "diff_accuracy": 0.02741666666666667,
+          "diff_accuracy": 0.027416666666666666,
           "se_accuracy": 0.002303476807183994,
           "diff_token_savings": -0.27360575436253926,
           "se_token_savings": 0.0013310945441177004
@@ -631,7 +653,7 @@
         "difficulty_mix_1_3": "run failed in risk_control"
       },
       "rank_quality_plus_self": -3.3076017143818994,
-      "rank_all_attempts": -2.6970186803000713,
+      "rank_all_attempts": -2.7349382479177584,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.4861083461400627,
         "adaptive_budget_efficiency.token_savings": -0.5647834788764662,
@@ -763,6 +785,63 @@
       },
       "rank_se_quality_plus_self": 0.0
     },
+    "shortcut_accumulate_calibration": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.48705555555555563,
+          "token_savings": 0.45307678774289567,
+          "false_positive_risk": 0.047611111111111125,
+          "false_negative_risk": 0.03620744153948811,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5322750000000002,
+          "token_savings": 0.19994926095930615,
+          "false_positive_risk": 0.029791666666666675,
+          "false_negative_risk": 0.018398930445235603,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6541111111111111,
+          "token_savings": 0.498454751322013,
+          "false_positive_risk": 0.06227777777777778,
+          "false_negative_risk": 0.04534109304295064,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.41494444444444434,
+          "token_savings": 0.4892865154212249,
+          "false_positive_risk": 0.039472222222222235,
+          "false_negative_risk": 0.05139727234887195,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.22258333333333333,
+          "token_savings": 0.2736057543625392,
+          "false_positive_risk": 0.010500000000000002,
+          "false_negative_risk": 0.022484940649401444,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {},
+      "failures": {},
+      "rank_quality_plus_self": 0.0,
+      "rank_all_attempts": 0.0,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.0,
+        "adaptive_budget_efficiency.token_savings": 0.0,
+        "risk_control.accuracy": 0.0,
+        "risk_control.token_savings": 0.0,
+        "difficulty_mix_3_1.accuracy": 0.0,
+        "difficulty_mix_3_1.token_savings": 0.0,
+        "difficulty_mix_1_1.accuracy": 0.0,
+        "difficulty_mix_1_1.token_savings": 0.0,
+        "difficulty_mix_1_3.accuracy": 0.0,
+        "difficulty_mix_1_3.token_savings": 0.0
+      },
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
     "shortcut_all_defer": {
       "test": {
         "adaptive_budget_efficiency": {
@@ -836,7 +915,7 @@
         "difficulty_mix_1_3": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.0000, FN=0.1753, savings=0.9317, accuracy=0.0000"
       },
       "rank_quality_plus_self": -2.9207234631612145,
-      "rank_all_attempts": -2.6970186803000713,
+      "rank_all_attempts": -2.7349382479177584,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
         "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
@@ -926,7 +1005,7 @@
         "difficulty_mix_1_3": "protocol failure: invalid action 'budget'; expected one of ['answer', 'continue', 'defer']"
       },
       "rank_quality_plus_self": -2.9207234631612145,
-      "rank_all_attempts": -2.6970186803000713,
+      "rank_all_attempts": -2.7349382479177584,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
         "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
@@ -1016,7 +1095,7 @@
         "difficulty_mix_1_3": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9793, FN=0.0000, savings=0.9317, accuracy=0.0207"
       },
       "rank_quality_plus_self": -2.9207234631612145,
-      "rank_all_attempts": -2.6970186803000713,
+      "rank_all_attempts": -2.7349382479177584,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
         "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
@@ -1100,7 +1179,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": -1.4297116190267285,
-      "rank_all_attempts": -1.5607272511019137,
+      "rank_all_attempts": -1.5769598301304326,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": 0.07160421645047586,
         "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
@@ -1116,31 +1195,31 @@
       "train_rank_vs_train_reference": -1.5954655332165872,
       "paired_noise": {
         "adaptive_budget_efficiency": {
-          "diff_accuracy": 0.06994444444444446,
+          "diff_accuracy": 0.06994444444444445,
           "se_accuracy": 0.004188880599756019,
-          "diff_token_savings": -0.45307678774289534,
+          "diff_token_savings": -0.4530767877428956,
           "se_token_savings": 0.003000311727259106
         },
         "risk_control": {
-          "diff_accuracy": 0.024058333333333338,
+          "diff_accuracy": 0.024058333333333334,
           "se_accuracy": 0.00201885107246121,
-          "diff_token_savings": -0.19994926095930615,
+          "diff_token_savings": -0.19994926095930612,
           "se_token_savings": 0.0015072341520868762
         },
         "difficulty_mix_3_1": {
           "diff_accuracy": 0.09588888888888888,
           "se_accuracy": 0.004757840183305503,
-          "diff_token_savings": -0.4984547513220129,
+          "diff_token_savings": -0.4984547513220131,
           "se_token_savings": 0.0031211970701834025
         },
         "difficulty_mix_1_1": {
-          "diff_accuracy": 0.08505555555555551,
+          "diff_accuracy": 0.08505555555555555,
           "se_accuracy": 0.004527156910397299,
-          "diff_token_savings": -0.48928651542122525,
+          "diff_token_savings": -0.4892865154212249,
           "se_token_savings": 0.002443126941769908
         },
         "difficulty_mix_1_3": {
-          "diff_accuracy": 0.02741666666666667,
+          "diff_accuracy": 0.027416666666666666,
           "se_accuracy": 0.002303476807183994,
           "diff_token_savings": -0.27360575436253926,
           "se_token_savings": 0.0013310945441177004
@@ -1336,7 +1415,7 @@
         "difficulty_mix_1_3": "risk constraint failed: realized risk exceeded epsilon at 0.889 of operating points (allowed 0.15); measured FP=0.1715, FN=0.0285, savings=0.7024, accuracy=0.0779"
       },
       "rank_quality_plus_self": -2.9207234631612145,
-      "rank_all_attempts": -2.6970186803000713,
+      "rank_all_attempts": -2.7349382479177584,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
         "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
@@ -1541,7 +1620,7 @@
         "difficulty_mix_1_3": "run failed in adaptive_budget_efficiency, difficulty_mix_1_1, difficulty_mix_3_1, risk_control"
       },
       "rank_quality_plus_self": -2.9207234631612145,
-      "rank_all_attempts": -2.6970186803000713,
+      "rank_all_attempts": -2.7349382479177584,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
         "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
@@ -1631,7 +1710,7 @@
         "difficulty_mix_1_3": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9713, FN=0.0000, savings=0.8343, accuracy=0.0287"
       },
       "rank_quality_plus_self": -2.9207234631612145,
-      "rank_all_attempts": -2.6970186803000713,
+      "rank_all_attempts": -2.7349382479177584,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
         "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
@@ -1645,6 +1724,63 @@
         "difficulty_mix_1_3.token_savings": -0.23119622942365312
       },
       "train_rank_vs_train_reference": -3.043533425879555,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "shortcut_test_memory_lookahead": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5569999999999998,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5563333333333335,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {},
+      "failures": {},
+      "rank_quality_plus_self": -1.4297116190267285,
+      "rank_all_attempts": -1.5769598301304326,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.07160421645047586,
+        "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
+        "risk_control.accuracy": 0.016072796852249067,
+        "risk_control.token_savings": -0.2777379953902158,
+        "difficulty_mix_3_1.accuracy": 0.03656857007925289,
+        "difficulty_mix_3_1.token_savings": -0.3061206246810842,
+        "difficulty_mix_1_1.accuracy": 0.048528738065131756,
+        "difficulty_mix_1_1.token_savings": -0.2789084267799496,
+        "difficulty_mix_1_3.accuracy": 0.0409219670111089,
+        "difficulty_mix_1_3.token_savings": -0.23119622942365312
+      },
       "paired_noise": {},
       "rank_se_quality_plus_self": null
     },
@@ -1715,7 +1851,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": -0.4802579502001425,
-      "rank_all_attempts": -0.5614417147892506,
+      "rank_all_attempts": -0.5686736327605005,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": 0.0510394356817528,
         "adaptive_budget_efficiency.token_savings": -0.19812368936796276,
@@ -1733,31 +1869,31 @@
         "adaptive_budget_efficiency": {
           "diff_accuracy": 0.051138888888888887,
           "se_accuracy": 0.002527396033445598,
-          "diff_token_savings": -0.15893744791044434,
+          "diff_token_savings": -0.15893744791044428,
           "se_token_savings": 0.0032312559541121592
         },
         "risk_control": {
-          "diff_accuracy": 0.02120000000000001,
+          "diff_accuracy": 0.021199999999999997,
           "se_accuracy": 0.0010563279557031517,
-          "diff_token_savings": -0.0647684455384594,
+          "diff_token_savings": -0.06476844553845944,
           "se_token_savings": 0.0013234766877930314
         },
         "difficulty_mix_3_1": {
           "diff_accuracy": 0.06527777777777778,
           "se_accuracy": 0.0029009515786597327,
-          "diff_token_savings": -0.09678591917164173,
+          "diff_token_savings": -0.09678591917164167,
           "se_token_savings": 0.0028261489436056963
         },
         "difficulty_mix_1_1": {
-          "diff_accuracy": 0.07216666666666666,
+          "diff_accuracy": 0.07216666666666667,
           "se_accuracy": 0.003076367005189284,
-          "diff_token_savings": -0.2238219621017979,
+          "diff_token_savings": -0.22382196210179806,
           "se_token_savings": 0.003787192246880559
         },
         "difficulty_mix_1_3": {
-          "diff_accuracy": 0.02866666666666666,
+          "diff_accuracy": 0.028666666666666667,
           "se_accuracy": 0.001698287081840311,
-          "diff_token_savings": -0.20143533687137966,
+          "diff_token_savings": -0.20143533687137974,
           "se_token_savings": 0.0020831061001447527
         }
       },
@@ -1830,7 +1966,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": -1.0812445631606804,
-      "rank_all_attempts": -1.1792579792516178,
+      "rank_all_attempts": -1.1932429560800106,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": 0.0683667834824568,
         "adaptive_budget_efficiency.token_savings": -0.38591296820622645,
@@ -1846,33 +1982,33 @@
       "train_rank_vs_train_reference": -1.1687686609150714,
       "paired_noise": {
         "adaptive_budget_efficiency": {
-          "diff_accuracy": 0.06850000000000002,
+          "diff_accuracy": 0.06849999999999999,
           "se_accuracy": 0.003303621049248391,
-          "diff_token_savings": -0.30958449480680966,
+          "diff_token_savings": -0.3095844948068097,
           "se_token_savings": 0.0016209661041228448
         },
         "risk_control": {
-          "diff_accuracy": 0.024058333333333338,
+          "diff_accuracy": 0.024058333333333334,
           "se_accuracy": 0.00201885107246121,
-          "diff_token_savings": -0.19994926095930615,
+          "diff_token_savings": -0.19994926095930612,
           "se_token_savings": 0.0015072341520868762
         },
         "difficulty_mix_3_1": {
-          "diff_accuracy": 0.08877777777777776,
+          "diff_accuracy": 0.08877777777777779,
           "se_accuracy": 0.003892898131751913,
-          "diff_token_savings": -0.31024221369680316,
+          "diff_token_savings": -0.310242213696803,
           "se_token_savings": 0.001498493046134553
         },
         "difficulty_mix_1_1": {
           "diff_accuracy": 0.08338888888888889,
           "se_accuracy": 0.0036997178320835543,
-          "diff_token_savings": -0.3596601285641235,
+          "diff_token_savings": -0.3596601285641233,
           "se_token_savings": 0.0018141774974728896
         },
         "difficulty_mix_1_3": {
-          "diff_accuracy": 0.02741666666666667,
+          "diff_accuracy": 0.027416666666666666,
           "se_accuracy": 0.002038881887665848,
-          "diff_token_savings": -0.24970577409329806,
+          "diff_token_savings": -0.24970577409329808,
           "se_token_savings": 0.0011713511643049361
         }
       },
@@ -1945,7 +2081,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": 0.020090787049767307,
-      "rank_all_attempts": 0.027569522245733058,
+      "rank_all_attempts": 0.028400164912870087,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": 5.544751296233817e-05,
         "adaptive_budget_efficiency.token_savings": -0.001011599540523678,
@@ -1961,21 +2097,21 @@
       "train_rank_vs_train_reference": -0.01126686974617782,
       "paired_noise": {
         "adaptive_budget_efficiency": {
-          "diff_accuracy": 5.5555555555555585e-05,
+          "diff_accuracy": 5.5555555555555545e-05,
           "se_accuracy": 0.00037469534950179407,
-          "diff_token_savings": -0.0008115185508158859,
+          "diff_token_savings": -0.0008115185508158857,
           "se_token_savings": 0.00018627469315745136
         },
         "risk_control": {
-          "diff_accuracy": -0.001758333333333333,
+          "diff_accuracy": -0.001758333333333334,
           "se_accuracy": 0.00040744929814095343,
-          "diff_token_savings": 0.0012855706477720944,
+          "diff_token_savings": 0.0012855706477720892,
           "se_token_savings": 0.0002749843055010277
         },
         "difficulty_mix_3_1": {
           "diff_accuracy": -0.0001111111111111112,
           "se_accuracy": 0.0003967168502335882,
-          "diff_token_savings": -0.0012888961267264552,
+          "diff_token_savings": -0.0012888961267264547,
           "se_token_savings": 0.00015135008275425545
         },
         "difficulty_mix_1_1": {
@@ -1985,9 +2121,9 @@
           "se_token_savings": 0.0
         },
         "difficulty_mix_1_3": {
-          "diff_accuracy": -0.006027777777777774,
+          "diff_accuracy": -0.006027777777777777,
           "se_accuracy": 0.0005660092864482693,
-          "diff_token_savings": 0.03559794323433814,
+          "diff_token_savings": 0.03559794323433813,
           "se_token_savings": 0.0005655997840864268
         }
       },
@@ -2060,7 +2196,7 @@
       },
       "failures": {},
       "rank_quality_plus_self": -1.4711913134493864,
-      "rank_all_attempts": -1.5607272511019137,
+      "rank_all_attempts": -1.5769598301304326,
       "contributions_quality_plus_self": {
         "adaptive_budget_efficiency.accuracy": 0.06980841881947494,
         "adaptive_budget_efficiency.token_savings": -0.5647834788764662,
@@ -2076,37 +2212,103 @@
       "train_rank_vs_train_reference": -1.6433185034284943,
       "paired_noise": {
         "adaptive_budget_efficiency": {
-          "diff_accuracy": 0.06994444444444446,
+          "diff_accuracy": 0.06994444444444445,
           "se_accuracy": 0.004188880599756019,
-          "diff_token_savings": -0.45307678774289534,
+          "diff_token_savings": -0.4530767877428956,
           "se_token_savings": 0.003000311727259106
         },
         "risk_control": {
-          "diff_accuracy": 0.024058333333333338,
+          "diff_accuracy": 0.024058333333333334,
           "se_accuracy": 0.00201885107246121,
-          "diff_token_savings": -0.19994926095930615,
+          "diff_token_savings": -0.19994926095930612,
           "se_token_savings": 0.0015072341520868762
         },
         "difficulty_mix_3_1": {
           "diff_accuracy": 0.09588888888888888,
           "se_accuracy": 0.004757840183305503,
-          "diff_token_savings": -0.4984547513220129,
+          "diff_token_savings": -0.4984547513220131,
           "se_token_savings": 0.0031211970701834025
         },
         "difficulty_mix_1_1": {
-          "diff_accuracy": 0.08505555555555551,
+          "diff_accuracy": 0.08505555555555555,
           "se_accuracy": 0.004527156910397299,
-          "diff_token_savings": -0.48928651542122525,
+          "diff_token_savings": -0.4892865154212249,
           "se_token_savings": 0.002443126941769908
         },
         "difficulty_mix_1_3": {
-          "diff_accuracy": 0.02741666666666667,
+          "diff_accuracy": 0.027416666666666666,
           "se_accuracy": 0.002303476807183994,
           "diff_token_savings": -0.27360575436253926,
           "se_token_savings": 0.0013310945441177004
         }
       },
       "rank_se_quality_plus_self": 0.008131450191044142
+    }
+  },
+  "before_isolation": {
+    "shortcut_accumulate_calibration": {
+      "rank_quality_plus_self": 0.27411135232022266,
+      "reference_identical_to_phase1": true,
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.4760833333333333,
+          "token_savings": 0.4750142931466869,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5043583333333331,
+          "token_savings": 0.32676848159492355,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6293611111111111,
+          "token_savings": 0.5423485053913684,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4016388888888888,
+          "token_savings": 0.5292682388328173,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.20825000000000002,
+          "token_savings": 0.37386517878046344,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {}
+    },
+    "shortcut_test_memory_lookahead": {
+      "rank_quality_plus_self": 0.23080248012275617,
+      "reference_identical_to_phase1": true,
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.4871666666666667,
+          "token_savings": 0.5048918649422289,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5322750000000002,
+          "token_savings": 0.2546564763308814,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6548333333333334,
+          "token_savings": 0.5523821720280855,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.41519444444444437,
+          "token_savings": 0.5286916908635652,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.22258333333333333,
+          "token_savings": 0.3047358589369408,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {}
     }
   }
 }

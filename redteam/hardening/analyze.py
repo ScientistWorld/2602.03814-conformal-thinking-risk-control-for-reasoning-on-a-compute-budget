@@ -193,7 +193,7 @@ def main() -> None:
         before_failures = {e: v.get("_failures", {}) for e, v in load(before_path)["experiments"].items()}
         report["before_isolation"] = {}
         for name, metrics in before.items():
-            if name == REFERENCE:
+            if name in (REFERENCE, "full_budget"):
                 continue
             std_b = population_std(quality + [metrics], scored)
             report["before_isolation"][name] = {

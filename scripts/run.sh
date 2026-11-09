@@ -9,7 +9,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-case "${AUDIT:-isolation}" in
+case "${AUDIT:-none}" in
   full) bash redteam/hardening/run_candidates.sh ;;
   isolation) bash redteam/hardening/run_isolation_check.sh ;;
   none) ;;
