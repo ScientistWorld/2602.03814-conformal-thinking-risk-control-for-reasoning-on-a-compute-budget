@@ -1,0 +1,6 @@
+state/
+*/artifacts/
+*/worktree_before/
+*/generated_data/
+__pycache__/
+*.pyc
