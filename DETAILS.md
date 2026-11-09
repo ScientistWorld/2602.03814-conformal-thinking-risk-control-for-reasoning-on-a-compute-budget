@@ -119,6 +119,10 @@ The benchmark includes difficulty-mix experiments with solvable:unsolvable ratio
 
 All methods must be evaluated from saved outputs produced by the candidate system. Evaluation code must not regenerate trajectories, recompute candidate stopping behavior internally, or import from the method implementation.
 
+## Paper Setup
+
+The paper evaluates Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Qwen3-VL-8B on AIME 1983-2025, DeepScaleR without AIME, GPQA-Diamond, and MathVision. Its risk-control sanity check uses Qwen3-8B on AIME with 40 validation-test splits, validation size 50, and an epsilon sweep from 0 to 1 in increments of 0.01. The paper reports the main outcomes as plotted risk-vs-epsilon and accuracy-vs-token curves rather than scalar tables, so this runnable gym uses fixed scaled scalar targets in `scoring/reference.json` while preserving the same benefit and constraint metric structure.
+
 ---
 
 # Reproduction Log
