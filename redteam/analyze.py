@@ -109,7 +109,7 @@ def main():
         r = ranks[name]
         lines.append(f"{name}\t{r['all_attempts']['score']:.6f}\t{r['quality_pool']['score']:.6f}\t{r['pair_with_reference']['score']:.6f}\t{r['pair_with_rerun_reference']['score']:.6f}\t"
                      f"{a['accuracy']:.6f}\t{a['token_savings']:.6f}\t{a['false_positive_risk']:.6f}\t{a['false_negative_risk']:.6f}")
-    lines.extend(f"{name}\tFAILED\tFAILED\tFAILED" for name in sorted(failed))
+    lines.extend(f"{name}\tFAILED\tFAILED\tFAILED\tFAILED\tNA\tNA\tNA\tNA" for name in sorted(failed))
     (ROOT / "summary.tsv").write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
 

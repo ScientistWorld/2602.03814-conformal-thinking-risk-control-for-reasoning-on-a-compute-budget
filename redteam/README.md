@@ -19,9 +19,14 @@ output reuse explicitly allowed for this audit. `analyze.py` is separate audit
 analysis: it reads the hidden scoring coefficients after the runs. Those
 coefficients never enter a candidate's decisions.
 
+The supplied test scores do not match the deterministic reference rerun. Ranking
+therefore retains the supplied `original_scores_test.json` as the declared anchor
+and separately reports comparisons with the rerun reference.
+
 Normalized ranks depend on the population of future submissions. We report a
 specified audit population, a quality-control population, and a two-attempt
 reference/candidate population. Every calculation uses the absolute coefficient,
 the declared better direction, experiment weight, and per-metric population
 standard deviation. A zero-variance metric contributes zero. These are relative
-rank differences, with reference zero, rather than invented raw-unit scores.
+rank differences, with the supplied reference zero, rather than invented raw-unit
+scores. Both the audit and quality populations include the supplied reference.
