@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/user/eval/train/evaluate_split.py", line 334, in <module>
+    main()
+  File "/home/user/eval/train/evaluate_split.py", line 325, in main
+    scores = build_scores(args)
+             ^^^^^^^^^^^^^^^^^^
+  File "/home/user/eval/train/evaluate_split.py", line 306, in build_scores
+    add_result(experiment_results, method_name, artifact, policy_name, fallback_data, args.epsilon)
+  File "/home/user/eval/train/evaluate_split.py", line 276, in add_result
+    results[method_name] = recompute_policy_metrics(policies[policy_name], data, slice_ids(data), point["epsilon"])
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/eval/train/evaluate_split.py", line 125, in recompute_policy_metrics
+    raise ValueError(
+ValueError: Policy <unnamed> has no per-example decisions; evaluation must recompute metrics from raw stopping decisions.

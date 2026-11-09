@@ -1,0 +1,66 @@
+{
+  "results.json": {
+    "config": {
+      "data": "data/synthetic_reasoning.jsonl",
+      "signal": "confidence",
+      "upper": 0.55,
+      "lower": 0.012,
+      "validation_objective": [
+        0.49770197533089405,
+        0.00781263489596823,
+        0.38122880665853587
+      ]
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_1_3.json": {
+    "config": {
+      "data": "data/synthetic_ratio_1_3.jsonl",
+      "signal": "confidence",
+      "upper": 0.55,
+      "lower": 0.006,
+      "validation_objective": [
+        0.8087943888793399,
+        0.014782462000599253,
+        0.19598129626446598
+      ]
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_1_1.json": {
+    "config": {
+      "data": "data/synthetic_ratio_1_1.jsonl",
+      "signal": "confidence",
+      "upper": 0.53,
+      "lower": 0.012,
+      "validation_objective": [
+        0.6240919412520979,
+        0.0073302469135802465,
+        0.3766027671366225
+      ]
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_3_1.json": {
+    "config": {
+      "data": "data/synthetic_ratio_3_1.jsonl",
+      "signal": "confidence",
+      "upper": 0.53,
+      "lower": 0.014,
+      "validation_objective": [
+        0.3430807626003123,
+        0.005650553150553151,
+        0.4028618012603003
+      ]
+    },
+    "epsilons": [
+      0.32
+    ]
+  }
+}

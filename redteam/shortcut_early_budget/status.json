@@ -1,0 +1,8 @@
+{
+  "case": "shortcut_early_budget",
+  "hidden_command": "bash scripts/evaluate_test.sh",
+  "method_returncode": 0,
+  "train_returncode": 0,
+  "test_returncode": 0,
+  "elapsed_seconds": 1.0031940420158207
+}

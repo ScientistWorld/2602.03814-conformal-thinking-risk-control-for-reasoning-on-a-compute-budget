@@ -1,0 +1,66 @@
+{
+  "results.json": {
+    "config": {
+      "data": "data/synthetic_reasoning.jsonl",
+      "output": "outputs/conformal_thinking/results.json",
+      "calibration": "ucb",
+      "delta": 0.1,
+      "epsilons": [
+        0.32
+      ],
+      "seed": 33,
+      "calibration_epsilon": 0.32
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_1_3.json": {
+    "config": {
+      "data": "data/synthetic_ratio_1_3.jsonl",
+      "output": "outputs/conformal_thinking/ratio_1_3.json",
+      "calibration": "ucb",
+      "delta": 0.1,
+      "epsilons": [
+        0.32
+      ],
+      "seed": 33,
+      "calibration_epsilon": 0.32
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_1_1.json": {
+    "config": {
+      "data": "data/synthetic_ratio_1_1.jsonl",
+      "output": "outputs/conformal_thinking/ratio_1_1.json",
+      "calibration": "ucb",
+      "delta": 0.1,
+      "epsilons": [
+        0.32
+      ],
+      "seed": 33,
+      "calibration_epsilon": 0.32
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_3_1.json": {
+    "config": {
+      "data": "data/synthetic_ratio_3_1.jsonl",
+      "output": "outputs/conformal_thinking/ratio_3_1.json",
+      "calibration": "ucb",
+      "delta": 0.1,
+      "epsilons": [
+        0.32
+      ],
+      "seed": 33,
+      "calibration_epsilon": 0.32
+    },
+    "epsilons": [
+      0.32
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "results.json": {
+    "config": {
+      "data": "method/redteam_generated_data/synthetic_reasoning.jsonl"
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_1_3.json": {
+    "config": {
+      "data": "method/redteam_generated_data/synthetic_ratio_1_3.jsonl"
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_1_1.json": {
+    "config": {
+      "data": "method/redteam_generated_data/synthetic_ratio_1_1.jsonl"
+    },
+    "epsilons": [
+      0.32
+    ]
+  },
+  "ratio_3_1.json": {
+    "config": {
+      "data": "method/redteam_generated_data/synthetic_ratio_3_1.jsonl"
+    },
+    "epsilons": [
+      0.32
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "case": "shortcut_null_decisions",
+  "hidden_command": "bash scripts/evaluate_test.sh",
+  "method_returncode": 0,
+  "train_returncode": 1,
+  "test_returncode": 1,
+  "elapsed_seconds": 0.6783501980826259
+}
