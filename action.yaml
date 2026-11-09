@@ -1,4 +1,4 @@
 action: submit
 gpus: 0
 test: false
-notes: "Run 24 bundled CPU audit cases: honest quality variants, three reference seeds, baselines, and shortcut trials; save hidden-test scores under redteam."
+notes: "Run two targeted CPU follow-ups: unchanged cached reference and answer-preserving false budget flags; recompute audit ranks against the supplied frozen reference."
