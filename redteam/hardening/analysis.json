@@ -1,0 +1,2112 @@
+{
+  "reference": "conformal_thinking",
+  "quality_population": [
+    "conformal_thinking",
+    "full_budget",
+    "upper_only",
+    "naive_calibration",
+    "reference_rerun",
+    "better_tighter_bound",
+    "better_joint_calibration",
+    "better_joint_tighter_bound",
+    "variant_stricter_calibration",
+    "weaker_confidence_only",
+    "weaker_token_budget"
+  ],
+  "methods": {
+    "better_joint_calibration": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.457138888888889,
+          "token_savings": 0.6173357635111665,
+          "false_positive_risk": 0.03988888888888889,
+          "false_negative_risk": 0.05879907590820583,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5244416666666669,
+          "token_savings": 0.26822627451477765,
+          "false_positive_risk": 0.03625833333333333,
+          "false_negative_risk": 0.02105338468720821,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6693888888888891,
+          "token_savings": 0.538903588626943,
+          "false_positive_risk": 0.05677777777777778,
+          "false_negative_risk": 0.03953199557341713,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.3979444444444446,
+          "token_savings": 0.6481186264935246,
+          "false_positive_risk": 0.04122222222222222,
+          "false_negative_risk": 0.05701274488957991,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.20147222222222225,
+          "token_savings": 0.5041415208632086,
+          "false_positive_risk": 0.01202777777777778,
+          "false_negative_risk": 0.02944216951611819,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.514027777777778,
+          "token_savings": 0.5799035878348655,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5150666666666669,
+          "token_savings": 0.2771537326014543,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6827222222222227,
+          "token_savings": 0.5539593691998324,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4330833333333334,
+          "token_savings": 0.5809055401235034,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.2098888888888888,
+          "token_savings": 0.4565338704384491,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": 0.5439066170968357,
+      "rank_all_attempts": 0.5926733232187734,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.02985848573017264,
+        "adaptive_budget_efficiency.token_savings": 0.20475724707338822,
+        "risk_control.accuracy": -0.005051326312019782,
+        "risk_control.token_savings": 0.09553264735752982,
+        "difficulty_mix_3_1.accuracy": 0.005668478749314372,
+        "difficulty_mix_3_1.token_savings": 0.025825899740243397,
+        "difficulty_mix_1_1.accuracy": -0.009496852211344987,
+        "difficulty_mix_1_1.token_savings": 0.09282627202940111,
+        "difficulty_mix_1_3.accuracy": -0.030750616300600712,
+        "difficulty_mix_1_3.token_savings": 0.19445335270109695
+      },
+      "train_rank_vs_train_reference": 0.41103386005788933,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": -0.029916666666666675,
+          "se_accuracy": 0.0028778824787903333,
+          "diff_token_savings": 0.16425897576827087,
+          "se_token_savings": 0.0029140822815098234
+        },
+        "risk_control": {
+          "diff_accuracy": -0.007833333333333335,
+          "se_accuracy": 0.0011712415658418017,
+          "diff_token_savings": 0.06827701355547154,
+          "se_token_savings": 0.00112842686899512
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.015277777777777769,
+          "se_accuracy": 0.0025281583962527368,
+          "diff_token_savings": 0.04044883730492971,
+          "se_token_savings": 0.0024025309003460216
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": -0.01700000000000001,
+          "se_accuracy": 0.0030226906806051597,
+          "diff_token_savings": 0.15883211107229972,
+          "se_token_savings": 0.002197955092040895
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": -0.02111111111111111,
+          "se_accuracy": 0.0025336269323045107,
+          "diff_token_savings": 0.23053576650066943,
+          "se_token_savings": 0.0018848189086357581
+        }
+      },
+      "rank_se_quality_plus_self": 0.0069184838373812
+    },
+    "better_joint_tighter_bound": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.4345277777777778,
+          "token_savings": 0.6765040008499354,
+          "false_positive_risk": 0.042138888888888885,
+          "false_negative_risk": 0.07044060670402581,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5115500000000001,
+          "token_savings": 0.4108465767181407,
+          "false_positive_risk": 0.060800000000000035,
+          "false_negative_risk": 0.027230391724288767,
+          "violation_rate": 0.05
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6423888888888892,
+          "token_savings": 0.6076476638244419,
+          "false_positive_risk": 0.06397222222222224,
+          "false_negative_risk": 0.05431750925862443,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.3825555555555557,
+          "token_savings": 0.6955046219274864,
+          "false_positive_risk": 0.04116666666666667,
+          "false_negative_risk": 0.06547247928334422,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.17938888888888893,
+          "token_savings": 0.7240048302148516,
+          "false_positive_risk": 0.014333333333333337,
+          "false_negative_risk": 0.04480040765311019,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.4993611111111113,
+          "token_savings": 0.6319928219430143,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.4946000000000002,
+          "token_savings": 0.4878208206418498,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6782222222222225,
+          "token_savings": 0.5680450957522664,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.41791666666666666,
+          "token_savings": 0.6335489055027648,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.19674999999999995,
+          "token_savings": 0.6416584193923661,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": 0.9925914102515021,
+      "rank_all_attempts": 1.1039452539158598,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.05242562350580925,
+        "adaptive_budget_efficiency.token_savings": 0.2785134928736948,
+        "risk_control.accuracy": -0.013364519721269572,
+        "risk_control.token_savings": 0.29508582531468663,
+        "difficulty_mix_3_1.accuracy": -0.004349269149473722,
+        "difficulty_mix_3_1.token_savings": 0.069717831179518,
+        "difficulty_mix_1_1.accuracy": -0.018093675945144345,
+        "difficulty_mix_1_1.token_savings": 0.12052007571204966,
+        "difficulty_mix_1_3.accuracy": -0.06291737940451858,
+        "difficulty_mix_1_3.token_savings": 0.3799046528977685
+      },
+      "train_rank_vs_train_reference": 0.9010831797644906,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": -0.0525277777777778,
+          "se_accuracy": 0.0034136622969734103,
+          "diff_token_savings": 0.22342721310703967,
+          "se_token_savings": 0.0032316201815237064
+        },
+        "risk_control": {
+          "diff_accuracy": -0.020724999999999997,
+          "se_accuracy": 0.002130269202471838,
+          "diff_token_savings": 0.2108973157588347,
+          "se_token_savings": 0.0010737207506423252
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": -0.01172222222222222,
+          "se_accuracy": 0.0034627056252175955,
+          "diff_token_savings": 0.10919291250242882,
+          "se_token_savings": 0.002499961210191432
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": -0.03238888888888889,
+          "se_accuracy": 0.0035158788831510753,
+          "diff_token_savings": 0.20621810650626143,
+          "se_token_savings": 0.0026065319670726065
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": -0.043194444444444445,
+          "se_accuracy": 0.003539557214932085,
+          "diff_token_savings": 0.4503990758523124,
+          "se_token_savings": 0.0021130654248707518
+        }
+      },
+      "rank_se_quality_plus_self": 0.008468267582584411
+    },
+    "better_tighter_bound": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.466611111111111,
+          "token_savings": 0.493301115382939,
+          "false_positive_risk": 0.060749999999999985,
+          "false_negative_risk": 0.04637931921246872,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.50995,
+          "token_savings": 0.3655330342432683,
+          "false_positive_risk": 0.05026666666666666,
+          "false_negative_risk": 0.03296397292386264,
+          "violation_rate": 0.016666666666666666
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6234999999999999,
+          "token_savings": 0.5581290775804026,
+          "false_positive_risk": 0.06797222222222225,
+          "false_negative_risk": 0.059648430587849445,
+          "violation_rate": 0.027777777777777776
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.39413888888888887,
+          "token_savings": 0.5395753140001434,
+          "false_positive_risk": 0.04902777777777778,
+          "false_negative_risk": 0.06091435701250267,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.18994444444444444,
+          "token_savings": 0.48444455744301884,
+          "false_positive_risk": 0.012833333333333339,
+          "false_negative_risk": 0.04446503835205138,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5022222222222222,
+          "token_savings": 0.5427920195901659,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5034166666666665,
+          "token_savings": 0.4033915072396094,
+          "violation_rate": 0.025
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6741944444444443,
+          "token_savings": 0.5318700670049759,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4308333333333334,
+          "token_savings": 0.5294865102690179,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.22677777777777777,
+          "token_savings": 0.3707045496109589,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": 0.421832391639583,
+      "rank_all_attempts": 0.4956002280271353,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.02040468477010892,
+        "adaptive_budget_efficiency.token_savings": 0.05014168969720455,
+        "risk_control.accuracy": -0.014396279989256635,
+        "risk_control.token_savings": 0.23168348170961067,
+        "difficulty_mix_3_1.accuracy": -0.011357570148626057,
+        "difficulty_mix_3_1.token_savings": 0.03810104986201686,
+        "difficulty_mix_1_1.accuracy": -0.011622781546237701,
+        "difficulty_mix_1_1.token_savings": 0.029390289314945476,
+        "difficulty_mix_1_3.accuracy": -0.04754207125421827,
+        "difficulty_mix_1_3.token_savings": 0.17783926876425304
+      },
+      "train_rank_vs_train_reference": 0.3907622583535421,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": -0.020444444444444453,
+          "se_accuracy": 0.001168692025035987,
+          "diff_token_savings": 0.04022432764004337,
+          "se_token_savings": 0.0005586301822564471
+        },
+        "risk_control": {
+          "diff_accuracy": -0.022325000000000008,
+          "se_accuracy": 0.0017958517593795614,
+          "diff_token_savings": 0.16558377328396232,
+          "se_token_savings": 0.0012727184312090602
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": -0.030611111111111096,
+          "se_accuracy": 0.0015837046348263206,
+          "diff_token_savings": 0.0596743262583895,
+          "se_token_savings": 0.001269509981922047
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": -0.02080555555555556,
+          "se_accuracy": 0.0012540031577923105,
+          "diff_token_savings": 0.050288798578918444,
+          "se_token_savings": 0.0006821218421671517
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": -0.0326388888888889,
+          "se_accuracy": 0.0017762382657017638,
+          "diff_token_savings": 0.21083880308047964,
+          "se_token_savings": 0.0006825000245586878
+        }
+      },
+      "rank_se_quality_plus_self": 0.0038346533863494654
+    },
+    "conformal_thinking": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.48705555555555563,
+          "token_savings": 0.45307678774289567,
+          "false_positive_risk": 0.047611111111111125,
+          "false_negative_risk": 0.03620744153948811,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5322750000000002,
+          "token_savings": 0.19994926095930615,
+          "false_positive_risk": 0.029791666666666675,
+          "false_negative_risk": 0.018398930445235603,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6541111111111111,
+          "token_savings": 0.498454751322013,
+          "false_positive_risk": 0.06227777777777778,
+          "false_negative_risk": 0.04534109304295064,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.41494444444444434,
+          "token_savings": 0.4892865154212249,
+          "false_positive_risk": 0.039472222222222235,
+          "false_negative_risk": 0.05139727234887195,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.22258333333333333,
+          "token_savings": 0.2736057543625392,
+          "false_positive_risk": 0.010500000000000002,
+          "false_negative_risk": 0.022484940649401444,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5214722222222222,
+          "token_savings": 0.4842132946692719,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5260166666666667,
+          "token_savings": 0.22023848696088252,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6858055555555553,
+          "token_savings": 0.5077436104337524,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4536111111111112,
+          "token_savings": 0.45266291472514397,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.23258333333333336,
+          "token_savings": 0.28266122353730677,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": 0.0,
+      "rank_all_attempts": 0.0,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.0,
+        "adaptive_budget_efficiency.token_savings": 0.0,
+        "risk_control.accuracy": 0.0,
+        "risk_control.token_savings": 0.0,
+        "difficulty_mix_3_1.accuracy": 0.0,
+        "difficulty_mix_3_1.token_savings": 0.0,
+        "difficulty_mix_1_1.accuracy": 0.0,
+        "difficulty_mix_1_1.token_savings": 0.0,
+        "difficulty_mix_1_3.accuracy": 0.0,
+        "difficulty_mix_1_3.token_savings": 0.0
+      },
+      "train_rank_vs_train_reference": 0.0,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "full_budget": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.557,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5563333333333333,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5703333333333334,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5416666666666667,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": -1.4711913134493864,
+      "rank_all_attempts": -1.5607272511019137,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.06980841881947515,
+        "adaptive_budget_efficiency.token_savings": -0.5647834788764662,
+        "risk_control.accuracy": 0.015514020279575722,
+        "risk_control.token_savings": -0.27976739523185185,
+        "difficulty_mix_3_1.accuracy": 0.035577433895696106,
+        "difficulty_mix_3_1.token_savings": -0.3182549435387917,
+        "difficulty_mix_1_1.accuracy": 0.04751529652146868,
+        "difficulty_mix_1_1.token_savings": -0.2859537839935529,
+        "difficulty_mix_1_3.accuracy": 0.03993533985354336,
+        "difficulty_mix_1_3.token_savings": -0.23078222117848268
+      },
+      "train_rank_vs_train_reference": -1.6433185034284936,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 0.06994444444444446,
+          "se_accuracy": 0.004188880599756019,
+          "diff_token_savings": -0.45307678774289534,
+          "se_token_savings": 0.003000311727259106
+        },
+        "risk_control": {
+          "diff_accuracy": 0.024058333333333338,
+          "se_accuracy": 0.00201885107246121,
+          "diff_token_savings": -0.19994926095930615,
+          "se_token_savings": 0.0015072341520868762
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.09588888888888888,
+          "se_accuracy": 0.004757840183305503,
+          "diff_token_savings": -0.4984547513220129,
+          "se_token_savings": 0.0031211970701834025
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.08505555555555551,
+          "se_accuracy": 0.004527156910397299,
+          "diff_token_savings": -0.48928651542122525,
+          "se_token_savings": 0.002443126941769908
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": 0.02741666666666667,
+          "se_accuracy": 0.002303476807183994,
+          "diff_token_savings": -0.27360575436253926,
+          "se_token_savings": 0.0013310945441177004
+        }
+      },
+      "rank_se_quality_plus_self": 0.008131450191044142
+    },
+    "naive_calibration": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        }
+      },
+      "failures": {
+        "adaptive_budget_efficiency": "run failed in risk_control",
+        "risk_control": "risk constraint failed: realized risk exceeded epsilon at 0.225 of operating points (allowed 0.15); measured FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602",
+        "difficulty_mix_3_1": "run failed in risk_control",
+        "difficulty_mix_1_1": "run failed in risk_control",
+        "difficulty_mix_1_3": "run failed in risk_control"
+      },
+      "rank_quality_plus_self": -3.3076017143818994,
+      "rank_all_attempts": -2.6970186803000713,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.4861083461400627,
+        "adaptive_budget_efficiency.token_savings": -0.5647834788764662,
+        "risk_control.accuracy": -0.34323762290174803,
+        "risk_control.token_savings": -0.27976739523185185,
+        "difficulty_mix_3_1.accuracy": -0.2426933410706407,
+        "difficulty_mix_3_1.token_savings": -0.3182549435387917,
+        "difficulty_mix_1_1.accuracy": -0.23180388616515285,
+        "difficulty_mix_1_1.token_savings": -0.2859537839935529,
+        "difficulty_mix_1_3.accuracy": -0.3242166952851498,
+        "difficulty_mix_1_3.token_savings": -0.23078222117848268
+      },
+      "train_rank_vs_train_reference": -3.463929152619809,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "reference_rerun": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.48705555555555563,
+          "token_savings": 0.45307678774289567,
+          "false_positive_risk": 0.047611111111111125,
+          "false_negative_risk": 0.03620744153948811,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5322750000000002,
+          "token_savings": 0.19994926095930615,
+          "false_positive_risk": 0.029791666666666675,
+          "false_negative_risk": 0.018398930445235603,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6541111111111111,
+          "token_savings": 0.498454751322013,
+          "false_positive_risk": 0.06227777777777778,
+          "false_negative_risk": 0.04534109304295064,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.41494444444444434,
+          "token_savings": 0.4892865154212249,
+          "false_positive_risk": 0.039472222222222235,
+          "false_negative_risk": 0.05139727234887195,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.22258333333333333,
+          "token_savings": 0.2736057543625392,
+          "false_positive_risk": 0.010500000000000002,
+          "false_negative_risk": 0.022484940649401444,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5214722222222222,
+          "token_savings": 0.4842132946692719,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5260166666666667,
+          "token_savings": 0.22023848696088252,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6858055555555553,
+          "token_savings": 0.5077436104337524,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4536111111111112,
+          "token_savings": 0.45266291472514397,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.23258333333333336,
+          "token_savings": 0.28266122353730677,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": 0.0,
+      "rank_all_attempts": 0.0,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.0,
+        "adaptive_budget_efficiency.token_savings": 0.0,
+        "risk_control.accuracy": 0.0,
+        "risk_control.token_savings": 0.0,
+        "difficulty_mix_3_1.accuracy": 0.0,
+        "difficulty_mix_3_1.token_savings": 0.0,
+        "difficulty_mix_1_1.accuracy": 0.0,
+        "difficulty_mix_1_1.token_savings": 0.0,
+        "difficulty_mix_1_3.accuracy": 0.0,
+        "difficulty_mix_1_3.token_savings": 0.0
+      },
+      "train_rank_vs_train_reference": 0.0,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "risk_control": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        }
+      },
+      "rank_se_quality_plus_self": 0.0
+    },
+    "shortcut_all_defer": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        }
+      },
+      "failures": {
+        "adaptive_budget_efficiency": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.0000, FN=0.3866, savings=0.9316, accuracy=0.0000",
+        "risk_control": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.0000, FN=0.4010, savings=0.9328, accuracy=0.0000",
+        "difficulty_mix_3_1": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.0000, FN=0.5131, savings=0.9320, accuracy=0.0000",
+        "difficulty_mix_1_1": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.0000, FN=0.3467, savings=0.9322, accuracy=0.0000",
+        "difficulty_mix_1_3": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.0000, FN=0.1753, savings=0.9317, accuracy=0.0000"
+      },
+      "rank_quality_plus_self": -2.9207234631612145,
+      "rank_all_attempts": -2.6970186803000713,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
+        "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
+        "risk_control.accuracy": -0.2654577096593925,
+        "risk_control.token_savings": -0.2777379953902158,
+        "difficulty_mix_3_1.accuracy": -0.1892981720907909,
+        "difficulty_mix_3_1.token_savings": -0.3061206246810842,
+        "difficulty_mix_1_1.accuracy": -0.18347071267050946,
+        "difficulty_mix_1_1.token_savings": -0.2789084267799496,
+        "difficulty_mix_1_3.accuracy": -0.2575236603150327,
+        "difficulty_mix_1_3.token_savings": -0.23119622942365312
+      },
+      "train_rank_vs_train_reference": -3.043533425879555,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "shortcut_claim_budget": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        }
+      },
+      "failures": {
+        "adaptive_budget_efficiency": "protocol failure: invalid action 'budget'; expected one of ['answer', 'continue', 'defer']",
+        "risk_control": "protocol failure: invalid action 'budget'; expected one of ['answer', 'continue', 'defer']",
+        "difficulty_mix_3_1": "protocol failure: invalid action 'budget'; expected one of ['answer', 'continue', 'defer']",
+        "difficulty_mix_1_1": "protocol failure: invalid action 'budget'; expected one of ['answer', 'continue', 'defer']",
+        "difficulty_mix_1_3": "protocol failure: invalid action 'budget'; expected one of ['answer', 'continue', 'defer']"
+      },
+      "rank_quality_plus_self": -2.9207234631612145,
+      "rank_all_attempts": -2.6970186803000713,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
+        "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
+        "risk_control.accuracy": -0.2654577096593925,
+        "risk_control.token_savings": -0.2777379953902158,
+        "difficulty_mix_3_1.accuracy": -0.1892981720907909,
+        "difficulty_mix_3_1.token_savings": -0.3061206246810842,
+        "difficulty_mix_1_1.accuracy": -0.18347071267050946,
+        "difficulty_mix_1_1.token_savings": -0.2789084267799496,
+        "difficulty_mix_1_3.accuracy": -0.2575236603150327,
+        "difficulty_mix_1_3.token_savings": -0.23119622942365312
+      },
+      "train_rank_vs_train_reference": -3.043533425879555,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "shortcut_early_answer": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        }
+      },
+      "failures": {
+        "adaptive_budget_efficiency": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9640, FN=0.0000, savings=0.9316, accuracy=0.0360",
+        "risk_control": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9660, FN=0.0000, savings=0.9328, accuracy=0.0340",
+        "difficulty_mix_3_1": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9473, FN=0.0000, savings=0.9320, accuracy=0.0527",
+        "difficulty_mix_1_1": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9677, FN=0.0000, savings=0.9322, accuracy=0.0323",
+        "difficulty_mix_1_3": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9793, FN=0.0000, savings=0.9317, accuracy=0.0207"
+      },
+      "rank_quality_plus_self": -2.9207234631612145,
+      "rank_all_attempts": -2.6970186803000713,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
+        "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
+        "risk_control.accuracy": -0.2654577096593925,
+        "risk_control.token_savings": -0.2777379953902158,
+        "difficulty_mix_3_1.accuracy": -0.1892981720907909,
+        "difficulty_mix_3_1.token_savings": -0.3061206246810842,
+        "difficulty_mix_1_1.accuracy": -0.18347071267050946,
+        "difficulty_mix_1_1.token_savings": -0.2789084267799496,
+        "difficulty_mix_1_3.accuracy": -0.2575236603150327,
+        "difficulty_mix_1_3.token_savings": -0.23119622942365312
+      },
+      "train_rank_vs_train_reference": -3.043533425879555,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "shortcut_encoded_answers": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5569999999999998,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5563333333333335,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5703333333333328,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5416666666666667,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": -1.4297116190267285,
+      "rank_all_attempts": -1.5607272511019137,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.07160421645047586,
+        "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
+        "risk_control.accuracy": 0.016072796852249067,
+        "risk_control.token_savings": -0.2777379953902158,
+        "difficulty_mix_3_1.accuracy": 0.03656857007925289,
+        "difficulty_mix_3_1.token_savings": -0.3061206246810842,
+        "difficulty_mix_1_1.accuracy": 0.048528738065131756,
+        "difficulty_mix_1_1.token_savings": -0.2789084267799496,
+        "difficulty_mix_1_3.accuracy": 0.0409219670111089,
+        "difficulty_mix_1_3.token_savings": -0.23119622942365312
+      },
+      "train_rank_vs_train_reference": -1.5954655332165872,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 0.06994444444444446,
+          "se_accuracy": 0.004188880599756019,
+          "diff_token_savings": -0.45307678774289534,
+          "se_token_savings": 0.003000311727259106
+        },
+        "risk_control": {
+          "diff_accuracy": 0.024058333333333338,
+          "se_accuracy": 0.00201885107246121,
+          "diff_token_savings": -0.19994926095930615,
+          "se_token_savings": 0.0015072341520868762
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.09588888888888888,
+          "se_accuracy": 0.004757840183305503,
+          "diff_token_savings": -0.4984547513220129,
+          "se_token_savings": 0.0031211970701834025
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.08505555555555551,
+          "se_accuracy": 0.004527156910397299,
+          "diff_token_savings": -0.48928651542122525,
+          "se_token_savings": 0.002443126941769908
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": 0.02741666666666667,
+          "se_accuracy": 0.002303476807183994,
+          "diff_token_savings": -0.27360575436253926,
+          "se_token_savings": 0.0013310945441177004
+        }
+      },
+      "rank_se_quality_plus_self": 0.008186448405083625
+    },
+    "shortcut_gold_lookup": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.48705555555555563,
+          "token_savings": 0.45307678774289567,
+          "false_positive_risk": 0.047611111111111125,
+          "false_negative_risk": 0.03620744153948811,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5322750000000002,
+          "token_savings": 0.19994926095930615,
+          "false_positive_risk": 0.029791666666666675,
+          "false_negative_risk": 0.018398930445235603,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6541111111111111,
+          "token_savings": 0.498454751322013,
+          "false_positive_risk": 0.06227777777777778,
+          "false_negative_risk": 0.04534109304295064,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.41494444444444434,
+          "token_savings": 0.4892865154212249,
+          "false_positive_risk": 0.039472222222222235,
+          "false_negative_risk": 0.05139727234887195,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.22258333333333333,
+          "token_savings": 0.2736057543625392,
+          "false_positive_risk": 0.010500000000000002,
+          "false_negative_risk": 0.022484940649401444,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5214722222222222,
+          "token_savings": 0.4842132946692719,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5260166666666667,
+          "token_savings": 0.22023848696088252,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6858055555555553,
+          "token_savings": 0.5077436104337524,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4536111111111112,
+          "token_savings": 0.45266291472514397,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.23258333333333336,
+          "token_savings": 0.28266122353730677,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": 0.0,
+      "rank_all_attempts": 0.0,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.0,
+        "adaptive_budget_efficiency.token_savings": 0.0,
+        "risk_control.accuracy": 0.0,
+        "risk_control.token_savings": 0.0,
+        "difficulty_mix_3_1.accuracy": 0.0,
+        "difficulty_mix_3_1.token_savings": 0.0,
+        "difficulty_mix_1_1.accuracy": 0.0,
+        "difficulty_mix_1_1.token_savings": 0.0,
+        "difficulty_mix_1_3.accuracy": 0.0,
+        "difficulty_mix_1_3.token_savings": 0.0
+      },
+      "train_rank_vs_train_reference": 0.0,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "risk_control": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        }
+      },
+      "rank_se_quality_plus_self": 0.0
+    },
+    "shortcut_ignore_epsilon": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        }
+      },
+      "failures": {
+        "adaptive_budget_efficiency": "risk constraint failed: realized risk exceeded epsilon at 0.861 of operating points (allowed 0.15); measured FP=0.2177, FN=0.0719, savings=0.7110, accuracy=0.2638",
+        "risk_control": "risk constraint failed: realized risk exceeded epsilon at 0.375 of operating points (allowed 0.15); measured FP=0.1113, FN=0.0647, savings=0.6206, accuracy=0.4063",
+        "difficulty_mix_3_1": "risk constraint failed: realized risk exceeded epsilon at 0.917 of operating points (allowed 0.15); measured FP=0.2321, FN=0.0983, savings=0.6921, accuracy=0.3938",
+        "difficulty_mix_1_1": "risk constraint failed: realized risk exceeded epsilon at 0.861 of operating points (allowed 0.15); measured FP=0.2120, FN=0.0647, savings=0.7088, accuracy=0.2276",
+        "difficulty_mix_1_3": "risk constraint failed: realized risk exceeded epsilon at 0.889 of operating points (allowed 0.15); measured FP=0.1715, FN=0.0285, savings=0.7024, accuracy=0.0779"
+      },
+      "rank_quality_plus_self": -2.9207234631612145,
+      "rank_all_attempts": -2.6970186803000713,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
+        "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
+        "risk_control.accuracy": -0.2654577096593925,
+        "risk_control.token_savings": -0.2777379953902158,
+        "difficulty_mix_3_1.accuracy": -0.1892981720907909,
+        "difficulty_mix_3_1.token_savings": -0.3061206246810842,
+        "difficulty_mix_1_1.accuracy": -0.18347071267050946,
+        "difficulty_mix_1_1.token_savings": -0.2789084267799496,
+        "difficulty_mix_1_3.accuracy": -0.2575236603150327,
+        "difficulty_mix_1_3.token_savings": -0.23119622942365312
+      },
+      "train_rank_vs_train_reference": -3.043533425879555,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "shortcut_manifest_overrides": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.48705555555555563,
+          "token_savings": 0.45307678774289567,
+          "false_positive_risk": 0.047611111111111125,
+          "false_negative_risk": 0.03620744153948811,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5322750000000002,
+          "token_savings": 0.19994926095930615,
+          "false_positive_risk": 0.029791666666666675,
+          "false_negative_risk": 0.018398930445235603,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6541111111111111,
+          "token_savings": 0.498454751322013,
+          "false_positive_risk": 0.06227777777777778,
+          "false_negative_risk": 0.04534109304295064,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.41494444444444434,
+          "token_savings": 0.4892865154212249,
+          "false_positive_risk": 0.039472222222222235,
+          "false_negative_risk": 0.05139727234887195,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.22258333333333333,
+          "token_savings": 0.2736057543625392,
+          "false_positive_risk": 0.010500000000000002,
+          "false_negative_risk": 0.022484940649401444,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5214722222222222,
+          "token_savings": 0.4842132946692719,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5260166666666667,
+          "token_savings": 0.22023848696088252,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6858055555555553,
+          "token_savings": 0.5077436104337524,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4536111111111112,
+          "token_savings": 0.45266291472514397,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.23258333333333336,
+          "token_savings": 0.28266122353730677,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": 0.0,
+      "rank_all_attempts": 0.0,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.0,
+        "adaptive_budget_efficiency.token_savings": 0.0,
+        "risk_control.accuracy": 0.0,
+        "risk_control.token_savings": 0.0,
+        "difficulty_mix_3_1.accuracy": 0.0,
+        "difficulty_mix_3_1.token_savings": 0.0,
+        "difficulty_mix_1_1.accuracy": 0.0,
+        "difficulty_mix_1_1.token_savings": 0.0,
+        "difficulty_mix_1_3.accuracy": 0.0,
+        "difficulty_mix_1_3.token_savings": 0.0
+      },
+      "train_rank_vs_train_reference": 0.0,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "risk_control": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        }
+      },
+      "rank_se_quality_plus_self": 0.0
+    },
+    "shortcut_public_simulator_calibration": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        }
+      },
+      "failures": {
+        "adaptive_budget_efficiency": "risk constraint failed: realized risk exceeded epsilon at 0.333 of operating points (allowed 0.15); measured FP=0.0289, FN=0.1223, savings=0.5884, accuracy=0.3709",
+        "risk_control": "risk constraint failed: realized risk exceeded epsilon at 0.250 of operating points (allowed 0.15); measured FP=0.0681, FN=0.0388, savings=0.3817, accuracy=0.5012",
+        "difficulty_mix_3_1": "risk constraint failed: realized risk exceeded epsilon at 0.444 of operating points (allowed 0.15); measured FP=0.0311, FN=0.1555, savings=0.5948, accuracy=0.5103",
+        "difficulty_mix_1_1": "risk constraint failed: realized risk exceeded epsilon at 0.333 of operating points (allowed 0.15); measured FP=0.0291, FN=0.1135, savings=0.5877, accuracy=0.3299",
+        "difficulty_mix_1_3": "run failed in adaptive_budget_efficiency, difficulty_mix_1_1, difficulty_mix_3_1, risk_control"
+      },
+      "rank_quality_plus_self": -2.9207234631612145,
+      "rank_all_attempts": -2.6970186803000713,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
+        "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
+        "risk_control.accuracy": -0.2654577096593925,
+        "risk_control.token_savings": -0.2777379953902158,
+        "difficulty_mix_3_1.accuracy": -0.1892981720907909,
+        "difficulty_mix_3_1.token_savings": -0.3061206246810842,
+        "difficulty_mix_1_1.accuracy": -0.18347071267050946,
+        "difficulty_mix_1_1.token_savings": -0.2789084267799496,
+        "difficulty_mix_1_3.accuracy": -0.2575236603150327,
+        "difficulty_mix_1_3.token_savings": -0.23119622942365312
+      },
+      "train_rank_vs_train_reference": -3.043533425879555,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "shortcut_stop_on_repeat": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "risk_control": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "violation_rate": 1.0
+        }
+      },
+      "failures": {
+        "adaptive_budget_efficiency": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9403, FN=0.0000, savings=0.8304, accuracy=0.0597",
+        "risk_control": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9063, FN=0.0000, savings=0.8197, accuracy=0.0937",
+        "difficulty_mix_3_1": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9173, FN=0.0000, savings=0.8273, accuracy=0.0827",
+        "difficulty_mix_1_1": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9477, FN=0.0000, savings=0.8316, accuracy=0.0523",
+        "difficulty_mix_1_3": "risk constraint failed: realized risk exceeded epsilon at 1.000 of operating points (allowed 0.15); measured FP=0.9713, FN=0.0000, savings=0.8343, accuracy=0.0287"
+      },
+      "rank_quality_plus_self": -2.9207234631612145,
+      "rank_all_attempts": -2.6970186803000713,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": -0.3815653009405419,
+        "adaptive_budget_efficiency.token_savings": -0.5494446312100443,
+        "risk_control.accuracy": -0.2654577096593925,
+        "risk_control.token_savings": -0.2777379953902158,
+        "difficulty_mix_3_1.accuracy": -0.1892981720907909,
+        "difficulty_mix_3_1.token_savings": -0.3061206246810842,
+        "difficulty_mix_1_1.accuracy": -0.18347071267050946,
+        "difficulty_mix_1_1.token_savings": -0.2789084267799496,
+        "difficulty_mix_1_3.accuracy": -0.2575236603150327,
+        "difficulty_mix_1_3.token_savings": -0.23119622942365312
+      },
+      "train_rank_vs_train_reference": -3.043533425879555,
+      "paired_noise": {},
+      "rank_se_quality_plus_self": null
+    },
+    "upper_only": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5381944444444444,
+          "token_savings": 0.2941393398324514,
+          "false_positive_risk": 0.08408333333333334,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5534750000000003,
+          "token_savings": 0.13518081542084667,
+          "false_positive_risk": 0.037766666666666664,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.7193888888888889,
+          "token_savings": 0.4016688321503714,
+          "false_positive_risk": 0.08305555555555556,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.48711111111111094,
+          "token_savings": 0.265464553319427,
+          "false_positive_risk": 0.08291666666666665,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25125,
+          "token_savings": 0.0721704174911595,
+          "false_positive_risk": 0.019000000000000006,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5565277777777778,
+          "token_savings": 0.31289522449685037,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5369833333333331,
+          "token_savings": 0.14147061476858286,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.7157222222222224,
+          "token_savings": 0.41361191402839076,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4883611111111111,
+          "token_savings": 0.2582011181636694,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.24941666666666665,
+          "token_savings": 0.07256722382863338,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": -0.4802579502001425,
+      "rank_all_attempts": -0.5614417147892506,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.0510394356817528,
+        "adaptive_budget_efficiency.token_savings": -0.19812368936796276,
+        "risk_control.accuracy": 0.013670823550828224,
+        "risk_control.token_savings": -0.0906234872515917,
+        "difficulty_mix_3_1.accuracy": 0.024219863747070056,
+        "difficulty_mix_3_1.token_savings": -0.06179617539932261,
+        "difficulty_mix_1_1.accuracy": 0.04031506870110234,
+        "difficulty_mix_1_1.token_savings": -0.13080829940463615,
+        "difficulty_mix_1_3.accuracy": 0.04175610002923679,
+        "difficulty_mix_1_3.token_savings": -0.16990759048661952
+      },
+      "train_rank_vs_train_reference": -0.606138848616675,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 0.051138888888888887,
+          "se_accuracy": 0.002527396033445598,
+          "diff_token_savings": -0.15893744791044434,
+          "se_token_savings": 0.0032312559541121592
+        },
+        "risk_control": {
+          "diff_accuracy": 0.02120000000000001,
+          "se_accuracy": 0.0010563279557031517,
+          "diff_token_savings": -0.0647684455384594,
+          "se_token_savings": 0.0013234766877930314
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.06527777777777778,
+          "se_accuracy": 0.0029009515786597327,
+          "diff_token_savings": -0.09678591917164173,
+          "se_token_savings": 0.0028261489436056963
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.07216666666666666,
+          "se_accuracy": 0.003076367005189284,
+          "diff_token_savings": -0.2238219621017979,
+          "se_token_savings": 0.003787192246880559
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": 0.02866666666666666,
+          "se_accuracy": 0.001698287081840311,
+          "diff_token_savings": -0.20143533687137966,
+          "se_token_savings": 0.0020831061001447527
+        }
+      },
+      "rank_se_quality_plus_self": 0.0070659639859019996
+    },
+    "variant_stricter_calibration": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5555555555555558,
+          "token_savings": 0.1434922929360859,
+          "false_positive_risk": 0.018527777777777782,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5563333333333335,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.7428888888888889,
+          "token_savings": 0.18821253762521006,
+          "false_positive_risk": 0.024833333333333336,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.49833333333333335,
+          "token_savings": 0.12962638685710168,
+          "false_positive_risk": 0.01855555555555556,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25,
+          "token_savings": 0.02389998026924115,
+          "false_positive_risk": 0.003805555555555555,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5627777777777776,
+          "token_savings": 0.178541740841587,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5416666666666667,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.7446666666666667,
+          "token_savings": 0.20382687882067993,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.49663888888888885,
+          "token_savings": 0.16088170663195495,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25033333333333335,
+          "token_savings": 0.02516119362207204,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": -1.0812445631606804,
+      "rank_all_attempts": -1.1792579792516178,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.0683667834824568,
+        "adaptive_budget_efficiency.token_savings": -0.38591296820622645,
+        "risk_control.accuracy": 0.015514020279575793,
+        "risk_control.token_savings": -0.27976739523185185,
+        "difficulty_mix_3_1.accuracy": 0.032939014696015304,
+        "difficulty_mix_3_1.token_savings": -0.1980844157700485,
+        "difficulty_mix_1_1.accuracy": 0.04658423257917996,
+        "difficulty_mix_1_1.token_savings": -0.21019621729403043,
+        "difficulty_mix_1_3.accuracy": 0.03993533985354336,
+        "difficulty_mix_1_3.token_savings": -0.21062295754929433
+      },
+      "train_rank_vs_train_reference": -1.1687686609150714,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 0.06850000000000002,
+          "se_accuracy": 0.003303621049248391,
+          "diff_token_savings": -0.30958449480680966,
+          "se_token_savings": 0.0016209661041228448
+        },
+        "risk_control": {
+          "diff_accuracy": 0.024058333333333338,
+          "se_accuracy": 0.00201885107246121,
+          "diff_token_savings": -0.19994926095930615,
+          "se_token_savings": 0.0015072341520868762
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.08877777777777776,
+          "se_accuracy": 0.003892898131751913,
+          "diff_token_savings": -0.31024221369680316,
+          "se_token_savings": 0.001498493046134553
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.08338888888888889,
+          "se_accuracy": 0.0036997178320835543,
+          "diff_token_savings": -0.3596601285641235,
+          "se_token_savings": 0.0018141774974728896
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": 0.02741666666666667,
+          "se_accuracy": 0.002038881887665848,
+          "diff_token_savings": -0.24970577409329806,
+          "se_token_savings": 0.0011713511643049361
+        }
+      },
+      "rank_se_quality_plus_self": 0.006468164144561243
+    },
+    "weaker_confidence_only": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.4871111111111113,
+          "token_savings": 0.45226526919207966,
+          "false_positive_risk": 0.04711111111111112,
+          "false_negative_risk": 0.03620744153948811,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5305166666666667,
+          "token_savings": 0.20123483160707822,
+          "false_positive_risk": 0.026133333333333342,
+          "false_negative_risk": 0.0202469932960558,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.654,
+          "token_savings": 0.4971658551952866,
+          "false_positive_risk": 0.06177777777777777,
+          "false_negative_risk": 0.04534109304295064,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.41494444444444434,
+          "token_savings": 0.4892865154212249,
+          "false_positive_risk": 0.039472222222222235,
+          "false_negative_risk": 0.05139727234887195,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.21655555555555556,
+          "token_savings": 0.30920369759687727,
+          "false_positive_risk": 0.00827777777777778,
+          "false_negative_risk": 0.02678250359616782,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.51875,
+          "token_savings": 0.48395375972619487,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5232416666666668,
+          "token_savings": 0.2161970191364027,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.6850555555555553,
+          "token_savings": 0.5044754746933351,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.4434444444444445,
+          "token_savings": 0.4663290183003858,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.22908333333333333,
+          "token_savings": 0.2855951095318623,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": 0.020090787049767307,
+      "rank_all_attempts": 0.027569522245733058,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 5.544751296233817e-05,
+        "adaptive_budget_efficiency.token_savings": -0.001011599540523678,
+        "risk_control.accuracy": -0.0011338615445066348,
+        "risk_control.token_savings": 0.0017987600943767201,
+        "difficulty_mix_3_1.accuracy": -4.122529999499459e-05,
+        "difficulty_mix_3_1.token_savings": -0.0008229384170794631,
+        "difficulty_mix_1_1.accuracy": 0.0,
+        "difficulty_mix_1_1.token_savings": 0.0,
+        "difficulty_mix_1_3.accuracy": -0.008780110180566259,
+        "difficulty_mix_1_3.token_savings": 0.030026314425099277
+      },
+      "train_rank_vs_train_reference": -0.01126686974617782,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 5.5555555555555585e-05,
+          "se_accuracy": 0.00037469534950179407,
+          "diff_token_savings": -0.0008115185508158859,
+          "se_token_savings": 0.00018627469315745136
+        },
+        "risk_control": {
+          "diff_accuracy": -0.001758333333333333,
+          "se_accuracy": 0.00040744929814095343,
+          "diff_token_savings": 0.0012855706477720944,
+          "se_token_savings": 0.0002749843055010277
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": -0.0001111111111111112,
+          "se_accuracy": 0.0003967168502335882,
+          "diff_token_savings": -0.0012888961267264552,
+          "se_token_savings": 0.00015135008275425545
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.0,
+          "se_accuracy": 0.0,
+          "diff_token_savings": 0.0,
+          "se_token_savings": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": -0.006027777777777774,
+          "se_accuracy": 0.0005660092864482693,
+          "diff_token_savings": 0.03559794323433814,
+          "se_token_savings": 0.0005655997840864268
+        }
+      },
+      "rank_se_quality_plus_self": 0.0012183087129361246
+    },
+    "weaker_token_budget": {
+      "test": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5569999999999998,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5563333333333335,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "train": {
+        "adaptive_budget_efficiency": {
+          "accuracy": 0.5703333333333328,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "risk_control": {
+          "accuracy": 0.5416666666666667,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_3_1": {
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_1": {
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        },
+        "difficulty_mix_1_3": {
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "failures": {},
+      "rank_quality_plus_self": -1.4711913134493864,
+      "rank_all_attempts": -1.5607272511019137,
+      "contributions_quality_plus_self": {
+        "adaptive_budget_efficiency.accuracy": 0.06980841881947494,
+        "adaptive_budget_efficiency.token_savings": -0.5647834788764662,
+        "risk_control.accuracy": 0.015514020279575793,
+        "risk_control.token_savings": -0.27976739523185185,
+        "difficulty_mix_3_1.accuracy": 0.035577433895696106,
+        "difficulty_mix_3_1.token_savings": -0.3182549435387917,
+        "difficulty_mix_1_1.accuracy": 0.04751529652146868,
+        "difficulty_mix_1_1.token_savings": -0.2859537839935529,
+        "difficulty_mix_1_3.accuracy": 0.03993533985354336,
+        "difficulty_mix_1_3.token_savings": -0.23078222117848268
+      },
+      "train_rank_vs_train_reference": -1.6433185034284943,
+      "paired_noise": {
+        "adaptive_budget_efficiency": {
+          "diff_accuracy": 0.06994444444444446,
+          "se_accuracy": 0.004188880599756019,
+          "diff_token_savings": -0.45307678774289534,
+          "se_token_savings": 0.003000311727259106
+        },
+        "risk_control": {
+          "diff_accuracy": 0.024058333333333338,
+          "se_accuracy": 0.00201885107246121,
+          "diff_token_savings": -0.19994926095930615,
+          "se_token_savings": 0.0015072341520868762
+        },
+        "difficulty_mix_3_1": {
+          "diff_accuracy": 0.09588888888888888,
+          "se_accuracy": 0.004757840183305503,
+          "diff_token_savings": -0.4984547513220129,
+          "se_token_savings": 0.0031211970701834025
+        },
+        "difficulty_mix_1_1": {
+          "diff_accuracy": 0.08505555555555551,
+          "se_accuracy": 0.004527156910397299,
+          "diff_token_savings": -0.48928651542122525,
+          "se_token_savings": 0.002443126941769908
+        },
+        "difficulty_mix_1_3": {
+          "diff_accuracy": 0.02741666666666667,
+          "se_accuracy": 0.002303476807183994,
+          "diff_token_savings": -0.27360575436253926,
+          "se_token_savings": 0.0013310945441177004
+        }
+      },
+      "rank_se_quality_plus_self": 0.008131450191044142
+    }
+  }
+}
