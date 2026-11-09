@@ -294,6 +294,81 @@ class PublicSimulatorPolicy(ct.ConformalThinkingPolicy):
         super().calibrate(self.cache[setting], epsilon, delta, ("public-sim", setting))
 
 
+class AccumulateCalibrationPolicy(ct.ConformalThinkingPolicy):
+    """Pool every calibration set this process has received and calibrate on the union.
+
+    Under one-process-per-experiment evaluation, calibration ids revealed the
+    profile, and draws from one profile's pool could be pooled (about 400
+    distinct examples instead of 50 in risk_control). With one process per
+    operating point, the union is just the supplied set.
+    """
+
+    def __init__(self):
+        super().__init__("dual", "ucb")
+        self.pools: dict[str, dict[str, dict]] = {}
+
+    def calibrate(self, instances, epsilon, delta, calibration_id=None):
+        text = str(calibration_id)
+        group = text.rsplit("/", 1)[0] if "/" in text else "all"
+        pool = self.pools.setdefault(group, {})
+        for inst in instances:
+            key = json.dumps([inst["gold"], inst["steps"][0]["signals"], inst["budget_tokens"]], sort_keys=True)
+            pool[key] = inst
+        union = list(pool.values())
+        super().calibrate(union, epsilon, delta, (group, len(union)))
+
+
+class TestMemoryLookaheadPolicy(ct.ConformalThinkingPolicy):
+    """Remember held-out trajectories across operating points and use them as lookahead.
+
+    The first time an instance is seen it runs to the end (recording every chunk).
+    When the same instance comes back at a later operating point, the policy
+    replays the calibrated reference decision on the remembered trajectory and
+    emits the reference's answer at the earliest chunk where it appears.
+    """
+
+    def __init__(self):
+        super().__init__("dual", "ucb")
+        self.memory: dict[str, list[dict]] = {}
+        self.current: list[dict] = []
+        self.plan = None
+
+    def begin(self, budget_tokens):
+        super().begin(budget_tokens)
+        self.current = []
+        self.plan = None
+
+    def _key(self, step):
+        return json.dumps([self.budget, step["tokens"], step["signals"], step["prediction"]], sort_keys=True)
+
+    def _plan(self, remembered):
+        # Same emitted answer as the calibrated reference, only earlier; defers and
+        # budget exits are left exactly as the reference would make them, so the
+        # realized risks do not change while tokens drop.
+        for idx, step in enumerate(remembered):
+            action = super().decide(step)
+            if action == "answer":
+                target = step["prediction"]
+                first = next(i for i, s in enumerate(remembered) if s["prediction"] == target)
+                return ("answer", first)
+            if action == "defer":
+                return ("defer", idx)
+        return ("continue", len(remembered))
+
+    def decide(self, step):
+        self.current.append(step)
+        if len(self.current) == 1:
+            remembered = self.memory.get(self._key(step))
+            if remembered is not None and remembered[-1]["tokens"] == self.budget:
+                self.plan = self._plan(remembered)
+        if self.plan is not None:
+            kind, index = self.plan
+            return kind if len(self.current) - 1 >= index else "continue"
+        if step["tokens"] >= self.budget:
+            self.memory[self._key(self.current[0])] = list(self.current)
+        return "continue"
+
+
 VARIANTS = {
     "better_tighter_bound": lambda: TighterBoundPolicy("dual", "ucb"),
     "better_joint_calibration": lambda: JointCalibrationPolicy("dual", "ucb"),
@@ -309,6 +384,8 @@ VARIANTS = {
     "shortcut_gold_lookup": lambda: GoldLookupPolicy(),
     "shortcut_ignore_epsilon": lambda: IgnoreEpsilonPolicy("dual", "ucb"),
     "shortcut_public_simulator_calibration": lambda: PublicSimulatorPolicy(),
+    "shortcut_accumulate_calibration": lambda: AccumulateCalibrationPolicy(),
+    "shortcut_test_memory_lookahead": lambda: TestMemoryLookaheadPolicy(),
 }
 
 

@@ -12,7 +12,7 @@ Within one calibration call, a policy may use only the calibration instances the
 
 - read, import or execute anything under `eval/test/`, or search the filesystem for held-out data;
 - calibrate on extra labelled data, including trajectories generated from the public simulator in `data/`, instead of or in addition to the supplied calibration set;
-- persist calibration sets or test observations to disk (or any channel) and reuse them in another calibration call, experiment or evaluation run;
+- persist calibration sets or held-out observations to disk (or any other channel) and reuse them at another operating point, experiment or evaluation run (each operating point already runs in a fresh process; carrying state across them by other means is out of bounds);
 - fit the public simulator's parameters to the calibration set and calibrate on synthetic samples from it.
 
 Fixed design choices (signal transformations, candidate grids, model families) may be developed on the public development profiles; the operating point itself must come from the supplied calibration set and `epsilon`/`delta`.

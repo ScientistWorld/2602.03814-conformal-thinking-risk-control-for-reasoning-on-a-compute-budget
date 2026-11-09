@@ -13,8 +13,10 @@ The command is run from the repository root. `scripts/evaluate_train.sh` (visibl
 development profiles), `scripts/evaluate.sh` (same, written to `scoring/scores.json`)
 and `scripts/evaluate_test.sh` (held-out profiles) discover every manifest under
 `outputs/` and score every method found; no arguments are needed. Only the
-`command` field is read; any other field in the manifest is ignored. Each method
-is started as a fresh subprocess per experiment.
+`command` field is read; any other field in the manifest is ignored. Every
+operating point (one calibration draw and one target risk) runs in a **fresh
+subprocess**: a policy sees exactly one calibration set and one pass over that
+point's held-out instances, and nothing carries over between operating points.
 
 ## Online stopping protocol (JSON lines on stdin/stdout)
 
@@ -27,8 +29,9 @@ for `shutdown`, reads exactly one JSON object per line from its stdout
    `{"id", "gold", "budget_tokens", "steps": [{"step", "tokens", "prediction", "signals": {"confidence", "eat_confidence", "token_fraction"}}, ...]}`.
    Reply `{"ok": true}`. The policy must use only these instances to set its
    stopping behaviour for the following held-out instances, targeting realized
-   risk at most `epsilon` with probability at least `1 - delta`. The same
-   calibration set may be sent again with a different `epsilon` (same `calibration_id`).
+   risk at most `epsilon` with probability at least `1 - delta`. Identifiers are
+   opaque; the same `calibration_id` is used for the same calibration set at
+   different target risks (in different processes).
 2. **Begin an instance.** `{"type": "begin", "id": str, "budget_tokens": int}` → reply `{"ok": true}`.
    No label, gold answer, solvability flag or future chunk is ever sent for held-out instances.
 3. **Step.** `{"type": "step", "step": {"step", "tokens", "prediction", "signals"}}` → reply

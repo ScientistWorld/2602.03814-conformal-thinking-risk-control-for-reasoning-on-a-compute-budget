@@ -67,23 +67,35 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.512,
-          "token_savings": 0.446
+          "accuracy": 0.4871,
+          "token_savings": 0.4531,
+          "false_positive_risk": 0.0476,
+          "false_negative_risk": 0.0362,
+          "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.551,
-          "token_savings": 0.27
+          "accuracy": 0.5382,
+          "token_savings": 0.2941,
+          "false_positive_risk": 0.0841,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         },
         "naive_calibration": {
           "type": "baseline",
-          "accuracy": 0.477,
-          "token_savings": 0.598
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
         },
         "full_budget": {
           "type": "baseline",
-          "accuracy": 0.553,
-          "token_savings": 0.0
+          "accuracy": 0.557,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         }
       },
       "_iteration10_values_obsolete_setup": {
@@ -109,7 +121,8 @@
           "defer_fraction": 0.428,
           "exit_budget_fraction": 0.0
         }
-      }
+      },
+      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
     },
     "risk_control": {
       "description": "Small-calibration regime: 50 labelled calibration examples per draw, 10 draws per profile, target risks 0.05/0.10/0.20/0.25, on held-out profiles disjoint from the other experiments. Realized risk must stay within the target across calibration draws (gate), and the policy should still save tokens.",
@@ -177,23 +190,35 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.526,
-          "token_savings": 0.208
+          "accuracy": 0.5323,
+          "token_savings": 0.1999,
+          "false_positive_risk": 0.0298,
+          "false_negative_risk": 0.0184,
+          "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.55,
-          "token_savings": 0.142
+          "accuracy": 0.5535,
+          "token_savings": 0.1352,
+          "false_positive_risk": 0.0378,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         },
         "naive_calibration": {
           "type": "baseline",
           "accuracy": 0.0,
-          "token_savings": 0.0
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
         },
         "full_budget": {
           "type": "baseline",
-          "accuracy": 0.553,
-          "token_savings": 0.0
+          "accuracy": 0.5563,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         }
       },
       "_iteration10_values_obsolete_setup": {
@@ -219,7 +244,8 @@
           "defer_fraction": 0.428,
           "exit_budget_fraction": 0.0
         }
-      }
+      },
+      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
     },
     "difficulty_mix_3_1": {
       "description": "3:1 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.10/0.15/0.20.",
@@ -287,23 +313,35 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.7,
-          "token_savings": 0.45
+          "accuracy": 0.6541,
+          "token_savings": 0.4985,
+          "false_positive_risk": 0.0623,
+          "false_negative_risk": 0.0453,
+          "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.735,
-          "token_savings": 0.33
+          "accuracy": 0.7194,
+          "token_savings": 0.4017,
+          "false_positive_risk": 0.0831,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         },
         "naive_calibration": {
           "type": "baseline",
-          "accuracy": 0.64,
-          "token_savings": 0.59
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
         },
         "full_budget": {
           "type": "baseline",
           "accuracy": 0.75,
-          "token_savings": 0.0
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         }
       },
       "_iteration10_values_obsolete_setup": {
@@ -329,7 +367,8 @@
           "defer_fraction": 0.292,
           "exit_budget_fraction": 0.0
         }
-      }
+      },
+      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
     },
     "difficulty_mix_1_1": {
       "description": "1:1 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.10/0.15/0.20.",
@@ -397,23 +436,35 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.45,
-          "token_savings": 0.42
+          "accuracy": 0.4149,
+          "token_savings": 0.4893,
+          "false_positive_risk": 0.0395,
+          "false_negative_risk": 0.0514,
+          "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.5,
-          "token_savings": 0.2
+          "accuracy": 0.4871,
+          "token_savings": 0.2655,
+          "false_positive_risk": 0.0829,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         },
         "naive_calibration": {
           "type": "baseline",
-          "accuracy": 0.41,
-          "token_savings": 0.59
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
         },
         "full_budget": {
           "type": "baseline",
           "accuracy": 0.5,
-          "token_savings": 0.0
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         }
       },
       "_iteration10_values_obsolete_setup": {
@@ -439,7 +490,8 @@
           "defer_fraction": 0.533,
           "exit_budget_fraction": 0.0
         }
-      }
+      },
+      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
     },
     "difficulty_mix_1_3": {
       "description": "1:3 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.05/0.10/0.125 (tighter because deferring everything already has false-negative risk of about 0.18 here).",
@@ -507,23 +559,35 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.229,
-          "token_savings": 0.28
+          "accuracy": 0.2226,
+          "token_savings": 0.2736,
+          "false_positive_risk": 0.0105,
+          "false_negative_risk": 0.0225,
+          "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.249,
-          "token_savings": 0.067
+          "accuracy": 0.2512,
+          "token_savings": 0.0722,
+          "false_positive_risk": 0.019,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         },
         "naive_calibration": {
           "type": "baseline",
-          "accuracy": 0.185,
-          "token_savings": 0.603
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
         },
         "full_budget": {
           "type": "baseline",
           "accuracy": 0.25,
-          "token_savings": 0.0
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
         }
       },
       "_iteration10_values_obsolete_setup": {
@@ -549,7 +613,8 @@
           "defer_fraction": 0.719,
           "exit_budget_fraction": 0.0
         }
-      }
+      },
+      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
     }
   }
 }

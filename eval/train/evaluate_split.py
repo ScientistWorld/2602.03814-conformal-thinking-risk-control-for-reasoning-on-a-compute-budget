@@ -100,7 +100,7 @@ class PolicyProcess:
     def __init__(self, command: list[str], log_path: Path) -> None:
         resolved = [sys.executable if part in {"python", "python3"} and i == 0 else part for i, part in enumerate(command)]
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        self._log = log_path.open("w", encoding="utf-8")
+        self._log = log_path.open("a", encoding="utf-8")
         self.proc = subprocess.Popen(
             resolved,
             cwd=str(REPO_ROOT),
@@ -279,6 +279,10 @@ def draw_indices(experiment: str, profile_index: int, draw: int, size: int) -> l
     return rng.sample(range(POOL_SIZE), size)
 
 
+def opaque_id(*parts: object) -> str:
+    return format(derived_seed("id", *parts), "016x")
+
+
 def run_experiment(
     experiment: str,
     config: dict,
@@ -287,7 +291,16 @@ def run_experiment(
     log_dir: Path,
     outcome_path: Path | None = None,
 ) -> tuple[dict, str | None]:
-    policy = PolicyProcess(command, log_dir / f"{experiment}.log") if command is not None else None
+    """Score one method on one experiment.
+
+    Every operating point (one calibration draw and one epsilon) runs in a fresh
+    policy process, so nothing observed at one operating point (calibration sets
+    or held-out chunks) is available at another. Identifiers are opaque.
+    """
+    log_path = log_dir / f"{experiment}.log"
+    if command is not None:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text("", encoding="utf-8")
     points = []
     saved = []
     try:
@@ -295,21 +308,27 @@ def run_experiment(
             for draw in range(config["draws"]):
                 indices = draw_indices(experiment, profile_index, draw, config["calibration_size"])
                 calibration = [calibration_view(task["pool"][i], j) for j, i in enumerate(indices)]
-                calibration_id = f"{experiment}/{profile_index}/{draw}"
+                calibration_id = opaque_id("calibration", experiment, profile_index, draw)
                 for epsilon in config["epsilons"]:
-                    if policy is not None:
-                        policy.request(
-                            {
-                                "type": "calibrate",
-                                "calibration_id": calibration_id,
-                                "epsilon": epsilon,
-                                "delta": DELTA,
-                                "instances": calibration,
-                            }
-                        )
-                    outcomes = [
-                        run_instance(policy, instance, f"q{qi:05d}") for qi, instance in enumerate(task["test"])
-                    ]
+                    policy = PolicyProcess(command, log_path) if command is not None else None
+                    try:
+                        if policy is not None:
+                            policy.request(
+                                {
+                                    "type": "calibrate",
+                                    "calibration_id": calibration_id,
+                                    "epsilon": epsilon,
+                                    "delta": DELTA,
+                                    "instances": calibration,
+                                }
+                            )
+                        outcomes = [
+                            run_instance(policy, instance, opaque_id("query", experiment, profile_index, draw, epsilon, qi))
+                            for qi, instance in enumerate(task["test"])
+                        ]
+                    finally:
+                        if policy is not None:
+                            policy.close()
                     points.append(point_metrics(task["test"], outcomes, epsilon))
                     if outcome_path is not None:
                         saved.append(
@@ -320,15 +339,12 @@ def run_experiment(
                                 "outcomes": "".join(f"{kind[0]}{index}," for kind, index in outcomes),
                             }
                         )
-                    if policy is None:
+                    if command is None:
                         break  # the full-budget control does not depend on calibration
-                if policy is None:
+                if command is None:
                     break
     except PolicyError as exc:
         return dict(FAILED_VALUES), f"protocol failure: {exc}"
-    finally:
-        if policy is not None:
-            policy.close()
     if outcome_path is not None:
         outcome_path.parent.mkdir(parents=True, exist_ok=True)
         outcome_path.write_text(json.dumps(saved), encoding="utf-8")

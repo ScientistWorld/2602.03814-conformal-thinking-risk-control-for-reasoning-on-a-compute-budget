@@ -138,14 +138,34 @@ def paired_noise(tasks, cand_saved, ref_saved, coef_acc, coef_sav):
     return diff_acc, math.sqrt(var_acc), diff_sav, math.sqrt(var_sav), math.sqrt(z_combo_var)
 
 
+def load_reference_phase1(test: dict, name: str) -> dict:
+    return results(load(HERE / "scores_test_all.json"))[name]
+
+
 def main() -> None:
     reference_spec = load(ROOT / "scoring" / "reference.json")
     scored = scored_metrics(reference_spec)
     weights = {e: spec["weight"] for e, spec in reference_spec["experiments"].items()}
     test = results(load(HERE / "scores_test_all.json"))
+    failures = {e: dict(v.get("_failures", {})) for e, v in load(HERE / "scores_test_all.json")["experiments"].items()}
+    isolated_path = HERE / "scores_test_isolated.json"
+    rerun_isolated: list[str] = []
+    identical_after_isolation: dict[str, bool] = {}
+    if isolated_path.exists():
+        # Phase 2: the current evaluator (one process per operating point). Its
+        # values replace phase-1 values for every method it scored.
+        isolated_scores = load(isolated_path)
+        for name, metrics in results(isolated_scores).items():
+            if name in test:
+                identical_after_isolation[name] = test[name] == metrics
+            test[name] = metrics
+            rerun_isolated.append(name)
+            for e, v in isolated_scores["experiments"].items():
+                failures[e].pop(name, None)
+                if name in v.get("_failures", {}):
+                    failures[e][name] = v["_failures"][name]
     train_path = HERE / "scores_train_all.json"
     train = results(load(train_path)) if train_path.exists() else {}
-    failures = {e: v.get("_failures", {}) for e, v in load(HERE / "scores_test_all.json")["experiments"].items()}
     anchor = test[REFERENCE]
 
     quality_names = [REFERENCE] + [n for n in BASELINES + HONEST if n in test]
@@ -160,7 +180,28 @@ def main() -> None:
     tasks = hidden_tasks.build_tasks(keys, 1000, load(HERE / "scores_test_all.json")["_metadata"]["test_size_per_profile"])
     outcome_root = ROOT / "logs" / "hardening_outcomes"
 
-    report = {"reference": REFERENCE, "quality_population": quality_names, "methods": {}}
+    report = {
+        "reference": REFERENCE,
+        "quality_population": quality_names,
+        "rerun_with_isolation": rerun_isolated,
+        "identical_after_isolation": identical_after_isolation,
+        "methods": {},
+    }
+    before_path = HERE / "scores_test_before_isolation.json"
+    if before_path.exists():
+        before = results(load(before_path))
+        before_failures = {e: v.get("_failures", {}) for e, v in load(before_path)["experiments"].items()}
+        report["before_isolation"] = {}
+        for name, metrics in before.items():
+            if name == REFERENCE:
+                continue
+            std_b = population_std(quality + [metrics], scored)
+            report["before_isolation"][name] = {
+                "rank_quality_plus_self": rank(metrics, before[REFERENCE], std_b, scored, weights)["score"],
+                "reference_identical_to_phase1": before[REFERENCE] == load_reference_phase1(test, REFERENCE),
+                "test": {e: {m: metrics[e][m] for m in ("accuracy", "token_savings", "violation_rate")} for e in metrics},
+                "failures": {e: before_failures[e][name] for e in before_failures if name in before_failures[e]},
+            }
     for name, metrics in sorted(test.items()):
         own_quality = quality if name in quality_names else quality + [metrics]
         std_own = population_std(own_quality, scored)
@@ -180,8 +221,10 @@ def main() -> None:
         noise = {}
         se_total_sq = 0.0
         for experiment, config in experiments.items():
-            cand_file = outcome_root / name / f"{experiment}.json"
-            ref_file = outcome_root / REFERENCE / f"{experiment}.json"
+            iso_root = ROOT / "logs" / "hardening_outcomes_isolated"
+            root = iso_root if (iso_root / name / f"{experiment}.json").exists() and (iso_root / REFERENCE / f"{experiment}.json").exists() else outcome_root
+            cand_file = root / name / f"{experiment}.json"
+            ref_file = root / REFERENCE / f"{experiment}.json"
             if name == REFERENCE or not cand_file.exists() or not ref_file.exists():
                 continue
             if name in failures.get(experiment, {}) or REFERENCE in failures.get(experiment, {}):
@@ -214,6 +257,10 @@ def main() -> None:
             f"{entry['rank_all_attempts']:+.3f} | {('%+.3f' % tr) if tr is not None else '—'} | {main['accuracy']:.3f} | "
             f"{main['token_savings']:.3f} | {', '.join(sorted(entry['failures'])) or '—'} |"
         )
+    if "before_isolation" in report:
+        lines += ["", "Pre-isolation hidden test (one policy process per experiment):", "", "| probe | rank before | failed experiments before |", "|---|---:|---|"]
+        for name, entry in sorted(report["before_isolation"].items()):
+            lines.append(f"| {name} | {entry['rank_quality_plus_self']:+.3f} | {', '.join(sorted(entry['failures'])) or '—'} |")
     (HERE / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))
 
