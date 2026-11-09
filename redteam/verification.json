@@ -1,0 +1,28 @@
+{
+  "start_commit": "b03c69167ef0306371bc1234242449ec81637e05",
+  "protected_paths_differing_from_start": [],
+  "outputs_restored": true,
+  "scoring_scores_test_restored": true,
+  "seeds": [
+    11,
+    22,
+    33
+  ],
+  "seed_experiments_identical": true,
+  "seed_rank_range": 0.0,
+  "original_and_rerun_decisions_identical": {
+    "results.json": true,
+    "ratio_3_1.json": true,
+    "ratio_1_1.json": true,
+    "ratio_1_3.json": true
+  },
+  "cached_and_rerun_metrics_identical": true,
+  "stored_scores_match_rerun": false,
+  "attempt_count": 26,
+  "successful_test_count": 22,
+  "rejected_test_count": 4,
+  "every_hidden_command_exact": true,
+  "candidate_file_removed": true,
+  "generated_data_removed": true,
+  "unrestored_case_backups": []
+}

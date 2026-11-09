@@ -1,4 +1,8 @@
-action: submit
+# Once you set action to 'submit' or 'done', STOP immediately.
+# Do NOT sleep, poll, or wait for jobs. The system reads this file
+# only after your turn ends.
+action: pending
 gpus: 0
 test: false
-notes: "Run two targeted CPU follow-ups: unchanged cached reference and answer-preserving false budget flags; recompute audit ranks against the supplied frozen reference."
+milestone: core_claim_plus
+notes: ""

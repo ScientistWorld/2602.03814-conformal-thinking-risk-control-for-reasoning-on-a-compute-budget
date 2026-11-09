@@ -66,13 +66,18 @@ def main():
     all_attempts = [anchor] + list(attempts.values())
     ranks = {}
     for name, metrics in attempts.items():
+        # A shortcut must participate in the population used to normalize its
+        # own comparison. Keep the fixed quality_pool as a diagnostic only.
+        augmented_quality = quality if name in QUALITY_NAMES else quality + [metrics]
         ranks[name] = {
             "all_attempts": rank(metrics, anchor, all_attempts, coefficients),
             "quality_pool": rank(metrics, anchor, quality, coefficients),
+            "quality_plus_candidate": rank(metrics, anchor, augmented_quality, coefficients),
             "pair_with_reference": rank(metrics, anchor, [anchor, metrics], coefficients),
             "pair_with_rerun_reference": rank(metrics, rerun_anchor, [rerun_anchor, metrics], coefficients),
             "all_attempts_vs_rerun": rank(metrics, rerun_anchor, all_attempts, coefficients),
             "quality_pool_vs_rerun": rank(metrics, rerun_anchor, quality, coefficients),
+            "quality_plus_candidate_vs_rerun": rank(metrics, rerun_anchor, augmented_quality, coefficients),
         }
         (ROOT / name / "rank.json").write_text(json.dumps(ranks[name], indent=2) + "\n")
     best_bounds = []
@@ -90,6 +95,7 @@ def main():
         "rerun_anchor": REFERENCE_NAME,
         "all_attempt_names": list(attempts),
         "quality_pool_names": [name for name in QUALITY_NAMES if name in attempts],
+        "quality_plus_candidate_definition": "supplied anchor + quality_pool_names + candidate, unless already in quality_pool_names",
         "reference_best_bounds": best_bounds,
         "reference_metrics": anchor,
         "rerun_reference_metrics": rerun_anchor,
@@ -103,11 +109,11 @@ def main():
         "failed": failed,
     }
     (ROOT / "analysis.json").write_text(json.dumps(summary, indent=2) + "\n")
-    lines = ["case\tall_pool_rank\tquality_pool_rank\tpair_rank\tpair_rank_vs_rerun\taccuracy\ttoken_savings\tFP\tFN"]
+    lines = ["case\tall_pool_rank\tquality_plus_candidate_rank\tpair_rank\tpair_rank_vs_rerun\taccuracy\ttoken_savings\tFP\tFN"]
     for name in sorted(attempts):
         a = attempts[name]["adaptive_budget_efficiency"]
         r = ranks[name]
-        lines.append(f"{name}\t{r['all_attempts']['score']:.6f}\t{r['quality_pool']['score']:.6f}\t{r['pair_with_reference']['score']:.6f}\t{r['pair_with_rerun_reference']['score']:.6f}\t"
+        lines.append(f"{name}\t{r['all_attempts']['score']:.6f}\t{r['quality_plus_candidate']['score']:.6f}\t{r['pair_with_reference']['score']:.6f}\t{r['pair_with_rerun_reference']['score']:.6f}\t"
                      f"{a['accuracy']:.6f}\t{a['token_savings']:.6f}\t{a['false_positive_risk']:.6f}\t{a['false_negative_risk']:.6f}")
     lines.extend(f"{name}\tFAILED\tFAILED\tFAILED\tFAILED\tNA\tNA\tNA\tNA" for name in sorted(failed))
     (ROOT / "summary.tsv").write_text("\n".join(lines) + "\n")

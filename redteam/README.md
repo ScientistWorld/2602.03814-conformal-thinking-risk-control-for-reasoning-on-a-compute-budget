@@ -30,3 +30,7 @@ the declared better direction, experiment weight, and per-metric population
 standard deviation. A zero-variance metric contributes zero. These are relative
 rank differences, with the supplied reference zero, rather than invented raw-unit
 scores. Both the audit and quality populations include the supplied reference.
+For comparisons with a shortcut, `quality_plus_candidate` adds that shortcut to
+the quality population before computing standard deviations. This is the quality
+column in `summary.tsv` and `REDTEAM.md`. The older `quality_pool` fields retain
+fixed-scale diagnostic comparisons; they are not used to claim shortcut wins.

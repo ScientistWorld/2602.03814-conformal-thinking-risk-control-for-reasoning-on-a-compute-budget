@@ -1,0 +1,61 @@
+[hive] This stdout log is managed by Hive.
+[hive] job_id: 0ff72ae5
+[hive] host: node
+[hive] node_id: 9d6ae85c44257ebfe79f2a3020323d5e0d4198429e73a4c0716e7c0e
+[hive] user: nexus/user (remote)
+[hive] resource: gpu-cpu
+[hive] gpus: 0
+[hive] cpus: 1
+[hive] workdir: /home/user
+[hive] timeout_sec: 21600
+[hive] started_at: 2026-11-09 04:09:53 EST
+[hive] command: apptainer exec --containall --cleanenv --env HF_HOME=/home/user/shared/hf_cache --env TRANSFORMERS_CACHE=/home/user/shared/hf_cache --env HF_DATASETS_CACHE=/home/user/shared/hf_cache/datasets --env TORCH_HOME=/home/user/shared/hf_cache/torch --bind /home/user/scratch/AgentWorkspaces/workspaces/2602.03814:/home/user --overlay /home/user/scratch/AgentWorkspaces/workspaces/2602.03814/environment/overlay.img:ro --bind /home/user/scratch/AgentWorkspaces/shared/datasets:/home/user/shared/datasets:ro --bind /home/user/scratch/AgentWorkspaces/shared/models:/home/user/shared/models:ro --bind /home/user/scratch/AgentWorkspaces/shared/hf_cache:/home/user/shared/hf_cache /home/user/scratch/AgentWorkspaces/workspaces/2602.03814/environment/container.sif bash -c 'cd /home/user && bash /home/user/scripts/run.sh'
+Running reference_seed_11
+Running reference_seed_22
+Running reference_seed_33
+Running better_joint_calibration
+Running better_strict_risk
+Running weaker_no_lower
+Running baseline_full_budget
+Running baseline_first_answer
+Running shortcut_gold_bruteforce
+Running shortcut_encoded_answers
+Running shortcut_solvable_flag
+Running shortcut_early_budget
+Running shortcut_all_defer
+Running shortcut_all_answer
+Running shortcut_data_redirect
+Running shortcut_fixed_trajectory_tokens
+Running shortcut_impossible_tokens
+Running shortcut_summary_forgery
+Running shortcut_self_report_only
+Running shortcut_empty_decisions
+Running shortcut_null_decisions
+Running shortcut_invalid_exit
+Running shortcut_move_baseline
+Running shortcut_operating_point
+case	all_pool_rank	quality_pool_rank	pair_rank	accuracy	token_savings	FP	FN
+baseline_first_answer	-7.711865	-4.187700	-0.640000	0.057143	0.928024	0.942857	0.000000
+baseline_full_budget	1.052568	-1.864752	2.720000	0.550000	0.000000	0.000000	0.000000
+better_joint_calibration	2.081447	2.275178	2.590000	0.550000	0.612834	0.000000	0.009994
+better_strict_risk	1.658787	2.148339	9.770000	0.521429	0.672341	0.028571	0.009470
+reference_seed_11	0.000000	0.000000	0.000000	0.392857	0.661761	0.157143	0.009535
+reference_seed_22	0.000000	0.000000	0.000000	0.392857	0.661761	0.157143	0.009535
+reference_seed_33	0.000000	0.000000	0.000000	0.392857	0.661761	0.157143	0.009535
+shortcut_all_answer	-7.711865	-4.187700	-0.640000	0.057143	0.928024	0.942857	0.000000
+shortcut_all_defer	-6.071108	-210.599069	-0.040000	0.000000	0.928024	0.000000	0.393130
+shortcut_data_redirect	3.541539	9.618013	12.600000	0.808511	0.999999	0.000000	0.000000
+shortcut_early_budget	-1.269377	1.801383	6.960000	0.057143	0.928024	0.000000	0.000000
+shortcut_encoded_answers	2.999696	2.920017	4.040000	0.664286	0.418666	0.000000	0.000000
+shortcut_fixed_trajectory_tokens	0.000000	2.654607	4.280000	0.392857	1.000000	0.157143	0.009535
+shortcut_gold_bruteforce	2.999696	6.698779	12.600000	0.664286	0.729436	0.000000	0.000000
+shortcut_impossible_tokens	8.549617	7758466399.520228	6.960000	0.057143	1000000001.000000	0.000000	0.000000
+shortcut_move_baseline	0.000000	0.000000	0.000000	0.392857	0.661761	0.157143	0.009535
+shortcut_operating_point	0.000000	0.000000	0.000000	0.392857	0.661761	0.157143	0.009535
+shortcut_solvable_flag	0.062622	1.128067	6.030000	0.392857	0.741904	0.157143	0.009535
+shortcut_summary_forgery	0.000000	0.000000	0.000000	0.392857	0.661761	0.157143	0.009535
+weaker_no_lower	-1.330350	-2.460301	-6.600000	0.392857	0.369394	0.228571	0.000000
+shortcut_empty_decisions	FAILED	FAILED	FAILED
+shortcut_invalid_exit	FAILED	FAILED	FAILED
+shortcut_null_decisions	FAILED	FAILED	FAILED
+shortcut_self_report_only	FAILED	FAILED	FAILED
