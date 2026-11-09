@@ -1,8 +1,6 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: submit
-gpus: 0
-test: false
+action: done
 milestone: core_claim_plus
-notes: "Final reference reproduction from the final code (scripts/run.sh with AUDIT=none: register reference + baselines, evaluate train and hidden test, validate). Audit evidence already in redteam/hardening/."
+notes: "Hardened gym: hidden online test owned by eval/test (private profiles/seeds), per-operating-point process isolation, evaluator-derived exits/tokens, risk gate failing the whole run; better variants rank +0.42..+0.99 (SE<0.01), weaker/shortcuts below; reference reproduces exactly. See HARDENING.md."

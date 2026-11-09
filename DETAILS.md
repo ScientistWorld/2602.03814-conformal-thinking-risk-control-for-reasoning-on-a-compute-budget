@@ -23,20 +23,19 @@ Reasoning LLMs often improve with more generated reasoning tokens, but fixed bud
 
 Reasoning language models can improve answer accuracy by spending more test-time compute, but a fixed reasoning budget wastes tokens on easy or hopeless instances and an adaptive budget can stop too early. The problem is to choose, for each reasoning instance, when to stop generating intermediate reasoning while preserving a user-specified bound on the error introduced by stopping.
 
-The benchmark asks whether a system can allocate reasoning effort adaptively across a set of difficult question-answering tasks. A solution receives a prompt, a reasoning model's partial reasoning trajectory over time, candidate answers at intermediate stopping points, and scalar stopping signals. It must decide when to stop, answer, or abstain/defer before the maximum token budget is exhausted.
+A solution is a stopping policy. Before deployment on a given (model, dataset) pair it receives a small labelled calibration set of complete reasoning trajectories, a target risk `epsilon` and a confidence level `delta`. It then watches unseen trajectories one reasoning chunk at a time (the trial answer, scalar uncertainty signals and the cumulative token count at that chunk) and after each chunk decides to continue, to stop and answer, or to stop and defer (abstain) before the maximum token budget is exhausted.
 
 ## Why It Matters
 
-Reasoning models are expensive at inference time. A useful stopping policy should save tokens without turning operating-point selection into a hidden accuracy failure mode, especially on hard datasets where many examples may never become answerable within the allowed budget.
+Reasoning models are expensive at inference time. A useful stopping policy should save tokens without turning operating-point selection into a hidden accuracy failure mode, especially on hard datasets where many examples never become answerable within the allowed budget. The mapping from a raw stopping signal to the error it causes differs between models and datasets, so the operating point has to be set from limited labelled calibration data, with the finite size of that data taken into account.
 
 ## Success Criteria
 
 A successful solution should:
 
-- Keep realized early-stopping risk at or below a user-selected tolerance on held-out test data.
-- Reduce token usage relative to a full-budget or uniform-budget policy at comparable task accuracy.
-- Work across multiple stopping signals, datasets, and difficulty mixes without relying on test-set labels for operating-point selection.
-- Report both benefit metrics, such as accuracy and token reduction, and constraint metrics, such as false positive and false negative risk.
+- Keep realized stopping risks (wrong early answers; premature deferrals of instances that would later have been answered correctly) at or below the requested tolerance on unseen data, for the stated confidence level, across calibration draws.
+- Use as few reasoning tokens as possible within that constraint, at the highest accuracy it can keep.
+- Work across (model, dataset) profiles, small and large calibration sets, and different mixes of solvable and unsolvable instances, using only the supplied calibration data.
 
 ---
 
@@ -61,6 +60,8 @@ It also defines matching efficiency losses that measure wasted reasoning after a
 
 Calibration enumerates candidate signals and threshold parameters on a labeled validation set. For each candidate, it computes empirical risk and then applies a finite-sample upper confidence correction. Candidates whose adjusted risk is at most the user-specified tolerance are feasible, and the method selects the feasible candidate with the lowest efficiency loss.
 
+In this benchmark the calibrated policy is deployed online: the evaluator sends a labelled calibration set with the target risk and confidence level, the policy runs the calibration above (upper threshold over the confidence, EAT-style and token-fraction signals; lower threshold over confidence with a grid of sigmoid shapes; Hoeffding correction with the supplied delta), and then decides continue/answer/defer chunk by chunk. If no candidate is feasible the corresponding exit is disabled, so the policy falls back to the full budget.
+
 The upper threshold exits at the first chunk where the transformed confidence signal exceeds a calibrated value. The lower threshold exits at the first chunk where the signal falls below a calibrated time-dependent sigmoid curve, parameterized by a shape value and scaled by token usage. When both thresholds are used, the method calibrates the upper threshold first, then calibrates the lower threshold under that upper bound, and exits at the earliest of the upper exit, lower exit, or maximum budget.
 
 ## Main Claims
@@ -81,47 +82,127 @@ Secondary claims:
 
 # Evaluation
 
-## Metrics
+## What is evaluated
 
-The evaluation is instance-based and operates on saved reasoning trajectories plus saved stopping decisions from a candidate system. For each example, the evaluator compares the selected stopping point against the gold answer and the full-budget trajectory.
+A submission is a **stopping-policy program**. It is registered by a manifest
+`outputs/<method_name>/policy.json`:
 
-- **Accuracy**: fraction of test questions answered correctly at the selected stopping point. If the system abstains or defers, that example is counted as incorrect for the main accuracy-vs-compute trade-off.
-- **Token count**: total generated reasoning tokens consumed by the policy across the test set. Lower is better at fixed or comparable accuracy.
-- **Token savings / token ratio**: reduction in token count relative to the full-budget trajectory or a uniform-budget baseline. Higher savings and lower ratios are better.
-- **False positive risk**: risk of emitting an answer before the budget is exhausted when that answer is wrong.
-- **False negative risk**: risk of abstaining or deferring before later trajectory steps would have produced a correct answer.
-- **Risk excess**: amount by which the larger realized risk exceeds the configured risk tolerance. This is a diagnostic constraint metric; lower is better.
-- **Defer fraction and defer precision**: how often the system abstains/defers and how often those decisions occur on examples that are not solved by the full-budget trajectory.
+```json
+{"command": ["python", "path/to/your_policy.py", "serve"]}
+```
 
-No scored metric depends on wall-clock time. Compute efficiency is measured through generated token counts and normalized token fractions.
+The command is run from the repository root. `scripts/evaluate_train.sh` (visible
+development profiles), `scripts/evaluate.sh` (same, written to `scoring/scores.json`)
+and `scripts/evaluate_test.sh` (held-out profiles) discover every manifest under
+`outputs/` and score every method found; no arguments are needed. Only the
+`command` field is read; any other field in the manifest is ignored. Every
+operating point (one calibration draw and one target risk) runs in a **fresh
+subprocess**: a policy sees exactly one calibration set and one pass over that
+point's held-out instances, and nothing carries over between operating points.
 
-## Baselines and Targets
+## Online stopping protocol (JSON lines on stdin/stdout)
 
-Reference baselines should include:
+The evaluator writes one JSON object per line to the policy's stdin and, except
+for `shutdown`, reads exactly one JSON object per line from its stdout
+(diagnostics go to stderr, which is logged under `logs/`).
 
-- A **full-budget** policy that always consumes the maximum reasoning budget before answering.
-- A **uniform-budget** policy that stops all examples at the same token or chunk budget.
-- A **validation-tuned adaptive** policy that selects an operating point from labeled validation data.
-- Single-signal adaptive policies where each available stopping signal is evaluated separately.
+1. **Calibrate.** `{"type": "calibrate", "calibration_id": str, "epsilon": float, "delta": float, "instances": [...]}`
+   Each instance is a labelled calibration trajectory:
+   `{"id", "gold", "budget_tokens", "steps": [{"step", "tokens", "prediction", "signals": {"confidence", "eat_confidence", "token_fraction"}}, ...]}`.
+   Reply `{"ok": true}`. The policy must use only these instances to set its
+   stopping behaviour for the following held-out instances, targeting realized
+   risk at most `epsilon` with probability at least `1 - delta`. Identifiers are
+   opaque; the same `calibration_id` is used for the same calibration set at
+   different target risks (in different processes).
+2. **Begin an instance.** `{"type": "begin", "id": str, "budget_tokens": int}` → reply `{"ok": true}`.
+   No label, gold answer, solvability flag or future chunk is ever sent for held-out instances.
+3. **Step.** `{"type": "step", "step": {"step", "tokens", "prediction", "signals"}}` → reply
+   `{"action": "continue" | "answer" | "defer"}`. Chunks are revealed one at a time.
+   * `answer` stops and emits that chunk's `prediction`.
+   * `defer` stops and abstains (counted as incorrect for accuracy).
+   * `continue` asks for the next chunk. After the last chunk the budget is
+     exhausted and the final chunk's prediction is emitted.
+4. `{"type": "shutdown"}` (no reply).
 
-The key target patterns are:
+The evaluator, not the policy, decides the exit type: an `answer` before the
+last chunk is an **early answer**; an `answer` or `continue` at the last chunk is
+a **budget exit**; `defer` at any chunk is a **defer**. Tokens are charged up to
+the chunk where the policy stopped (`tokens` is cumulative). Any other reply, a
+crash, or a non-JSON line is a protocol failure.
 
-- Realized test risk should stay below the user-specified tolerance across a sweep of tolerances, especially when validation data is limited.
-- At comparable accuracy, adaptive stopping should use fewer total tokens than full-budget and uniform-budget policies.
-- Useful policies should save more compute when the test mix contains more examples that are not solved by the full reasoning budget.
-- Selecting among available stopping signals should improve efficiency compared with relying on any single signal across all operating points.
+Trial answers are opaque numeric strings; wrong answers can persist across
+chunks and correct answers can flicker, so answer text alone does not reveal
+correctness.
 
-## Evaluation Protocol
+## Data
 
-Use held-out validation data only to select stopping configurations, then score on a disjoint test split. Evaluation should report accuracy versus total token usage over a sweep of risk tolerances, with both answer-error and premature-defer risks measured.
+Trajectories are simulated reasoning runs. Each *profile* stands for one
+(reasoning model, dataset) pair and has its own mapping from signals to
+correctness (signal scale and curvature, noise, how often hopeless runs become
+falsely confident, how persistent wrong answers are). The visible side uses
+the public profiles in `data/generate_synthetic_reasoning.py`; the held-out test
+uses different profiles drawn from the same documented parameter ranges, with
+their own calibration pools and test sets. A stopping rule therefore has to be
+set from each profile's calibration data; thresholds copied from the public
+profiles do not transfer.
 
-The benchmark includes difficulty-mix experiments with solvable:unsolvable ratios of 3:1, 1:1, and 1:3. An example is considered solvable if the full-budget trajectory reaches a correct answer at least once.
+An instance is **solvable** when its full-budget (final-chunk) answer is correct.
 
-All methods must be evaluated from saved outputs produced by the candidate system. Evaluation code must not regenerate trajectories, recompute candidate stopping behavior internally, or import from the method implementation.
+## Experiments (all fixed by the evaluator)
 
-## Paper Setup
+Every experiment uses 3 profiles, 1000 held-out instances per profile, labelled
+calibration sets drawn from a separate pool of 1000 per profile, and `delta = 0.1`.
+Each (profile, calibration draw, epsilon) triple is one operating point.
 
-The paper evaluates Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Qwen3-VL-8B on AIME 1983-2025, DeepScaleR without AIME, GPQA-Diamond, and MathVision. Its risk-control sanity check uses Qwen3-8B on AIME with 40 validation-test splits, validation size 50, and an epsilon sweep from 0 to 1 in increments of 0.01. The paper reports the main outcomes as plotted risk-vs-epsilon and accuracy-vs-token curves rather than scalar tables, so this runnable gym uses fixed scaled scalar targets in `scoring/reference.json` while preserving the same benefit and constraint metric structure.
+| Experiment | Solvable:unsolvable mix | Calibration size | Draws per profile | Target risks `epsilon` |
+|---|---|---:|---:|---|
+| `adaptive_budget_efficiency` | natural (~58% solvable) | 400 | 4 | 0.10, 0.15, 0.20 |
+| `risk_control` | natural, separate profiles | 50 | 10 | 0.05, 0.10, 0.20, 0.25 |
+| `difficulty_mix_3_1` | 3:1 | 400 | 4 | 0.10, 0.15, 0.20 |
+| `difficulty_mix_1_1` | 1:1 | 400 | 4 | 0.10, 0.15, 0.20 |
+| `difficulty_mix_1_3` | 1:3 | 400 | 4 | 0.05, 0.10, 0.125 |
+
+The 1:3 mix uses tighter tolerances because there, deferring every instance at
+the first chunk already has a premature-defer risk of only about 0.18.
+
+## Metrics (per experiment, averaged over its operating points)
+
+Scored (enter the ranking):
+
+- **token_savings** (primary, coefficient 1.0): `1 - tokens used / full-budget tokens`.
+- **accuracy** (coefficient 0.5): fraction of held-out instances whose emitted answer is correct; a defer counts as incorrect.
+
+Constraints (enforced by a gate, coefficient 0):
+
+- **false_positive_risk**: fraction of instances with an early answer that is wrong.
+- **false_negative_risk**: for each deferred instance, the fraction of its chunks from the defer point to the end whose prediction is correct; averaged over all instances (0 for non-deferred instances).
+- **violation_rate**: fraction of operating points where realized `false_positive_risk > epsilon` or `false_negative_risk > epsilon`.
+
+**Gate.** If `violation_rate > 0.15` in any experiment, or the policy breaks the
+protocol anywhere, the whole run is failed: every experiment reports accuracy 0,
+token savings 0, risks 1, violation rate 1 (`constraint_satisfied = 0`), and the
+reason is recorded under `_failures`. A valid policy therefore always scores at
+least as high as a failed one.
+
+Diagnostics (coefficient 0): `solvable_accuracy`, `unsolvable_token_savings`,
+`defer_fraction`, `defer_precision`, `budget_exit_fraction`, `constraint_satisfied`.
+
+No metric depends on wall-clock time.
+
+## Baselines scored alongside every method
+
+- `full_budget` (built into the evaluators): never stops early.
+- `upper_only`: stops once a confidence signal is high enough; no early abstention.
+- `naive_calibration`: chooses its operating point on raw validation risk without a finite-sample correction.
+
+## Paper setup (for reference)
+
+The paper evaluates Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B and
+Qwen3-VL-8B on AIME 1983-2025, DeepScaleR without AIME, GPQA-Diamond and
+MathVision, with risk-control checks over 40 random validation/test splits with
+50 validation examples and epsilon swept over [0, 1]. Its results are curves
+(risk vs. epsilon, accuracy vs. tokens), not scalar tables, so this benchmark's
+reference values come from its own scaled runs.
 
 ---
 
@@ -434,6 +515,48 @@ The paper evaluates Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Q
 ### [2026-06-07 12:20] - core_claim_plus
 - Completed final gym verification of scoring metadata, method-agnostic documentation, train/test split wiring, download portability, and repository hygiene.
 - Added explicit scaled-reference notes in `reference.json`, aligned `scoring/TARGETS.md` with the scored metric set, and removed stale transcript artifacts from the tracked workspace.
+
+</details>
+
+### Iteration 11: claude-opus-5-5 (hardener)
+- **Milestone**: `core_claim_plus` | **Status**: done
+- **Working time**: 51m | **GPU**: 0.0h
+- **Jobs**: 6 total (5 completed, 0 failed)
+
+<details>
+<summary>Progress Log</summary>
+
+### [2026-06-07 11:30] - method_runs
+- Implemented the paper's upper-threshold false-positive loss, sigmoid lower-threshold false-negative loss, UCB finite-sample correction, efficiency-loss selection, and combined earliest-exit policy.
+- Ran the method end-to-end on fixed synthetic reasoning trajectories.
+
+### [2026-06-07 11:45] - core_claim
+- Reproduced the core scaled claim on one held-out synthetic trajectory split: dual-threshold Conformal Thinking saved more tokens than upper-only stopping while satisfying the configured risk tolerance.
+- Verified the reusable evaluator reads saved method and baseline artifacts and does not import from `method/`.
+
+### [2026-06-07 12:05] - core_claim_plus
+- Added three additional solvable:unsolvable mix experiments matching the paper's Figure 6 axis: 3:1, 1:1, and 1:3.
+- Confirmed lower-threshold exits and token savings increase as unsolvable trajectories become more common, with `risk_excess` remaining zero in the scaled benchmark.
+
+### [2026-06-07 11:40] - core_claim_plus
+- Audited the continued workspace after milestone reset and fixed the evaluator so it recomputes all scored metrics from per-example stopping decisions and held-out labels instead of trusting method-reported aggregate metrics.
+- Reran `bash scripts/reproduce.sh`; the corrected evaluator reproduced the same five-experiment score contract and `python validate.py --compare` passed.
+
+### [2026-06-07 12:12] - core_claim_plus
+- Completed final verification of folder structure, method/evaluation separation, reusable scoring, and train/test split wiring.
+- Cleaned public-facing experiment and metric names so from-scratch documentation stays method-agnostic, then reran `python validate.py --compare`.
+
+### [2026-06-07 12:16] - core_claim_plus
+- Extended the main reusable evaluator so `scores.json` includes the full metric set declared by `reference.json`, including solvable accuracy, unsolvable token savings, maximum realized risk, and defer precision.
+- Reran `bash scripts/reproduce.sh`; the scaled benchmark still passes `python validate.py --compare`.
+
+### [2026-06-07 12:20] - core_claim_plus
+- Completed final gym verification of scoring metadata, method-agnostic documentation, train/test split wiring, download portability, and repository hygiene.
+- Added explicit scaled-reference notes in `reference.json`, aligned `scoring/TARGETS.md` with the scored metric set, and removed stale transcript artifacts from the tracked workspace.
+
+### [2026-11-09] - core_claim_plus (hardening, iteration 11)
+- Rebuilt the measurement as a hidden, online test: held-out profiles, calibration pools and test sets are generated only inside `eval/test/`; methods are stopping-policy programs that see one chunk at a time; exits, tokens and every score are computed by the evaluator; any risk-constraint or protocol failure fails the run.
+- Reproduced on the hidden test: lower+upper thresholds save more tokens than upper-only (gap +0.10 → +0.16 → +0.22 from 3:1 → natural → 1:1 mixes), UCB never violates the risk target while naive calibration fails the gate with 50 calibration examples. Reference is deterministic and reproduces exactly. Details in `HARDENING.md`.
 
 </details>
 
