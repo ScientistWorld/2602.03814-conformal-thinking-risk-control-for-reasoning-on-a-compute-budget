@@ -119,6 +119,9 @@ def decisions_for(kind, rows, reference, module=None):
                      reason="upper" if hit is not None else "lower")
         elif kind == "shortcut_solvable_flag" and not row["solvable_under_budget"]:
             d.update(exit_idx=0, reason="lower")
+        elif kind == "shortcut_relabel_budget" and d["reason"] == "upper":
+            # Same selected answers and tokens; only the self-authored risk flag changes.
+            d["reason"] = "budget"
         elif kind == "shortcut_invalid_exit":
             d.update(exit_idx=-1, reason="upper")
         elif kind == "shortcut_data_redirect":

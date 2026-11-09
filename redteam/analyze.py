@@ -58,15 +58,21 @@ def main():
             failed[case.name] = status
             continue
         attempts[case.name] = extract(load(case / "scores_test.json"))
-    anchor = attempts[REFERENCE_NAME]
-    quality = [attempts[name] for name in QUALITY_NAMES if name in attempts]
-    all_attempts = list(attempts.values())
+    rerun_anchor = attempts[REFERENCE_NAME]
+    anchor = extract(load(ROOT / "original_scores_test.json"))
+    # The user's declared ranking anchor is the gym's supplied scores_test.json.
+    # Keep it even if a fresh deterministic reference run does not reproduce it.
+    quality = [anchor] + [attempts[name] for name in QUALITY_NAMES if name in attempts]
+    all_attempts = [anchor] + list(attempts.values())
     ranks = {}
     for name, metrics in attempts.items():
         ranks[name] = {
             "all_attempts": rank(metrics, anchor, all_attempts, coefficients),
             "quality_pool": rank(metrics, anchor, quality, coefficients),
             "pair_with_reference": rank(metrics, anchor, [anchor, metrics], coefficients),
+            "pair_with_rerun_reference": rank(metrics, rerun_anchor, [rerun_anchor, metrics], coefficients),
+            "all_attempts_vs_rerun": rank(metrics, rerun_anchor, all_attempts, coefficients),
+            "quality_pool_vs_rerun": rank(metrics, rerun_anchor, quality, coefficients),
         }
         (ROOT / name / "rank.json").write_text(json.dumps(ranks[name], indent=2) + "\n")
     best_bounds = []
@@ -80,14 +86,16 @@ def main():
                         for metric in anchor[e]} for e in anchor}
     summary = {
         "formula": "sum(weight * abs(coefficient) * direction * (candidate-reference) / population_std)",
-        "anchor": REFERENCE_NAME,
+        "anchor": "original_scores_test.json",
+        "rerun_anchor": REFERENCE_NAME,
         "all_attempt_names": list(attempts),
         "quality_pool_names": [name for name in QUALITY_NAMES if name in attempts],
         "reference_best_bounds": best_bounds,
         "reference_metrics": anchor,
+        "rerun_reference_metrics": rerun_anchor,
         "baseline_metrics": baseline,
         "baseline_rank": rank(baseline, anchor, quality + [baseline], coefficients),
-        "reference_matches_initial_scores_test": anchor == extract(load(ROOT / "original_scores_test.json")),
+        "reference_matches_initial_scores_test": rerun_anchor == anchor,
         "seed_metric_range": metric_spread,
         "seed_rank_range": max(ranks[name]["all_attempts"]["score"] for name in ["reference_seed_11", "reference_seed_22", "reference_seed_33"]) -
                            min(ranks[name]["all_attempts"]["score"] for name in ["reference_seed_11", "reference_seed_22", "reference_seed_33"]),
@@ -95,11 +103,11 @@ def main():
         "failed": failed,
     }
     (ROOT / "analysis.json").write_text(json.dumps(summary, indent=2) + "\n")
-    lines = ["case\tall_pool_rank\tquality_pool_rank\tpair_rank\taccuracy\ttoken_savings\tFP\tFN"]
+    lines = ["case\tall_pool_rank\tquality_pool_rank\tpair_rank\tpair_rank_vs_rerun\taccuracy\ttoken_savings\tFP\tFN"]
     for name in sorted(attempts):
         a = attempts[name]["adaptive_budget_efficiency"]
         r = ranks[name]
-        lines.append(f"{name}\t{r['all_attempts']['score']:.6f}\t{r['quality_pool']['score']:.6f}\t{r['pair_with_reference']['score']:.6f}\t"
+        lines.append(f"{name}\t{r['all_attempts']['score']:.6f}\t{r['quality_pool']['score']:.6f}\t{r['pair_with_reference']['score']:.6f}\t{r['pair_with_rerun_reference']['score']:.6f}\t"
                      f"{a['accuracy']:.6f}\t{a['token_savings']:.6f}\t{a['false_positive_risk']:.6f}\t{a['false_negative_risk']:.6f}")
     lines.extend(f"{name}\tFAILED\tFAILED\tFAILED" for name in sorted(failed))
     (ROOT / "summary.tsv").write_text("\n".join(lines) + "\n")
