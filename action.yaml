@@ -1,8 +1,8 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: pending
+action: submit
 gpus: 0
 test: false
 milestone: core_claim_plus
-notes: ""
+notes: "Hardening 2 audit: (1) reference + baselines alone, train + hidden test, from final code; (2) every audit candidate (honest variants, ensemble ablations, simulator-fit / read-hidden / rule probes) through the hidden test with outcome dump; (3) new probes on the previous gym (tmp/old_gym, commit 6090d6e) for before scores; (4) train for honest variants; analysis in redteam/hardening2/."
