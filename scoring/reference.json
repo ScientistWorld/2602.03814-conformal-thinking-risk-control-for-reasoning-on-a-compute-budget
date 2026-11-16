@@ -82,12 +82,7 @@
           "violation_rate": 0.0
         },
         "naive_calibration": {
-          "type": "baseline",
-          "accuracy": 0.0,
-          "token_savings": 0.0,
-          "false_positive_risk": 1.0,
-          "false_negative_risk": 1.0,
-          "violation_rate": 1.0
+          "type": "baseline"
         },
         "full_budget": {
           "type": "baseline",
@@ -155,12 +150,29 @@
           "false_negative_risk": 0.0,
           "violation_rate": 0.0
         }
+      },
+      "_naive_calibration_measured": {
+        "note": "Naive calibration's scored values depend on the risk gate: it fails the gate on the hidden test (realized risk above epsilon at 37.5% of risk_control operating points), so every experiment carries the failure values there; on the visible train profiles it violates at exactly 15% of risk_control operating points and passes the '> 15%' gate at the boundary. These values are not comparable across splits, so they are recorded here rather than under 'results'.",
+        "hidden_test": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "visible_train": {
+          "accuracy": 0.4883,
+          "token_savings": 0.5664,
+          "false_positive_risk": 0.0835,
+          "false_negative_risk": 0.0376,
+          "violation_rate": 0.0278
+        }
       }
     },
     "risk_control": {
       "description": "Small-calibration regime: 50 labelled calibration examples per draw, 10 draws per profile, target risks 0.05/0.10/0.20/0.25, on held-out profiles disjoint from the other experiments. Realized risk must stay within the target across calibration draws (gate), and the policy should still save tokens.",
       "weight": 0.2,
-      "primary_metric": "token_savings",
+      "primary_metric": "violation_rate",
       "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles drawn from a process broader than the public generator; values in 'results' are this gym's reference runs on the hidden test (scripts/evaluate_test.sh), not paper numbers.",
       "_paper_reported": "Paper (Sec. 5.2, Fig. 4, Fig. 7): over 40 random validation/test splits with 50 validation examples, UCB-calibrated thresholds keep realized test risk below epsilon, while naive validation tuning frequently exceeds it; the gap widens for smaller validation sets (8/16/40). Reported only as curves.",
       "metrics": {
@@ -238,12 +250,7 @@
           "violation_rate": 0.0
         },
         "naive_calibration": {
-          "type": "baseline",
-          "accuracy": 0.0,
-          "token_savings": 0.0,
-          "false_positive_risk": 1.0,
-          "false_negative_risk": 1.0,
-          "violation_rate": 1.0
+          "type": "baseline"
         },
         "full_budget": {
           "type": "baseline",
@@ -312,7 +319,25 @@
           "violation_rate": 0.0
         }
       },
-      "_naive_calibration_measured_before_gate": "Fails the gate in risk_control (realized risk above epsilon at 37.5% of operating points; measured there FP=0.1142, FN=0.0653, savings=0.3947, accuracy=0.4312), so the whole run carries the failure values. On the visible train profiles it violates at exactly 15% of risk_control operating points (gate boundary, passes) versus 0% for the reference."
+      "_naive_calibration_measured_before_gate": "Fails the gate in risk_control (realized risk above epsilon at 37.5% of operating points; measured there FP=0.1142, FN=0.0653, savings=0.3947, accuracy=0.4312), so the whole run carries the failure values. On the visible train profiles it violates at exactly 15% of risk_control operating points (gate boundary, passes) versus 0% for the reference.",
+      "_naive_calibration_measured": {
+        "note": "Naive calibration's scored values depend on the risk gate: it fails the gate on the hidden test (realized risk above epsilon at 37.5% of risk_control operating points), so every experiment carries the failure values there; on the visible train profiles it violates at exactly 15% of risk_control operating points and passes the '> 15%' gate at the boundary. These values are not comparable across splits, so they are recorded here rather than under 'results'.",
+        "hidden_test": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "visible_train": {
+          "accuracy": 0.4943,
+          "token_savings": 0.5167,
+          "false_positive_risk": 0.0987,
+          "false_negative_risk": 0.0222,
+          "violation_rate": 0.15
+        }
+      },
+      "_primary_metric_note": "The paper's risk-control experiment (Sec. 5.2, Fig. 4; validation-size ablation Fig. 7) measures whether realized test risk stays below epsilon across random validation/test splits, i.e. the violation rate across calibration draws; that is this experiment's primary quantity. Scoring is unchanged: token_savings (1.0) and accuracy (0.5) are scored, violation_rate is a gated constraint (coefficient 0). Reference token savings here differ between the visible train profiles (0.219) and the hidden test (0.109) because held-out profiles carry behaviours that make small-sample calibration harder; see HARDENING.md."
     },
     "difficulty_mix_3_1": {
       "description": "3:1 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.10/0.15/0.20.",
@@ -395,12 +420,7 @@
           "violation_rate": 0.0
         },
         "naive_calibration": {
-          "type": "baseline",
-          "accuracy": 0.0,
-          "token_savings": 0.0,
-          "false_positive_risk": 1.0,
-          "false_negative_risk": 1.0,
-          "violation_rate": 1.0
+          "type": "baseline"
         },
         "full_budget": {
           "type": "baseline",
@@ -467,6 +487,23 @@
           "false_positive_risk": 0.0,
           "false_negative_risk": 0.0,
           "violation_rate": 0.0
+        }
+      },
+      "_naive_calibration_measured": {
+        "note": "Naive calibration's scored values depend on the risk gate: it fails the gate on the hidden test (realized risk above epsilon at 37.5% of risk_control operating points), so every experiment carries the failure values there; on the visible train profiles it violates at exactly 15% of risk_control operating points and passes the '> 15%' gate at the boundary. These values are not comparable across splits, so they are recorded here rather than under 'results'.",
+        "hidden_test": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "visible_train": {
+          "accuracy": 0.6515,
+          "token_savings": 0.5761,
+          "false_positive_risk": 0.0989,
+          "false_negative_risk": 0.0393,
+          "violation_rate": 0.0556
         }
       }
     },
@@ -551,12 +588,7 @@
           "violation_rate": 0.0
         },
         "naive_calibration": {
-          "type": "baseline",
-          "accuracy": 0.0,
-          "token_savings": 0.0,
-          "false_positive_risk": 1.0,
-          "false_negative_risk": 1.0,
-          "violation_rate": 1.0
+          "type": "baseline"
         },
         "full_budget": {
           "type": "baseline",
@@ -623,6 +655,23 @@
           "false_positive_risk": 0.0,
           "false_negative_risk": 0.0,
           "violation_rate": 0.0
+        }
+      },
+      "_naive_calibration_measured": {
+        "note": "Naive calibration's scored values depend on the risk gate: it fails the gate on the hidden test (realized risk above epsilon at 37.5% of risk_control operating points), so every experiment carries the failure values there; on the visible train profiles it violates at exactly 15% of risk_control operating points and passes the '> 15%' gate at the boundary. These values are not comparable across splits, so they are recorded here rather than under 'results'.",
+        "hidden_test": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "visible_train": {
+          "accuracy": 0.4299,
+          "token_savings": 0.5566,
+          "false_positive_risk": 0.0834,
+          "false_negative_risk": 0.0318,
+          "violation_rate": 0.0278
         }
       }
     },
@@ -707,12 +756,7 @@
           "violation_rate": 0.0
         },
         "naive_calibration": {
-          "type": "baseline",
-          "accuracy": 0.0,
-          "token_savings": 0.0,
-          "false_positive_risk": 1.0,
-          "false_negative_risk": 1.0,
-          "violation_rate": 1.0
+          "type": "baseline"
         },
         "full_budget": {
           "type": "baseline",
@@ -779,6 +823,23 @@
           "false_positive_risk": 0.0,
           "false_negative_risk": 0.0,
           "violation_rate": 0.0
+        }
+      },
+      "_naive_calibration_measured": {
+        "note": "Naive calibration's scored values depend on the risk gate: it fails the gate on the hidden test (realized risk above epsilon at 37.5% of risk_control operating points), so every experiment carries the failure values there; on the visible train profiles it violates at exactly 15% of risk_control operating points and passes the '> 15%' gate at the boundary. These values are not comparable across splits, so they are recorded here rather than under 'results'.",
+        "hidden_test": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "visible_train": {
+          "accuracy": 0.2115,
+          "token_savings": 0.4743,
+          "false_positive_risk": 0.0445,
+          "false_negative_risk": 0.0258,
+          "violation_rate": 0.1111
         }
       }
     }

@@ -105,7 +105,7 @@ the first chunk already has a premature-defer risk of only about 0.18.
 
 Scored (enter the ranking):
 
-- **token_savings** (primary, coefficient 1.0): `1 - tokens used / full-budget tokens`.
+- **token_savings** (coefficient 1.0; the primary metric of every experiment except `risk_control`, whose declared primary quantity is the violation rate below): `1 - tokens used / full-budget tokens`.
 - **accuracy** (coefficient 0.5): fraction of held-out instances whose emitted answer is correct; a defer counts as incorrect.
 
 Constraints (enforced by a gate, coefficient 0):

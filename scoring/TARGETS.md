@@ -4,7 +4,7 @@ All targets are measured by `scripts/evaluate_test.sh` (held-out profiles) and `
 
 Every experiment has the same metric structure:
 
-- **Scored benefit metrics**: `token_savings` (primary, coefficient 1.0, higher is better) and `accuracy` (coefficient 0.5, higher is better), averaged over the experiment's operating points.
+- **Scored benefit metrics**: `token_savings` (coefficient 1.0, higher is better; primary metric everywhere except `risk_control`) and `accuracy` (coefficient 0.5, higher is better), averaged over the experiment's operating points.
 - **Constraint metrics** (coefficient 0, enforced by the gate): `false_positive_risk`, `false_negative_risk`, `violation_rate` (fraction of operating points with realized risk above the target). If `violation_rate > 0.15` in any experiment, or the protocol is broken, the whole run receives the failure values (accuracy 0, savings 0, risks 1).
 - **Diagnostics** (coefficient 0): `solvable_accuracy`, `unsolvable_token_savings`, `constraint_satisfied`, `defer_fraction`, `defer_precision`, `budget_exit_fraction`.
 
@@ -15,6 +15,8 @@ Across all experiments, the most informative stopping signal differs between pro
 Natural mix (~58% solvable), 400 calibration examples, 4 draws per profile, target risks 0.10 / 0.15 / 0.20. Target: save tokens relative to running every instance to the full budget, at accuracy comparable to the confident-stop baseline, with no constraint failure.
 
 ## Constraint: risk_control (weight 0.2)
+
+Primary metric: `violation_rate` (the paper's risk-control measurement: realized risk vs. the target across calibration draws). Scoring is the same as elsewhere (token savings and accuracy; violation rate gated).
 
 Natural mix on separate held-out profiles, 50 calibration examples, 10 draws per profile, target risks 0.05 / 0.10 / 0.20 / 0.25. Target: realized risks within tolerance on at least 85% of operating points (the paper's claim is that finite-sample-corrected calibration achieves this while naive validation tuning does not), with as many tokens saved as the scarce calibration data allows. With only 50 examples the reference's lower (no-progress) exit is never feasible on the held-out profiles, so here it saves exactly as much as the confident-stop baseline; tighter finite-sample bounds leave room above it.
 

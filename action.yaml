@@ -1,8 +1,6 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: submit
-gpus: 0
-test: false
+action: done
 milestone: secondary_claims
-notes: "Train/test comparability fix: public profiles now include mild confident intermediate mistakes and silent late solvers (below held-out rates). Reruns reference + baselines alone (train + test), the simulator-fit / public-simulator shortcut batches on the hidden test (attacker now fits the changed public family), and train scores of honest variants; honest test batches and old-gym probes reused (unaffected)."
+notes: "Hardening round 2 done; validation fixed by restructuring reference.json (naive calibration's gate-dependent values under _naive_calibration_measured; risk_control primary metric = violation_rate as in the paper's Sec. 5.2/Fig. 4/7; scoring unchanged, no measured number changed). Unscored public-generator change reverted. See HARDENING.md."

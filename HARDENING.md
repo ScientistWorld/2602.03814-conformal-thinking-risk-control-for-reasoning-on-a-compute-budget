@@ -131,6 +131,17 @@ The new reference is deterministic. Three runs produced identical scores: the re
 - **Brute force does not apply**, because the test is hidden and online.
 - **Simple baselines sit clearly below the reference:** upper-only −0.337, full budget −1.657.
 
+## Validation fix (after the audit)
+
+`validate.py` compares every score file, train included, with `reference.json` `results`. Those results hold this gym's own hidden-test reference values, because the paper reports only curves. Two entries were not comparable across splits:
+
+- **Naive calibration.** Its scored values are a gate outcome: the failure values on the hidden test, but a boundary pass on train. Its `results` entries now carry only the type. Its measured train and test values are kept under `_naive_calibration_measured` in each experiment.
+- **`risk_control` primary metric.** The declared primary metric is now `violation_rate`. That is the quantity the paper's risk-control experiment measures (Sec. 5.2, Fig. 4 and 7): realized risk against ε across validation draws. Scoring is unchanged: `token_savings` 1.0, `accuracy` 0.5, risks gated.
+
+No measured number changed.
+
+I also tried fixing the setup itself. I gave the public profiles milder versions of the confident intermediate mistakes and silent late solvers. Locally this brought train `risk_control` savings to about 0.18 and made naive calibration fail on train too. I reverted it, because the change could not be scored and re-audited against the simulator-fit attack in a job during validation. The train/test gap therefore remains, as listed below.
+
 ## Weights and coefficients
 
 Unchanged: experiment weights 0.3 / 0.2 / 0.15 / 0.15 / 0.2; `token_savings` 1.0; `accuracy` 0.5. Risks remain gated constraints. The ensemble claim is exercised inside every experiment, so it needs no separate weight.
@@ -138,7 +149,7 @@ Unchanged: experiment weights 0.3 / 0.2 / 0.15 / 0.15 / 0.2; `token_savings` 1.0
 ## Not fixed / limitations
 
 - **Synthetic data.** The benchmark simulates trajectories rather than running Qwen3 or R1 on AIME, GPQA, DeepScaleR or MathVision. The paper's probe signal is not modelled. Results are curves in the paper; `results` holds this gym's own reference runs.
-- **The test is harder than train at small n.** In `risk_control` the reference saves 0.219 on train vs 0.109 on test, because the held-out-only behaviours add risk. The other experiments are within 0.03–0.06 of each other. Honest candidates keep the same order on both sides, except the two single-signal ablations, which swap places below the reference.
+- **The test is harder than train at small n.** In `risk_control` the reference saves 0.219 on train vs 0.109 on test, because the held-out-only behaviours add risk. The fix is to give the public profiles milder versions of these behaviours; it was tested locally but not applied (see "Validation fix"). The other experiments are within 0.03–0.06 of each other. Honest candidates keep the same order on both sides, except the two single-signal ablations, which swap places below the reference.
 - **Naive calibration passes the gate on train at the boundary.** It violates at exactly 15% of `risk_control` operating points (the gate is "> 15%"), versus 0% for the reference. On test it fails clearly (37.5%). The paper's direction holds on both sides; only the pass/fail outcome differs.
 - **The 1:3 mix uses tighter tolerances** (≤ 0.125), as in round 1. Deferring every instance at the first chunk has a false-negative risk of 0.187 there.
 - **Population dependence of the rank** is as in round 1. Failed runs widen the population std; the gate keeps them below every valid run.

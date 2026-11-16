@@ -16,11 +16,8 @@ paper observes across models and datasets, and what the profiles reproduce:
   its own susceptibility to *false confidence* (hopeless runs that settle on a
   wrong answer and look confident).
 * Hopeless runs either stay flat, wander, or become falsely confident late;
-  solvable runs make some progress, become correct at some chunk and the
-  signals rise after it (strongly for most questions, weakly for some, late
-  for others; a few show no progress at all and solve late). Occasionally a
-  run commits to a wrong answer for a chunk or two and looks confident before
-  it becomes correct.
+  solvable runs become correct at some chunk and the signals rise after it
+  (strongly for most questions, weakly for some, late for others).
 * Trial answers are opaque numeric strings from one vocabulary. Wrong answers
   persist across chunks and correct answers can flicker, so answer text alone
   does not reveal correctness. Chunk lengths vary.
@@ -48,19 +45,19 @@ PUBLIC_PROFILES = {
     "public_a": {
         "steps": [10, 18], "stride": [24, 46], "chunk_cv": 0.25,
         "solve_latest_frac": 0.58, "solve_shape": [1.2, 1.5],
-        "solvable_mix": {"clean": 0.72, "muted": 0.14, "late_signal": 0.14, "silent": 0.07},
+        "solvable_mix": {"clean": 0.72, "muted": 0.14, "late_signal": 0.14},
         "unsolvable_mix": {"flat": 0.45, "wander": 0.30, "false_confident": 0.25},
         "rise_width": 3.0, "rise_knots": [0.0, 0.3, 0.6, 0.85, 1.0],
         "muted_clarity": [0.35, 0.6], "drift": [0.0, 0.25], "wander_amp": 0.3,
-        "progress": [0.2, 0.4], "ease_lift": 0.06, "spike_rate": 0.06, "spike_height": [0.5, 0.85],
+        "progress": [0.2, 0.4], "ease_lift": 0.06,
         "fc_onset": [0.45, 0.85], "fc_boost": [0.65, 1.0],
         "early_lucky_rate": 0.05, "flicker_rate": 0.04, "unsolv_lucky_rate": 0.006,
         "wrong_stickiness": 0.55, "fc_stickiness": 0.9,
         "channels": {
             "confidence": {"floor": 0.15, "gain": 0.78, "gamma": 1.0, "noise": 0.035, "df": 10, "rho": 0.3,
-                           "offset_sd": 0.03, "lag": 0, "late_lag": 3, "fooled": 0.3, "attenuation": 0.15, "spike_seen": 0.4},
+                           "offset_sd": 0.03, "lag": 0, "late_lag": 3, "fooled": 0.3, "attenuation": 0.15},
             "eat_confidence": {"floor": 0.12, "gain": 0.75, "gamma": 1.3, "noise": 0.06, "df": 5, "rho": 0.4,
-                               "offset_sd": 0.06, "lag": 1, "late_lag": 4, "fooled": 0.75, "attenuation": 0.2, "spike_seen": 0.75},
+                               "offset_sd": 0.06, "lag": 1, "late_lag": 4, "fooled": 0.75, "attenuation": 0.2},
         },
     },
     # Confidence is badly calibrated across questions and nearly always fooled
@@ -68,19 +65,19 @@ PUBLIC_PROFILES = {
     "public_b": {
         "steps": [9, 17], "stride": [22, 42], "chunk_cv": 0.35,
         "solve_latest_frac": 0.62, "solve_shape": [1.0, 1.2],
-        "solvable_mix": {"clean": 0.66, "muted": 0.18, "late_signal": 0.16, "silent": 0.08},
+        "solvable_mix": {"clean": 0.66, "muted": 0.18, "late_signal": 0.16},
         "unsolvable_mix": {"flat": 0.40, "wander": 0.30, "false_confident": 0.30},
         "rise_width": 3.5, "rise_knots": [0.0, 0.2, 0.5, 0.8, 1.0],
         "muted_clarity": [0.35, 0.6], "drift": [0.0, 0.3], "wander_amp": 0.3,
-        "progress": [0.15, 0.35], "ease_lift": 0.05, "spike_rate": 0.07, "spike_height": [0.5, 0.85],
+        "progress": [0.15, 0.35], "ease_lift": 0.05,
         "fc_onset": [0.4, 0.8], "fc_boost": [0.7, 1.0],
         "early_lucky_rate": 0.05, "flicker_rate": 0.06, "unsolv_lucky_rate": 0.004,
         "wrong_stickiness": 0.65, "fc_stickiness": 0.85,
         "channels": {
             "confidence": {"floor": 0.18, "gain": 0.72, "gamma": 0.8, "noise": 0.05, "df": 6, "rho": 0.3,
-                           "offset_sd": 0.1, "lag": 0, "late_lag": 3, "fooled": 0.9, "attenuation": 0.25, "spike_seen": 0.8},
+                           "offset_sd": 0.1, "lag": 0, "late_lag": 3, "fooled": 0.9, "attenuation": 0.25},
             "eat_confidence": {"floor": 0.1, "gain": 0.8, "gamma": 1.2, "noise": 0.035, "df": 12, "rho": 0.3,
-                               "offset_sd": 0.03, "lag": 1, "late_lag": 2, "fooled": 0.12, "attenuation": 0.1, "spike_seen": 0.35},
+                               "offset_sd": 0.03, "lag": 1, "late_lag": 2, "fooled": 0.12, "attenuation": 0.1},
         },
     },
     # Confidence reacts first but is fooled by falsely confident runs; the
@@ -89,19 +86,19 @@ PUBLIC_PROFILES = {
     "public_c": {
         "steps": [11, 19], "stride": [26, 50], "chunk_cv": 0.2,
         "solve_latest_frac": 0.52, "solve_shape": [1.5, 1.3],
-        "solvable_mix": {"clean": 0.76, "muted": 0.12, "late_signal": 0.12, "silent": 0.07},
+        "solvable_mix": {"clean": 0.76, "muted": 0.12, "late_signal": 0.12},
         "unsolvable_mix": {"flat": 0.40, "wander": 0.25, "false_confident": 0.35},
         "rise_width": 2.5, "rise_knots": [0.0, 0.35, 0.65, 0.9, 1.0],
         "muted_clarity": [0.4, 0.65], "drift": [0.0, 0.2], "wander_amp": 0.25,
-        "progress": [0.2, 0.45], "ease_lift": 0.07, "spike_rate": 0.06, "spike_height": [0.5, 0.85],
+        "progress": [0.2, 0.45], "ease_lift": 0.07,
         "fc_onset": [0.5, 0.9], "fc_boost": [0.6, 0.95],
         "early_lucky_rate": 0.07, "flicker_rate": 0.03, "unsolv_lucky_rate": 0.009,
         "wrong_stickiness": 0.45, "fc_stickiness": 0.92,
         "channels": {
             "confidence": {"floor": 0.2, "gain": 0.72, "gamma": 1.1, "noise": 0.03, "df": 10, "rho": 0.2,
-                           "offset_sd": 0.03, "lag": 0, "late_lag": 2, "fooled": 0.95, "attenuation": 0.2, "spike_seen": 0.85},
+                           "offset_sd": 0.03, "lag": 0, "late_lag": 2, "fooled": 0.95, "attenuation": 0.2},
             "eat_confidence": {"floor": 0.15, "gain": 0.78, "gamma": 0.9, "noise": 0.035, "df": 10, "rho": 0.3,
-                               "offset_sd": 0.03, "lag": 2, "late_lag": 3, "fooled": 0.05, "attenuation": 0.1, "spike_seen": 0.3},
+                               "offset_sd": 0.03, "lag": 2, "late_lag": 3, "fooled": 0.05, "attenuation": 0.1},
         },
     },
 }
@@ -175,10 +172,6 @@ def make_instance(rng: random.Random, p: dict, solvable_probability: float) -> d
         solve_step = min(solve_step, latest)
         clarity = rng.uniform(*p["muted_clarity"]) if kind == "muted" else rng.uniform(0.9, 1.05)
         progress = rng.uniform(*p["progress"])
-        if kind == "silent":
-            # Shows no progress at all, then solves late.
-            progress = 0.0
-            solve_step = rng.randint(max(3, (latest + 3) // 2), latest)
     else:
         kind = choose(rng, p["unsolvable_mix"])
         solve_step = total_steps + 1
@@ -186,15 +179,6 @@ def make_instance(rng: random.Random, p: dict, solvable_probability: float) -> d
         onset = max(2, int(round(rng.uniform(*p["fc_onset"]) * total_steps)))
         boost = rng.uniform(*p["fc_boost"])
     stickiness = p["fc_stickiness"] if kind == "false_confident" else p["wrong_stickiness"]
-    # Confident intermediate mistake: for one or two chunks before the run is
-    # correct, the model commits to a wrong answer and may look confident.
-    spike_steps: set[int] = set()
-    spike_height = 0.0
-    last_wrong_step = min(total_steps, solve_step - 1)
-    if last_wrong_step >= 1 and rng.random() < p["spike_rate"]:
-        first = rng.randint(1, last_wrong_step)
-        spike_steps = set(range(first, min(last_wrong_step, first + rng.randint(0, 1)) + 1))
-        spike_height = rng.uniform(*p["spike_height"])
 
     channel_state = {}
     for name in CHANNELS:
@@ -204,7 +188,6 @@ def make_instance(rng: random.Random, p: dict, solvable_probability: float) -> d
             "fooled": rng.random() < ch["fooled"],
             "lag": ch["lag"] + (ch["late_lag"] if kind == "late_signal" else 0),
             "noise": 0.0,
-            "spike": bool(spike_steps) and rng.random() < ch["spike_seen"],
         }
 
     wander = 0.0
@@ -224,8 +207,6 @@ def make_instance(rng: random.Random, p: dict, solvable_probability: float) -> d
             if kind == "wander":
                 wander = max(-1.0, min(1.0, wander + rng.gauss(0.0, 0.4)))
 
-        if t in spike_steps:
-            correct = False
         if correct:
             prediction = gold
         else:
@@ -253,8 +234,6 @@ def make_instance(rng: random.Random, p: dict, solvable_probability: float) -> d
                 elif kind == "false_confident":
                     share = 1.0 if state["fooled"] else ch["attenuation"]
                     latent += share * boost * rise((t - onset - state["lag"] + 1) / width, knots)
-            if t in spike_steps and state["spike"]:
-                latent = max(latent, spike_height)
             rho = ch["rho"]
             state["noise"] = rho * state["noise"] + math.sqrt(1.0 - rho * rho) * ch["noise"] * heavy_noise(rng, ch["df"])
             raw = ch["floor"] + ch["gain"] * latent + state["offset"] + state["noise"]
