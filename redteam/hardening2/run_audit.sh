@@ -38,13 +38,13 @@ register() {  # register <dir> <name>...
   local dir=$1
   shift
   rm -rf "$dir" && mkdir -p "$dir"
-  for name in "$@"; do
-    mkdir -p "$dir/$name"
-    case $name in
-      conformal_thinking) echo '{"command": ["python", "method/conformal_thinking.py", "serve"]}' > "$dir/$name/policy.json" ;;
-      upper_only) echo '{"command": ["python", "baseline/upper_only.py"]}' > "$dir/$name/policy.json" ;;
-      naive_calibration) echo '{"command": ["python", "baseline/naive_calibration.py"]}' > "$dir/$name/policy.json" ;;
-      *) printf '{"command": ["python", "%s/variants.py", "serve", "%s"]}\n' "$HERE" "$name" > "$dir/$name/policy.json" ;;
+  for nam2 in "$@"; do
+    mkdir -p "$dir/$nam2"
+    case $nam2 in
+      conformal_thinking) echo '{"command": ["python", "method/conformal_thinking.py", "serve"]}' > "$dir/$nam2/policy.json" ;;
+      upper_only) echo '{"command": ["python", "baseline/upper_only.py"]}' > "$dir/$nam2/policy.json" ;;
+      naive_calibration) echo '{"command": ["python", "baseline/naive_calibration.py"]}' > "$dir/$nam2/policy.json" ;;
+      *) printf '{"command": ["python", "%s/variants.py", "serve", "%s"]}\n' "$HERE" "$nam2" > "$dir/$nam2/policy.json" ;;
     esac
   done
 }
@@ -76,9 +76,9 @@ old_gym() {
     [ -f "$OLD/eval/test/$f" ] || git show "6090d6e:eval/test/$f" > "$OLD/eval/test/$f"
   done
   rm -rf "$OLD/outputs" && mkdir -p "$OLD/outputs"
-  for name in shortcut_simfit_ucb shortcut_simfit_naive shortcut_simfit_hybrid shortcut_simfit_cautious shortcut_read_hidden; do
-    mkdir -p "$OLD/outputs/$name"
-    printf '{"command": ["python", "%s/%s/variants.py", "serve", "%s", "--family", "old"]}\n' "$REPO_ROOT" "$HERE" "$name" > "$OLD/outputs/$name/policy.json"
+  for nam2 in shortcut_simfit_ucb shortcut_simfit_naive shortcut_simfit_hybrid shortcut_simfit_cautious shortcut_read_hidden; do
+    mkdir -p "$OLD/outputs/$nam2"
+    printf '{"command": ["python", "%s/%s/variants.py", "serve", "%s", "--family", "old"]}\n' "$REPO_ROOT" "$HERE" "$nam2" > "$OLD/outputs/$nam2/policy.json"
   done
   time python "$OLD/eval/test/evaluate_split.py" --outputs "$REPO_ROOT/$OLD/outputs" --scores "$REPO_ROOT/$HERE/old_gym_scores_test.json"
 }

@@ -1,0 +1,494 @@
+{
+  "_metadata": {
+    "slice": "test",
+    "delta": 0.1,
+    "max_violation_rate": 0.15,
+    "test_size_per_profile": 1000,
+    "profiles": 3,
+    "experiments": {
+      "adaptive_budget_efficiency": {
+        "group": 0,
+        "setting": "natural",
+        "calibration_size": 400,
+        "draws": 4,
+        "epsilons": [
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "risk_control": {
+        "group": 1,
+        "setting": "natural",
+        "calibration_size": 50,
+        "draws": 10,
+        "epsilons": [
+          0.05,
+          0.1,
+          0.2,
+          0.25
+        ]
+      },
+      "difficulty_mix_3_1": {
+        "group": 0,
+        "setting": "ratio_3_1",
+        "calibration_size": 400,
+        "draws": 4,
+        "epsilons": [
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "difficulty_mix_1_1": {
+        "group": 0,
+        "setting": "ratio_1_1",
+        "calibration_size": 400,
+        "draws": 4,
+        "epsilons": [
+          0.1,
+          0.15,
+          0.2
+        ]
+      },
+      "difficulty_mix_1_3": {
+        "group": 0,
+        "setting": "ratio_1_3",
+        "calibration_size": 400,
+        "draws": 4,
+        "epsilons": [
+          0.05,
+          0.1,
+          0.125
+        ]
+      }
+    }
+  },
+  "experiments": {
+    "adaptive_budget_efficiency": {
+      "results": {
+        "full_budget": {
+          "accuracy": 0.557,
+          "token_savings": 0.0,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_read_hidden": {
+          "accuracy": 0.5569999999999998,
+          "token_savings": 0.7810664238979489,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.9318743356689454,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.016641870060910318,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.4430000000000003,
+          "defer_precision": 1.0,
+          "budget_exit_fraction": 0.0026666666666666683
+        },
+        "shortcut_simfit_cautious": {
+          "accuracy": 0.516888888888889,
+          "token_savings": 0.3626383655400866,
+          "solvable_accuracy": 0.893302718808654,
+          "unsolvable_token_savings": 0.2223320657110341,
+          "false_positive_risk": 0.04080555555555557,
+          "false_negative_risk": 0.026222411584421387,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.15525,
+          "defer_precision": 0.2137653638203932,
+          "budget_exit_fraction": 0.34519444444444436
+        },
+        "shortcut_simfit_hybrid": {
+          "accuracy": 0.4466944444444445,
+          "token_savings": 0.5470723955862496,
+          "solvable_accuracy": 0.769163900317213,
+          "unsolvable_token_savings": 0.5186249474560334,
+          "false_positive_risk": 0.04224999999999999,
+          "false_negative_risk": 0.06563180603664671,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.3795277777777778,
+          "defer_precision": 0.5034039958201956,
+          "budget_exit_fraction": 0.1594444444444444
+        },
+        "shortcut_simfit_naive": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "solvable_accuracy": 0.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0,
+          "constraint_satisfied": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_simfit_ucb": {
+          "accuracy": 0.442638888888889,
+          "token_savings": 0.553162173002517,
+          "solvable_accuracy": 0.762098203668183,
+          "unsolvable_token_savings": 0.5242081534792972,
+          "false_positive_risk": 0.04505555555555555,
+          "false_negative_risk": 0.06798809269207552,
+          "violation_rate": 0.027777777777777776,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.38380555555555557,
+          "defer_precision": 0.4988917198566146,
+          "budget_exit_fraction": 0.15641666666666662
+        }
+      },
+      "_failures": {
+        "shortcut_simfit_naive": "risk constraint failed: realized risk exceeded epsilon at 0.194 of operating points (allowed 0.15); measured FP=0.0437, FN=0.0908, savings=0.6570, accuracy=0.4033"
+      }
+    },
+    "risk_control": {
+      "results": {
+        "full_budget": {
+          "accuracy": 0.5563333333333333,
+          "token_savings": 0.0,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_read_hidden": {
+          "accuracy": 0.5563333333333335,
+          "token_savings": 0.7912478202983234,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.9328467006870422,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.020882406648505752,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.4436666666666664,
+          "defer_precision": 1.0,
+          "budget_exit_fraction": 0.0016666666666666679
+        },
+        "shortcut_simfit_cautious": {
+          "accuracy": 0.4977749999999998,
+          "token_savings": 0.35012884076159334,
+          "solvable_accuracy": 0.8607052361814308,
+          "unsolvable_token_savings": 0.2962947753598769,
+          "false_positive_risk": 0.03349166666666663,
+          "false_negative_risk": 0.047463946479718536,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.2586999999999999,
+          "defer_precision": 0.40451746894683893,
+          "budget_exit_fraction": 0.3495333333333335
+        },
+        "shortcut_simfit_hybrid": {
+          "accuracy": 0.4957166666666666,
+          "token_savings": 0.40833760370324973,
+          "solvable_accuracy": 0.8509415455661898,
+          "unsolvable_token_savings": 0.325743599318347,
+          "false_positive_risk": 0.05272500000000001,
+          "false_negative_risk": 0.04066163672860367,
+          "violation_rate": 0.03333333333333333,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.2637416666666666,
+          "defer_precision": 0.44907664483115867,
+          "budget_exit_fraction": 0.24866666666666654
+        },
+        "shortcut_simfit_naive": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "solvable_accuracy": 0.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0,
+          "constraint_satisfied": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_simfit_ucb": {
+          "accuracy": 0.4926000000000001,
+          "token_savings": 0.4110082224493276,
+          "solvable_accuracy": 0.845793362183914,
+          "unsolvable_token_savings": 0.32848373730058356,
+          "false_positive_risk": 0.06264166666666665,
+          "false_negative_risk": 0.039718827925206625,
+          "violation_rate": 0.1,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.2615916666666666,
+          "defer_precision": 0.46713705589168153,
+          "budget_exit_fraction": 0.24153333333333324
+        }
+      },
+      "_failures": {
+        "shortcut_simfit_naive": "risk constraint failed: realized risk exceeded epsilon at 0.275 of operating points (allowed 0.15); measured FP=0.0723, FN=0.0549, savings=0.4924, accuracy=0.4688"
+      }
+    },
+    "difficulty_mix_3_1": {
+      "results": {
+        "full_budget": {
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_read_hidden": {
+          "accuracy": 0.75,
+          "token_savings": 0.7258886521752868,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.932101008689171,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.017256488513493158,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.25,
+          "defer_precision": 1.0,
+          "budget_exit_fraction": 0.0020000000000000005
+        },
+        "shortcut_simfit_cautious": {
+          "accuracy": 0.7158333333333331,
+          "token_savings": 0.3873280546357185,
+          "solvable_accuracy": 0.9238518518518521,
+          "unsolvable_token_savings": 0.17462464120423404,
+          "false_positive_risk": 0.046777777777777786,
+          "false_negative_risk": 0.017010526059361843,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.06644444444444446,
+          "defer_precision": 0.12984545400526834,
+          "budget_exit_fraction": 0.25049999999999994
+        },
+        "shortcut_simfit_hybrid": {
+          "accuracy": 0.6416666666666667,
+          "token_savings": 0.5268880350288292,
+          "solvable_accuracy": 0.8265185185185185,
+          "unsolvable_token_savings": 0.4449579552186719,
+          "false_positive_risk": 0.05127777777777778,
+          "false_negative_risk": 0.060206736366608005,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.2161944444444444,
+          "defer_precision": 0.33433046196742616,
+          "budget_exit_fraction": 0.1292222222222222
+        },
+        "shortcut_simfit_naive": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "solvable_accuracy": 0.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0,
+          "constraint_satisfied": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_simfit_ucb": {
+          "accuracy": 0.6321111111111112,
+          "token_savings": 0.5341368737225788,
+          "solvable_accuracy": 0.8142222222222223,
+          "unsolvable_token_savings": 0.4547305329973722,
+          "false_positive_risk": 0.0505,
+          "false_negative_risk": 0.06521593301254033,
+          "violation_rate": 0.08333333333333333,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.22652777777777777,
+          "defer_precision": 0.32274499780564503,
+          "budget_exit_fraction": 0.12949999999999998
+        }
+      },
+      "_failures": {
+        "shortcut_simfit_naive": "run failed in adaptive_budget_efficiency, difficulty_mix_1_1, difficulty_mix_1_3, risk_control"
+      }
+    },
+    "difficulty_mix_1_1": {
+      "results": {
+        "full_budget": {
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_read_hidden": {
+          "accuracy": 0.5,
+          "token_savings": 0.7930668206257632,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.9323474765358937,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.018538063374247574,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.5,
+          "defer_precision": 1.0,
+          "budget_exit_fraction": 0.005000000000000001
+        },
+        "shortcut_simfit_cautious": {
+          "accuracy": 0.44747222222222216,
+          "token_savings": 0.3682116633576581,
+          "solvable_accuracy": 0.8568888888888886,
+          "unsolvable_token_savings": 0.26256597480582444,
+          "false_positive_risk": 0.03977777777777779,
+          "false_negative_risk": 0.0363429401668211,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.2097222222222222,
+          "defer_precision": 0.2558799552458545,
+          "budget_exit_fraction": 0.3541666666666667
+        },
+        "shortcut_simfit_hybrid": {
+          "accuracy": 0.38883333333333325,
+          "token_savings": 0.5574332014272391,
+          "solvable_accuracy": 0.7411666666666664,
+          "unsolvable_token_savings": 0.5378774050131531,
+          "false_positive_risk": 0.04088888888888889,
+          "false_negative_risk": 0.06632946263307461,
+          "violation_rate": 0.027777777777777776,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.42194444444444446,
+          "defer_precision": 0.5137362116151315,
+          "budget_exit_fraction": 0.17586111111111113
+        },
+        "shortcut_simfit_naive": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "solvable_accuracy": 0.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0,
+          "constraint_satisfied": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_simfit_ucb": {
+          "accuracy": 0.3872777777777777,
+          "token_savings": 0.5605399476647529,
+          "solvable_accuracy": 0.7383333333333331,
+          "unsolvable_token_savings": 0.5405625521649421,
+          "false_positive_risk": 0.044138888888888894,
+          "false_negative_risk": 0.06692062524225194,
+          "violation_rate": 0.08333333333333333,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.4231666666666667,
+          "defer_precision": 0.5125641890439447,
+          "budget_exit_fraction": 0.1724444444444445
+        }
+      },
+      "_failures": {
+        "shortcut_simfit_naive": "risk constraint failed: realized risk exceeded epsilon at 0.222 of operating points (allowed 0.15); measured FP=0.0403, FN=0.0891, savings=0.6632, accuracy=0.3526"
+      }
+    },
+    "difficulty_mix_1_3": {
+      "results": {
+        "full_budget": {
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_read_hidden": {
+          "accuracy": 0.25,
+          "token_savings": 0.8604373937729541,
+          "solvable_accuracy": 1.0,
+          "unsolvable_token_savings": 0.9321294684699917,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.011865695346964697,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.75,
+          "defer_precision": 1.0,
+          "budget_exit_fraction": 0.005666666666666669
+        },
+        "shortcut_simfit_cautious": {
+          "accuracy": 0.22802777777777772,
+          "token_savings": 0.2650575161655164,
+          "solvable_accuracy": 0.8720000000000001,
+          "unsolvable_token_savings": 0.22470737567764396,
+          "false_positive_risk": 0.015305555555555564,
+          "false_negative_risk": 0.018273474312996384,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.22872222222222222,
+          "defer_precision": 0.250071642582817,
+          "budget_exit_fraction": 0.5666388888888889
+        },
+        "shortcut_simfit_hybrid": {
+          "accuracy": 0.17494444444444446,
+          "token_savings": 0.554564014810249,
+          "solvable_accuracy": 0.6683333333333333,
+          "unsolvable_token_savings": 0.5549980093930797,
+          "false_positive_risk": 0.009833333333333338,
+          "false_negative_risk": 0.05383491979213406,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.5711388888888888,
+          "defer_precision": 0.5793545899752467,
+          "budget_exit_fraction": 0.2570555555555556
+        },
+        "shortcut_simfit_naive": {
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "solvable_accuracy": 0.0,
+          "unsolvable_token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0,
+          "constraint_satisfied": 0.0,
+          "defer_fraction": 0.0,
+          "defer_precision": 0.0,
+          "budget_exit_fraction": 1.0
+        },
+        "shortcut_simfit_ucb": {
+          "accuracy": 0.1755,
+          "token_savings": 0.5555851279167816,
+          "solvable_accuracy": 0.6705555555555556,
+          "unsolvable_token_savings": 0.5556046283566651,
+          "false_positive_risk": 0.010527777777777782,
+          "false_negative_risk": 0.05287193360093258,
+          "violation_rate": 0.0,
+          "constraint_satisfied": 1.0,
+          "defer_fraction": 0.570111111111111,
+          "defer_precision": 0.580404587151757,
+          "budget_exit_fraction": 0.25677777777777777
+        }
+      },
+      "_failures": {
+        "shortcut_simfit_naive": "risk constraint failed: realized risk exceeded epsilon at 0.278 of operating points (allowed 0.15); measured FP=0.0124, FN=0.0609, savings=0.6492, accuracy=0.1629"
+      }
+    }
+  }
+}
