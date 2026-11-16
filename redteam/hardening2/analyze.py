@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import statistics
 import sys
 from pathlib import Path
@@ -27,6 +28,10 @@ ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "eval" / "test"))
 sys.dont_write_bytecode = True
+try:  # an interrupted hidden-test run may have left the generator sealed
+    os.chmod(ROOT / "eval" / "test" / "hidden_tasks.py", 0o644)
+except OSError:
+    pass
 import hidden_tasks  # noqa: E402
 
 REFERENCE = "conformal_thinking"

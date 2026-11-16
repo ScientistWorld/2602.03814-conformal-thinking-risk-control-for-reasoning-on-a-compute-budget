@@ -9,4 +9,6 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 mkdir -p scoring
+# An interrupted run may have left the held-out generator sealed; the
+# evaluator unseals it on start, reads it, and seals it while policies run.
 python eval/test/evaluate_split.py "$@"
