@@ -8,8 +8,10 @@ Implements the paper's actual computational steps:
   * Hoeffding UCB finite-sample risk correction (Eq. 25)
   * efficiency-loss selection among feasible signal/threshold candidates
     (Alg. 1, Eq. 8, 9, 16)
-  * two-step combination: calibrate the upper threshold first, then the lower
-    threshold under it, and exit at min(tau_+, tau_-, T) (Eq. 17)
+  * two-step combination for a given signal (Sec. 4.4): the signal and upper
+    threshold are selected first (Alg. 1 over the signal set), then the lower
+    threshold on that same signal, scaled by the upper threshold; exit at
+    min(tau_+, tau_-, T) (Eq. 17)
 
 The policy is deployed through the benchmark's online stopping protocol
 (``serve``): the evaluator sends a labelled calibration set with the target
@@ -29,7 +31,12 @@ from typing import Callable, Iterable
 
 
 SIGNALS = ["confidence", "eat_confidence", "token_fraction"]
-LOWER_SIGNAL = "confidence"
+# Signals on a confidence scale, for which a "no progress" lower curve is
+# meaningful. Sec. 4.4 calibrates both thresholds for one given signal: the
+# lower threshold uses the signal selected for the upper threshold, or plain
+# confidence when the upper exit is disabled or uses the token count.
+CONFIDENCE_SIGNALS = ["confidence", "eat_confidence"]
+DEFAULT_LOWER_SIGNAL = "confidence"
 UPPER_GRID = [i / 100.0 for i in range(5, 101)]
 # Very small c values make the sigmoid lower threshold nearly flat and can
 # trigger at the first chunk. The paper's lower threshold is a progress curve
@@ -83,6 +90,13 @@ def upper_exit(instance: dict, signal_name: str, threshold: float) -> tuple[int,
         if signal(step, signal_name, budget) >= threshold:
             return idx, "upper"
     return len(instance["steps"]) - 1, "budget"
+
+
+def lower_signal_for(upper: "Candidate | None") -> str:
+    """Signal used by the lower threshold (Sec. 4.4: the same signal as the upper one)."""
+    if upper is not None and upper.name in CONFIDENCE_SIGNALS:
+        return upper.name
+    return DEFAULT_LOWER_SIGNAL
 
 
 def lower_curve(tokens: int, budget: int, c: float, upper_threshold: float) -> float:
@@ -177,7 +191,7 @@ class ConformalThinkingPolicy:
         self.lower: Candidate | None = None
         self._cache_id: object = None
         self._upper_stats: list | None = None
-        self._lower_stats: dict[float, list] = {}
+        self._lower_stats: dict[tuple[str, float], list] = {}
         self.budget = 1
 
     def calibrate(self, instances: list[dict], epsilon: float, delta: float, calibration_id: object = None) -> None:
@@ -194,20 +208,22 @@ class ConformalThinkingPolicy:
         self.lower = None
         if self.variant == "upper_only":
             return
-        # Sec. 4.4: the lower curve is scaled by the selected upper threshold so the
-        # two thresholds never intersect. Without a feasible upper threshold the
-        # curve is scaled by the maximum signal value.
+        # Sec. 4.4: for the selected signal, the lower curve is scaled by the
+        # selected upper threshold so the two thresholds never intersect. Without
+        # a feasible upper threshold the curve is scaled by the maximum signal value.
         scale = self.upper.threshold if self.upper is not None else 1.0
-        if scale not in self._lower_stats:
-            self._lower_stats[scale] = candidate_statistics(
+        lower_signal = lower_signal_for(self.upper)
+        key = (lower_signal, scale)
+        if key not in self._lower_stats:
+            self._lower_stats[key] = candidate_statistics(
                 instances,
-                [LOWER_SIGNAL],
+                [lower_signal],
                 C_GRID,
                 lambda instance, sig, c: lower_exit(instance, sig, c, scale),
                 fn_loss,
                 lower_efficiency_loss,
             )
-        self.lower = select(self._lower_stats[scale], n, epsilon, delta, self.calibration)
+        self.lower = select(self._lower_stats[key], n, epsilon, delta, self.calibration)
 
     def begin(self, budget_tokens: int) -> None:
         self.budget = max(1, int(budget_tokens))
@@ -219,7 +235,7 @@ class ConformalThinkingPolicy:
         if self.lower is not None:
             scale = self.upper.threshold if self.upper is not None else 1.0
             curve = lower_curve(step["tokens"], self.budget, self.lower.threshold, scale)
-            if signal(step, LOWER_SIGNAL, self.budget) < curve:
+            if signal(step, self.lower.name, self.budget) < curve:
                 return "defer"
         return "continue"
 

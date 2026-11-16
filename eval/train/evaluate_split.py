@@ -27,6 +27,7 @@ import random
 import subprocess
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -44,7 +45,14 @@ DELTA = 0.1
 MAX_VIOLATION_RATE = 0.15
 POOL_SIZE = 1000
 TEST_SIZE = 1000
-RUN_TIMEOUT_SECONDS = 3 * 3600
+# Compute limits for a policy process (one operating point). They count CPU
+# time, not wall-clock time, so they do not depend on machine load: a process
+# is stopped when it has used CPU_SECONDS_PER_PROCESS of CPU, or when a reply
+# is pending and its process tree has made no CPU progress at all for
+# IDLE_SECONDS (a deadlocked or sleeping policy). The reference policy uses a
+# few CPU seconds per operating point.
+CPU_SECONDS_PER_PROCESS = 3600
+IDLE_SECONDS = 1800
 ACTIONS = {"continue", "answer", "defer"}
 
 # Fixed by the evaluator: calibration-set size, number of calibration draws per
@@ -96,13 +104,54 @@ class PolicyError(RuntimeError):
 # ── policy process ───────────────────────────────────────────────────────────
 
 
+# The CPU limit is set inside the child by a small shim that then execs the
+# policy command (preexec_fn is unsafe while other threads start processes).
+_CPU_LIMIT_SHIM = (
+    "import os, resource, sys; "
+    "limit = int(sys.argv[1]); "
+    "resource.setrlimit(resource.RLIMIT_CPU, (limit, limit + 30)); "
+    "os.execvp(sys.argv[2], sys.argv[2:])"
+)
+
+
+def _tree_cpu_seconds(root_pid: int) -> float | None:
+    """CPU seconds used by a process and its live descendants (Linux /proc); None if unavailable."""
+    try:
+        parents: dict[int, int] = {}
+        times: dict[int, float] = {}
+        tick = os.sysconf("SC_CLK_TCK")
+        for entry in os.listdir("/proc"):
+            if not entry.isdigit():
+                continue
+            try:
+                with open(f"/proc/{entry}/stat", encoding="utf-8") as handle:
+                    fields = handle.read().rsplit(")", 1)[1].split()
+            except OSError:
+                continue
+            parents[int(entry)] = int(fields[1])
+            times[int(entry)] = sum(int(x) for x in fields[11:15]) / tick
+    except OSError:
+        return None
+    if root_pid not in times:
+        return None
+    total, stack = 0.0, [root_pid]
+    children: dict[int, list[int]] = {}
+    for pid, ppid in parents.items():
+        children.setdefault(ppid, []).append(pid)
+    while stack:
+        pid = stack.pop()
+        total += times.get(pid, 0.0)
+        stack.extend(children.get(pid, []))
+    return total
+
+
 class PolicyProcess:
     def __init__(self, command: list[str], log_path: Path) -> None:
         resolved = [sys.executable if part in {"python", "python3"} and i == 0 else part for i, part in enumerate(command)]
         log_path.parent.mkdir(parents=True, exist_ok=True)
         self._log = log_path.open("a", encoding="utf-8")
         self.proc = subprocess.Popen(
-            resolved,
+            [sys.executable, "-c", _CPU_LIMIT_SHIM, str(CPU_SECONDS_PER_PROCESS), *resolved],
             cwd=str(REPO_ROOT),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
@@ -110,9 +159,24 @@ class PolicyProcess:
             text=True,
             bufsize=1,
         )
-        self._timer = threading.Timer(RUN_TIMEOUT_SECONDS, self.proc.kill)
-        self._timer.daemon = True
-        self._timer.start()
+        self._pending = False
+        self._closed = threading.Event()
+        self._watchdog = threading.Thread(target=self._watch_idle, daemon=True)
+        self._watchdog.start()
+
+    def _watch_idle(self) -> None:
+        """Stop a policy that waits on nothing: a reply is pending and its CPU time does not move."""
+        last_cpu, last_progress = None, time.monotonic()
+        while not self._closed.wait(min(30.0, IDLE_SECONDS / 3.0)):
+            cpu = _tree_cpu_seconds(self.proc.pid)
+            if cpu is None:
+                return
+            now = time.monotonic()
+            if not self._pending or last_cpu is None or cpu > last_cpu + 0.01:
+                last_cpu, last_progress = cpu, now
+            elif now - last_progress > IDLE_SECONDS:
+                self.proc.kill()
+                return
 
     def request(self, message: dict) -> dict:
         try:
@@ -120,9 +184,11 @@ class PolicyProcess:
             self.proc.stdin.flush()
         except (BrokenPipeError, OSError) as exc:
             raise PolicyError(f"policy stopped accepting input: {exc}") from exc
+        self._pending = True
         line = self.proc.stdout.readline()
+        self._pending = False
         if not line:
-            raise PolicyError("policy exited or timed out without replying")
+            raise PolicyError("policy exited (crash, CPU limit or idle) without replying")
         try:
             reply = json.loads(line)
         except json.JSONDecodeError as exc:
@@ -134,7 +200,7 @@ class PolicyProcess:
         return reply
 
     def close(self) -> None:
-        self._timer.cancel()
+        self._closed.set()
         try:
             self.proc.stdin.write(json.dumps({"type": "shutdown"}) + "\n")
             self.proc.stdin.flush()
