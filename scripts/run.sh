@@ -18,9 +18,12 @@ for dir in outputs/*/; do
 done
 
 echo "== reference reproduction $(date)"
-time bash scripts/reproduce.sh
+time bash scripts/reproduce.sh || echo "WARNING: reproduce.sh exited non-zero"
+mkdir -p redteam/hardening2
+cp scoring/scores_test.json redteam/hardening2/reference_only_scores_test.json
+cp scoring/scores_train.json redteam/hardening2/reference_only_scores_train.json
 
-if [ "${AUDIT:-none}" = "full" ]; then
-  export RUN_TAG="${RUN_TAG:-audit-$(date +%Y%m%d%H%M%S)}"
+if [ "${AUDIT:-full}" = "full" ]; then
+  export RUN_TAG="${RUN_TAG:-hardening2-v3}"
   bash redteam/hardening2/run_audit.sh
 fi
