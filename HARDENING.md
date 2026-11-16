@@ -1,122 +1,155 @@
-# Hardening report (iteration 11)
+# Hardening report (round 2)
 
-## Summary
+The first round (report kept in `redteam/hardening/HARDENING_round1.md`) rebuilt the gym as a hidden, online test. REVIEW.md found two remaining weaknesses:
 
-The audited gym (REDTEAM.md) had a public test set and an evaluator that trusted method-written decisions. Gold answers, full trajectories, solvability flags and correctness-revealing answer strings were all visible to the method. Exit reasons and data paths were self-reported. The ranking had no feasibility gate. Several shortcuts outranked the reference, and the supplied reference score did not reproduce (45% vs 39.3% main accuracy). I rebuilt the measurement around a hidden, online test that the evaluator fully owns. I kept the paper's algorithm, the five experiments and their weights. I re-ran the reference, the baselines, three honest improvements, an operating-point shift, two ablations and 15 shortcut probes through the hidden test command (`bash scripts/evaluate_test.sh`).
+1. The signal-ensemble claim (paper Fig. 5) was not exercised. Confidence-only tied the reference (+0.020) because the alternative signals were noisier copies of confidence.
+2. Fitting the public simulator to the calibration set and calibrating on simulated samples had not been measured at small n.
 
-**Result.** Better methods now score higher and worse ones lower. Gaps are many times the paired test noise; every failed shortcut ranks below the reference, and the rest tie it (no shortcut outranks it). Every shortcut from REDTEAM.md is closed. So are two further in-memory exploits found during this audit. The reference is deterministic and reproduces exactly: its rerun was identical, and so was its rerun under the final evaluator.
+This round fixes both. It also fixes three items from the checklist:
 
-Evidence: `redteam/hardening/` (`variants.py` candidates, `run_candidates.sh` and `run_isolation_check.sh` drivers, `scores_test_all.json`, `scores_train_all.json`, `scores_test_isolated.json`, `scores_test_before_isolation.json`, `analysis.json`, `summary.md`).
+- a wall-clock kill in the method's path;
+- a hidden generator that running policies could read;
+- a departure of the reference from the paper's Sec. 4.4.
+
+Everything was checked in one audit job (`redteam/hardening2/`). That job was preempted twice and resumed. Its first, preempted attempt had already produced a full hidden-test audit, which is byte-identical to the final one (`attempt1_scores_test_all.json`).
+
+**Result.**
+
+- **Ranking.** Better methods score higher and weaker ones lower, by 55–130× the paired test noise. The reference sits at 0, with clear headroom above it.
+- **Ensemble claim.** It is now measured: confidence-only scores −0.370 and EAT-only −0.366 (paired SE 0.005).
+- **Simulator-fit shortcut.** It paid before (+0.530, above the honest KL-bound variant's +0.422). Now it fails the risk gate in every form. Its cautious best response scores −0.126, below the reference.
+- **Reading the hidden generator.** It paid +1.838 before and now scores exactly the reference.
+- **Other shortcuts.** No shortcut outranks the reference.
 
 ## What changed
 
-| Problem (REDTEAM.md) | Fix |
+| Problem | Fix |
 |---|---|
-| Test trajectories, gold answers and solvability flags were in public `data/*.jsonl`; seeds in `scripts/download.sh` regenerated them. | Test data is generated **only inside `eval/test/hidden_tasks.py`** from private profiles and seeds. This covers 3 held-out (model, dataset) profiles per group, a 1000-instance calibration pool and a 1000-instance test set per profile and setting. The old public data files are deleted. The public generator (`data/`) uses different, documented public profiles, which `eval/train/` uses. |
-| Method wrote per-example decisions offline, with full lookahead (gold brute force, solvable-flag deferral). | A method is now a **policy program** (`outputs/<name>/policy.json`) that speaks a JSON-lines protocol. The evaluator sends a labelled calibration set with `epsilon` and `delta`, then reveals each held-out trajectory **one chunk at a time**. The policy answers `continue`/`answer`/`defer`. No label, flag or future chunk is ever sent. |
-| Exit reason self-reported (`budget` relabelling erased FP; `early_budget` at step 0). | The **exit type is derived from where the policy stopped**: an answer before the last chunk is an early answer, and continuing or answering at the last chunk is a budget exit. Any other action is a protocol failure. |
-| Token counts and data path taken from the artifact (`data_redirect`, `fixed_trajectory_tokens`, `impossible_tokens` = savings 1e9). | **Tokens are charged by the evaluator** from its own trajectories, up to the stopping chunk. Only the manifest's `command` is read; any other field is ignored. Impossible values cannot be produced. |
-| Answer strings `ans_*`/`wrong_*` revealed correctness; wrong answers never repeated, so answer stability was a perfect verifier. | Answers are **opaque numbers** drawn from one vocabulary. Wrong answers persist across chunks (stickiness 0.4–0.95), and correct answers flicker. Solvability is labelled by whether the full-budget answer is correct (the paper's Fig. 6 wording). |
-| Operating point (`epsilon`) chosen by the method. | `epsilon`, `delta=0.1`, calibration size, draws and test size are **fixed by the evaluator** (per-experiment table in `briefing/evaluation.md`). |
-| Additive rank with no task/risk gate: a 5.7%-accurate shortcut outranked the reference; duplicated metrics (`token_fraction` = 1 − `token_savings`, `max_realized_risk`). | **Gate:** a run whose realized FP or FN risk exceeds `epsilon` at more than 15% of operating points in *any* experiment, or that breaks the protocol, receives the failure values in *every* experiment (accuracy 0, savings 0, risks 1). **Scored metrics** are now only `token_savings` (1.0) and `accuracy` (0.5). Risks are constraints (gated, coefficient 0); duplicates and at-bound diagnostics have coefficient 0. |
-| One process per experiment (found in this audit): a policy could pool calibration draws (≈400 instead of 50 examples in `risk_control`), and could remember held-out trajectories from an earlier `epsilon`/draw to get lookahead. | **Every operating point** (one calibration draw, one `epsilon`) **runs in a fresh process**; calibration and query ids are opaque. `risk_control` uses its own held-out profiles (group 1), so no other experiment's calibration data can help it. |
-| Reference score not reproducible. | Regenerated from the final code by `scripts/reproduce.sh` (job f376c27d). Identical across four runs: audit run, second registered copy, isolated rerun, final reproduction. The train scores are also identical. |
+| **Signals did not disagree.** `eat_confidence` was confidence plus noise, so selecting a signal (Alg. 1 over signals; Fig. 1 right, Fig. 5) could not help. | **New trajectory process** (`data/generate_synthetic_reasoning.py`, and its own copy in `eval/test/hidden_tasks.py`). Each signal channel has its own lag after the answer becomes correct, its own noise level (Student-t, autocorrelated), its own per-question bias and its own susceptibility to falsely confident runs. Profiles fall into regimes: confidence reliable; EAT reliable; or confidence fast but fooled while EAT is slow but robust. In the last regime the better signal depends on ε. Every profile group contains each regime, on both train and test. |
+| **The lower threshold needs visible progress.** The paper's lower threshold stops runs that are "not making progress" (Fig. 2). | **Pre-solve progress.** Solvable runs show partial progress before the answer becomes correct, plus a small per-question ease lift. Hopeless runs stay flat, wander, or become falsely confident late. Muted and late-signalling solvable runs keep false-negative risk real. Chunk lengths now vary. `token_fraction` is now `tokens / budget_tokens`, matching its name. |
+| **Simulator fit paid at n=50.** The held-out profiles came from the same documented ranges as the public generator. Approximate-Bayesian matching of the calibration set to that family, followed by calibration on 1500 simulated runs, beat the honest methods. | **Broader, unpublished held-out process.** The held-out generator draws from wider private ranges with randomly shaped rise curves. It adds behaviours absent from the public generator: (a) brief confident intermediate mistakes, i.e. a one- or two-chunk signal spike on a wrong answer, seen by each channel with a regime-dependent probability; (b) silent late solvers, which show no progress and then solve late; (c) runs that reach the correct answer and later abandon it; (d) noise that grows over the run. The public generator no longer publishes held-out ranges. The docs state that the held-out process is broader and not described by it. It has a new secret. |
+| **Hidden generator readable at test time.** A policy subprocess could import `eval/test/hidden_tasks.py`, regenerate the test set and answer at the first correct chunk. That paid +1.838. | **Sealed while policies run.** Held-out tasks are built in the evaluator's memory. Before any policy starts, `hidden_tasks.py` is set to mode 000 and stale bytecode is deleted (no bytecode is written). Permissions are restored after every policy has exited, and on the next evaluator start if a run was killed. |
+| **Wall-clock limit in the method's path.** A 3-hour per-process timer made scores load-dependent in principle. | **CPU-time limits (both evaluators).** Each policy process gets 3600 CPU s, set through an exec shim rather than `preexec_fn`, which is unsafe with threads. A no-progress detector stops only a process whose reply is pending and whose process tree uses no CPU for 30 minutes. Core dumps are disabled for policy processes. A sleeper and a spinner were both verified to become protocol failures. The core-dump setting was added after the audit job; it changes no score, since no audited policy came near the limits. |
+| **Reference departed from Sec. 4.4.** The upper threshold's signal was selected by Alg. 1, but the lower threshold always used confidence, scaled by a threshold on another signal's scale. | **Lower threshold on the selected signal.** Sec. 4.4 calibrates both thresholds "given a signal s", so the lower threshold now uses the signal selected for the upper one. It falls back to confidence when the upper exit is disabled or is the token count. A vectorised re-implementation (`fast_reference`) reproduces the reference's selections exactly on every audited operating point. |
+
+Unchanged: the interface, the five experiments, their ε grids, the gate, and the weights and coefficients.
 
 ## Do better results score higher?
 
-Ranks use the specified formula, Σ weight × |coefficient| × direction × (candidate − reference) / population std, with the final `scoring/reference.json`. Two populations are reported:
-- **Q:** the reference, baselines and honest variants, plus the candidate itself.
-- **A:** every attempt in the audit.
+**How the ranks are computed.**
 
-The paired SE is the test-sampling standard error of the candidate-minus-reference rank. It treats held-out instances as the sampling unit; every method sees identical instances. The train rank is the same rank computed on the visible train profiles.
+- **Formula:** Σ weight × |coefficient| × direction × (candidate − reference) / population std, using `scoring/reference.json`.
+- **Population Q:** the reference, the baselines and the honest variants, plus the candidate itself.
+- **Paired SE:** held-out instances are the sampling unit, and every method sees the same instances.
+- **Train rank:** the same rank on the visible profiles.
+- **"Before":** the round-1 audit on the previous trajectory process.
 
-| Candidate | Before (old gym, Q / A) | After: Q rank | paired SE | A rank | train rank |
+| Candidate | Before (rank Q) | **After: rank Q** | paired SE | train rank |
+|---|---:|---:|---:|---:|
+| Joint calibration + KL tail bound | +0.993 | **+1.039** | 0.008 | +0.494 |
+| Joint search over (signal, upper, lower) (Sec. 4.4 remark) | +0.544 | **+0.536** | 0.007 | +0.274 |
+| KL (relative-entropy) tail bound instead of the Hoeffding margin | +0.422 | **+0.533** | 0.005 | +0.160 |
+| Reference (`conformal_thinking`); `fast_reference` identical | 0 | 0 | 0 | 0 |
+| Upper threshold only (baseline) | −0.480 | **−0.337** | 0.006 | −0.231 |
+| EAT-only signal set (no ensemble) | — | **−0.366** | 0.005 | −0.417 |
+| Confidence-only signal set (no ensemble) | **+0.020** | **−0.370** | 0.005 | −0.232 |
+| Stricter calibration (ε/2) | −1.081 | −1.300 | 0.008 | −0.734 |
+| Uniform token budget / full budget | −1.471 | −1.657 | 0.011 | −1.218 |
+| Naive calibration (no finite-sample correction) | failed | **failed** (−3.527) | — | +0.088 (passes at the gate boundary, see limitations) |
+
+**Paired differences against the reference, per experiment.** Each entry is the token-savings difference, with the accuracy difference in brackets. The SE of each savings difference is 0.001–0.002.
+
+| Experiment | KL bound | Joint + KL | Confidence-only |
+|---|---:|---:|---:|
+| main | +0.051 (−0.014) | +0.112 (+0.002) | −0.105 (+0.023) |
+| risk_control | +0.096 (−0.015) | +0.177 (−0.053) | −0.023 |
+| 3:1 | +0.050 (−0.020) | +0.087 (−0.006) | −0.086 |
+| 1:1 | +0.077 (−0.018) | +0.133 (+0.003) | −0.095 |
+| 1:3 | +0.151 (−0.014) | +0.302 (−0.046) | −0.058 |
+
+Ordering on train matches test for every honest candidate except the two single-signal ablations, which swap places; both stay below the reference.
+
+## The paper's claims on the hidden test
+
+These numbers come from the reference and baselines run alone (`scoring/scores_test.json`).
+
+| Experiment | full budget acc | upper-only acc / savings | **reference acc / savings** | reference unsolvable savings (upper-only) | violation rate |
 |---|---:|---:|---:|---:|---:|
-| Joint calibration + KL tail bound | — | **+0.993** | 0.008 | +1.123 | +0.901 |
-| Joint calibration (product-space search, Sec. 4.4) | +2.000 / +1.748 | **+0.544** | 0.007 | +0.602 | +0.411 |
-| KL (relative-entropy) tail bound instead of the Hoeffding margin | — | **+0.422** | 0.004 | +0.505 | +0.391 |
-| No signal ensemble (confidence only) | — | +0.020 | 0.001 | +0.028 | −0.011 |
-| Reference (conformal_thinking) / rerun | 0 (rerun −0.417 / −0.465) | 0 / 0 | 0 | 0 | 0 |
-| Upper threshold only (no lower threshold; was `weaker_no_lower`) | −3.199 / −1.862 | **−0.480** | 0.007 | −0.569 | −0.606 |
-| Stricter calibration (epsilon/2; was `better_strict_risk`) | +1.855 / +1.299 | −1.081 | 0.006 | −1.193 | −1.169 |
-| Full budget (honest alternative) | −2.557 / **+0.682** | −1.471 | 0.008 | −1.577 | −1.643 |
-| Uniform token budget (token-fraction threshold only) | — | −1.471 | 0.008 | −1.577 | −1.643 |
-| Naive calibration (no finite-sample correction) | — | **failed** −3.308 | — | −2.735 | −3.464 |
+| adaptive_budget_efficiency | 0.560 | 0.556 / 0.320 | **0.510 / 0.441** | 0.34 (0.09) | 0 |
+| risk_control (n = 50) | 0.533 | 0.529 / 0.109 | **0.529 / 0.109** | 0.03 (0.03) | 0 |
+| difficulty_mix_3_1 | 0.750 | 0.734 / 0.399 | **0.693 / 0.456** | 0.32 (0.12) | 0 |
+| difficulty_mix_1_1 | 0.500 | 0.498 / 0.276 | **0.456 / 0.405** | 0.31 (0.07) | 0 |
+| difficulty_mix_1_3 | 0.250 | 0.249 / 0.079 | **0.240 / 0.166** | 0.13 (0.02) | 0 |
 
-- **Improvements beat the reference by roughly 80–120× their paired SE** (+0.42 ± 0.004, +0.54 ± 0.007, +0.99 ± 0.008), with savings gains in every experiment. Savings gains: tighter bound +0.04 to +0.21; joint calibration +0.04 to +0.23; both +0.11 to +0.45. Accuracy costs are 0.01–0.05, and violation rates stay ≤ 0.05.
-- **Train ranks match test ranks** for every honest candidate, so honest methods score alike on both sides.
-- **Stricter calibration now ranks below the reference.** The redteam counted it as "better". It leaves half the allowed risk unused; the paper's objective is the least compute that satisfies the tolerance. It does gain accuracy (+0.02 to +0.09), but loses 0.20–0.36 savings.
-- **Full budget can no longer beat the reference** in either population (before: +0.682 in A).
-- **The no-ensemble ablation ties the reference.** In this simulator the alternative signals are noisier copies of confidence, so the paper's ensemble claim (Fig. 5) is not exercised (see "Not fixed").
-
-## The paper's claims on the hidden test (reference vs baselines)
-
-| Experiment | full budget acc | upper-only acc / savings | **reference acc / savings** | reference FP / FN | violation rate |
-|---|---:|---:|---:|---:|---:|
-| adaptive_budget_efficiency (natural) | 0.557 | 0.538 / 0.294 | **0.487 / 0.453** | 0.048 / 0.036 | 0 |
-| risk_control (n = 50) | 0.556 | 0.554 / 0.135 | **0.532 / 0.200** | 0.030 / 0.018 | 0 |
-| difficulty_mix_3_1 | 0.750 | 0.719 / 0.402 | **0.654 / 0.499** | 0.062 / 0.045 | 0 |
-| difficulty_mix_1_1 | 0.500 | 0.487 / 0.266 | **0.415 / 0.489** | 0.040 / 0.051 | 0 |
-| difficulty_mix_1_3 | 0.250 | 0.251 / 0.072 | **0.223 / 0.274** | 0.011 / 0.023 | 0 |
-
-- **Lower + upper saves more tokens than upper-only**, with the gap growing as unsolvable instances become common: +0.097 (3:1), +0.159 (natural), +0.224 (1:1), +0.201 (1:3, at tighter tolerances). Paired SEs are 0.001–0.004.
-- **Upper-only collapses when unsolvable instances dominate** (0.40 → 0.07 savings).
-- **The lower threshold does the saving on unsolvable instances:** in the main and mix experiments, savings on unsolvable instances are 0.26–0.44 vs 0.01–0.08 for upper-only.
-- **Finite-sample correction controls risk; naive tuning does not.** UCB never exceeds `epsilon`, while naive calibration exceeds it at 22.5% of `risk_control` operating points (measured FP 0.082, FN 0.051) and fails the run.
-- **Accuracy cost:** the reference gives up 3–7 accuracy points relative to upper-only. That is within its false-negative budget, but it is "comparable accuracy" only loosely; in the 1:1 mix it is 0.415 vs 0.487.
-
-**Reference score.** Before: frozen 45.0% accuracy / 65.2% savings / FP 13.6% (rerun 39.3% / 66.2% / 15.7%), on the old public split at epsilon 0.32. After (hidden test, averaged over operating points): main experiment 0.487 accuracy / 0.453 savings. The other experiments are in the table above. The two are different measurements and not comparable. The new values are in `scoring/scores_test.json` and in `scoring/reference.json` `results`.
+- **The lower threshold saves more as unsolvable instances become common.** Lower + upper beats upper-only by +0.057 (3:1), +0.121 (natural) and +0.129 (1:1) at matched ε. The 1:3 mix, at tighter ε, gains +0.087 while upper-only collapses to 0.079. The savings come from unsolvable instances.
+- **The signal ensemble saves more than any single signal**, in every experiment. Savings are 0.441 vs 0.337 / 0.324 (main), 0.109 vs 0.085 / 0.092, 0.456 vs 0.371 / 0.378, 0.405 vs 0.310 / 0.307, and 0.166 vs 0.108 / 0.142 (reference vs confidence-only / EAT-only).
+- **Finite-sample correction controls risk; naive tuning does not, and the gap is largest with small validation sets (Fig. 7).** UCB never exceeds ε. Naive calibration stays within the gate in the four experiments with 400 calibration examples, but exceeds ε at 37.5% of `risk_control` operating points (n = 50; FP 0.114, FN 0.065) and so fails.
 
 ## Shortcuts: fix and score before → after
 
-Before = Q / A rank in REDTEAM.md (old gym) unless stated. After = Q rank on the hardened hidden test ("failed" = gate or protocol failure, failure values everywhere, −2.92).
+All rows are Q ranks through `bash scripts/evaluate_test.sh`. "Failed" means the gate fired and the run carries the failure values everywhere (−3.078).
 
 | Shortcut | Fix | Before | After |
 |---|---|---:|---:|
-| `gold_bruteforce`: scan all steps for the visible gold | test data hidden; chunks revealed online | +6.057 / +2.728 | `shortcut_gold_lookup` (looks up gold/flags in visible files and the begin message, finds nothing): 0.000 (= reference) |
-| `encoded_answers`: stop on `ans_` prefix | opaque answers | +2.153 / +2.728 | −1.430 (never fires, so full budget) |
-| answer-stability oracle (stop when the answer repeats) | sticky wrong answers | (same mechanism as above) | failed (FP 0.91–0.97) |
-| `solvable_flag` | flag never sent | +0.769 / −0.399 | covered by `shortcut_gold_lookup`: 0.000 |
-| `relabel_budget`, `early_budget`: self-labelled budget exits | exit type derived by evaluator | +0.556 / +0.584; +1.746 / −1.802 | `shortcut_claim_budget`: failed (protocol); `shortcut_early_answer`: failed (FP 0.95–0.98) |
-| `data_redirect`, `fixed_trajectory_tokens`, `impossible_tokens` (savings 1e9), `summary_forgery`, `operating_point` field | evaluator owns data, tokens and epsilon; only `command` is read; scores file is written by the evaluator | +7.857 / +3.309; +2.190 / −0.465; +6.763 / +8.692; ties | `shortcut_manifest_overrides` (data path, epsilon 1000, −1e9 tokens, forged scores in the manifest): 0.000 (= reference) |
-| ignore the requested epsilon (calibrate at 0.4) | gate | (tie; diagnostic only) | failed (violations at 37–92% of points) |
-| all-defer / all-answer | gate; epsilon grids keep all-defer infeasible (1:3 uses ≤ 0.125 because all-defer FN ≈ 0.18 there) | −3.817 / −6.959; −3.572 / −8.645 | failed / failed |
-| calibrate on 3000 public-simulator examples instead of the supplied set (new probe) | held-out profiles differ from public ones; gate | — | failed (violation rate 0.25–0.44) |
-| pool calibration draws across operating points (new) | fresh process per operating point; opaque ids; disjoint profiles for `risk_control` | **+0.274** (pre-isolation hidden test; `risk_control` savings 0.327 vs 0.200) | 0.000 (= reference) |
-| remember held-out trajectories across operating points, replay with lookahead (new) | fresh process per operating point | **+0.231** (main savings 0.505 vs 0.453, same accuracy and risk) | −1.430 (never has memory; runs to budget) |
-| missing / empty / null decisions, invalid exit index | (rejected before too) | rejected | protocol failure: failed |
-| `move_baseline` | baselines are separate policy programs and the evaluator's built-in `full_budget`; the ranking anchors on the frozen reference | tie | unchanged (no rank effect) |
+| `simfit_ucb`: approximate-Bayesian fit of the public simulator to the calibration set; Alg. 1 with Hoeffding margin on 1500 simulated runs | broader unpublished held-out process | **+0.530**: risk_control savings 0.411 vs reference 0.200 and KL 0.366, violation rate 0.10, passes | **failed**: violations 0.40 in risk_control, 0.19 in 3:1 |
+| `simfit_hybrid`: as above, plus requires the supplied set's raw risk ≤ ε | same | **+0.522** | **failed**: 0.183 in risk_control |
+| `simfit_naive`: no margin on the simulated set | same | failed | failed |
+| `simfit_cautious`: the hybrid at 0.7 ε, the natural best response | same | −0.009 | **−0.126**: risk_control 0.497 / 0.199 vs KL 0.513 / 0.205; 1:3 savings 0.063 |
+| `read_hidden`: import `eval/test/hidden_tasks.py` at test time, regenerate the test set, answer at the first correct chunk | generator sealed while policies run | **+1.838**: savings 0.79 at full-budget accuracy, zero risk | **0.000**: gets `PermissionError`, falls back to the reference |
+| `public_simulator_calibration`: calibrate on 3000 public-profile runs | broader held-out process | failed | failed (violations 0.61–0.67) |
+| `fixed_rule`: hand-written thresholds on max(confidence, EAT) | (new probe) | — | failed (risk_control 0.33, 1:3 0.44) |
+| `ignore_epsilon`, `stop_on_repeat`, `early_answer`, `all_defer` | rechecked on the new process | failed | failed |
+
+Round-1 probes that depend only on the protocol were not replayed: manifest overrides, self-labelled budget exits, gold lookup in visible files, and cross-operating-point memory or pooling. The protocol is unchanged.
 
 ## Shortcuts left open
 
-- **Reading `eval/test/` at test time.** A policy subprocess runs on the same filesystem. It could import `eval/test/hidden_tasks.py`, regenerate the held-out trajectories and look up gold answers. Preventing this needs a sandbox; it is a blatant violation (`scoring/CONSTRAINTS.md`) left to the shortcut grader.
-- **Deliberate persistence through disk.** Writing calibration sets or held-out observations to a file and reading them in a later process (another operating point or another run) would recreate the two in-memory exploits above. Per-process isolation closes every in-memory route; disk persistence is forbidden in `CONSTRAINTS.md` and left to the grader.
-- **Exploiting the simulator family.** Fitting the public generator's parameters to the calibration set and calibrating on simulated samples could beat honest finite-sample methods, especially at n = 50. The direct version (calibrating on public-simulator data) fails the gate. The parametric version is forbidden in `CONSTRAINTS.md` but not mechanically detectable.
-- **Within-pass transduction.** A policy sees unlabelled chunks of many held-out instances within one operating point and could adapt to their signal distribution. This is minor and arguably legitimate, so it is left open.
+- **Undoing the seal.** The seal is a permission change by the same user. A policy that chmods the file back, or reads the generator out of `.git` objects where those are present, is deliberate tampering. That is forbidden in `CONSTRAINTS.md` and left to the grader.
+- **Persisting state through disk across operating points.** Unchanged from round 1; forbidden and left to the grader.
+- **Stronger hand-built models of the held-out process.** The measured fits (four variants, including the cautious best response) do not pay. A better parametric model of behaviours the public generator does not show is not measured. Writing such a model would require knowledge of the held-out process that is not published.
+- **Within-pass transduction** over unlabelled held-out chunks. Minor and arguably legitimate; unchanged.
+
+## Reference score before → after
+
+These are not comparable, because the trajectory process changed. The previous values are kept in `scoring/reference.json` under `_hardening1_values_previous_process`.
+
+| Experiment | Before (acc / savings) | After (acc / savings) |
+|---|---:|---:|
+| main | 0.487 / 0.453 | 0.510 / 0.441 |
+| risk_control | 0.532 / 0.200 | 0.529 / 0.109 |
+| 3:1 | 0.654 / 0.499 | 0.693 / 0.456 |
+| 1:1 | 0.415 / 0.489 | 0.456 / 0.405 |
+| 1:3 | 0.223 / 0.274 | 0.240 / 0.166 |
+
+The new reference is deterministic. Three runs produced identical scores: the reference-only run, the audit run, and the preempted first attempt.
 
 ## Headroom check
 
-- **Neither scored metric is at its bound for the reference** in any experiment. Accuracy sits below the full-budget ceiling (e.g. 0.487 vs 0.557). Savings is 0.20–0.50. An oracle that answers at the first correct chunk and defers unsolvable instances at the first chunk saves about 0.77 (natural mix) and 0.83 (1:3), measured on the public profiles.
-- **The reference's only at-bound value is a diagnostic:** `violation_rate` = 0, which is not scored.
-- **Three honest variants beat it** by +0.42 to +0.99 with SE < 0.01. None reaches a bound; the best main-experiment savings is 0.68.
-- **The added experiment targets where the paper's method falls short.** `risk_control` was a verbatim copy of the main experiment. It is now a small-calibration (n = 50) experiment on disjoint profiles, which is the paper's own Fig. 7 axis. There the Hoeffding margin of 0.152 makes the reference conservative (savings 0.20), and tighter bounds gain up to +0.21 at the same violation rate.
-- **Brute force does not apply:** the test is hidden and online, so there is nothing to enumerate.
-- **A simple baseline sits clearly below the reference.** Full budget and token budget score −1.47, and upper-only −0.48.
+- **No scored metric is at its bound for the reference.** Accuracy is below the full-budget ceiling. Savings range from 0.109 to 0.456.
+- **Three honest variants beat the reference** by 0.53–1.04 in rank, with SE ≤ 0.008. The best one saves 0.553 (main), 0.285 (risk_control) and 0.467 (1:3), so none reaches a bound.
+- **The small-calibration experiment remains where the paper's method falls short.** At n = 50 on held-out profiles, the reference's lower exit is never feasible: Hoeffding's margin of 0.152 consumes most of the tolerance. Its savings equal upper-only's, which leaves room for tighter finite-sample bounds.
+- **Brute force does not apply**, because the test is hidden and online.
+- **Simple baselines sit clearly below the reference:** upper-only −0.337, full budget −1.657.
 
 ## Weights and coefficients
 
-- **Experiment weights are unchanged:** 0.3 / 0.2 / 0.15 / 0.15 / 0.2.
-- **Coefficients now reflect the paper's objective.** The paper minimises compute subject to risk ≤ epsilon, and reports accuracy vs. tokens. So `token_savings` (1.0) and `accuracy` (0.5) are scored. Realized risks are constraints enforced by the gate, and are not rewarded below epsilon. Rewarding them let the full-budget policy outrank the reference.
-- **Coefficient 0:**
-  - duplicates: `token_fraction` is removed; `max_realized_risk` is removed;
-  - the risks themselves (gated instead);
-  - `exit_budget_fraction`, which sat at its bound;
-  - `defer_fraction`, which is not a benefit.
+Unchanged: experiment weights 0.3 / 0.2 / 0.15 / 0.15 / 0.2; `token_savings` 1.0; `accuracy` 0.5. Risks remain gated constraints. The ensemble claim is exercised inside every experiment, so it needs no separate weight.
 
 ## Not fixed / limitations
 
-- **Synthetic data.** The benchmark is a scaled simulator of reasoning trajectories, not the paper's Qwen3/R1 runs on AIME/GPQA/DeepScaleR/MathVision. The paper reports curves only, so `scoring/reference.json` `results` hold this gym's hidden-test reference values. The paper's qualitative findings are under `_paper_reported`, and the old iteration-10 values are under `_iteration10_values_obsolete_setup`.
-- **The signal-ensemble claim (Fig. 5) is not exercised.** Selecting among confidence, EAT-like and token-fraction signals ties confidence-only (+0.020).
-- **The 1:3 mix uses tighter tolerances** than the other mixes, so absolute numbers across mixes are not at matched epsilon. The 3:1 → natural → 1:1 progression is at matched epsilon.
-- **Rank normalisation depends on the population.** Failed runs carry extreme values that enlarge the population std. The gate guarantees that no failed run outranks a valid one, but the size of valid gains in std units shifts with the population.
-- **One audit item was only partly re-run.** The joint-calibration variants were scored before the per-operating-point isolation and not re-run after it, to save compute. Their decisions depend only on (calibration set, epsilon), and every other deterministic policy re-run after isolation produced byte-identical scores (`analysis.json`, `identical_after_isolation`).
+- **Synthetic data.** The benchmark simulates trajectories rather than running Qwen3 or R1 on AIME, GPQA, DeepScaleR or MathVision. The paper's probe signal is not modelled. Results are curves in the paper; `results` holds this gym's own reference runs.
+- **The test is harder than train at small n.** In `risk_control` the reference saves 0.219 on train vs 0.109 on test, because the held-out-only behaviours add risk. The other experiments are within 0.03–0.06 of each other. Honest candidates keep the same order on both sides, except the two single-signal ablations, which swap places below the reference.
+- **Naive calibration passes the gate on train at the boundary.** It violates at exactly 15% of `risk_control` operating points (the gate is "> 15%"), versus 0% for the reference. On test it fails clearly (37.5%). The paper's direction holds on both sides; only the pass/fail outcome differs.
+- **The 1:3 mix uses tighter tolerances** (≤ 0.125), as in round 1. Deferring every instance at the first chunk has a false-negative risk of 0.187 there.
+- **Population dependence of the rank** is as in round 1. Failed runs widen the population std; the gate keeps them below every valid run.
+
+## Evidence
+
+`redteam/hardening2/` holds:
+
+- `variants.py`: every candidate, the vectorised Alg. 1, and the simulator-fit attack with its bank builder;
+- `run_audit.sh`: the resumable driver;
+- `analyze.py` and `merge_scores.py`;
+- `scores_test_all.json`, `scores_train_all.json` and `old_gym_scores_test.json`;
+- `reference_only_scores_{test,train}.json`, `analysis.json` (ranks, contributions, paired noise) and `summary.md`;
+- `old_public_generator.py` and `old_conformal_thinking.py`, the previous gym's public code used for the "before" runs. The previous hidden test is rebuilt from commit 6090d6e.

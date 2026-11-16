@@ -18,6 +18,13 @@ operating point (one calibration draw and one target risk) runs in a **fresh
 subprocess**: a policy sees exactly one calibration set and one pass over that
 point's held-out instances, and nothing carries over between operating points.
 
+Compute limits count CPU time, not wall-clock time, so they do not depend on
+machine load: a policy process (one operating point) may use up to 3600 CPU
+seconds, and a process whose reply is pending while its process tree makes no
+CPU progress for 30 minutes (sleeping or deadlocked) is stopped. Either counts
+as a protocol failure. The reference policy uses a few CPU seconds per point.
+While policies run, the held-out generator under `eval/test/` is unreadable.
+
 ## Online stopping protocol (JSON lines on stdin/stdout)
 
 The evaluator writes one JSON object per line to the policy's stdin and, except
@@ -27,6 +34,8 @@ for `shutdown`, reads exactly one JSON object per line from its stdout
 1. **Calibrate.** `{"type": "calibrate", "calibration_id": str, "epsilon": float, "delta": float, "instances": [...]}`
    Each instance is a labelled calibration trajectory:
    `{"id", "gold", "budget_tokens", "steps": [{"step", "tokens", "prediction", "signals": {"confidence", "eat_confidence", "token_fraction"}}, ...]}`.
+   `confidence` and `eat_confidence` are confidence-type signals (higher = more
+   confident; their scales differ); `token_fraction` is `tokens / budget_tokens`.
    Reply `{"ok": true}`. The policy must use only these instances to set its
    stopping behaviour for the following held-out instances, targeting realized
    risk at most `epsilon` with probability at least `1 - delta`. Identifiers are
@@ -56,13 +65,22 @@ correctness.
 
 Trajectories are simulated reasoning runs. Each *profile* stands for one
 (reasoning model, dataset) pair and has its own mapping from signals to
-correctness (signal scale and curvature, noise, how often hopeless runs become
-falsely confident, how persistent wrong answers are). The visible side uses
-the public profiles in `data/generate_synthetic_reasoning.py`; the held-out test
-uses different profiles drawn from the same documented parameter ranges, with
-their own calibration pools and test sets. A stopping rule therefore has to be
-set from each profile's calibration data; thresholds copied from the public
-profiles do not transfer.
+correctness: signal scale and curvature, noise and its persistence, per-question
+bias, how long each signal lags behind the moment the answer becomes correct,
+how often hopeless runs look confident, how persistent wrong answers are. In
+particular, **which signal is the more informative one differs between
+profiles, and within a profile it can depend on the target risk** (one signal
+reacts sooner but is fooled more often, another reacts later but is more
+reliable).
+
+The visible side uses the three public development profiles in
+`data/generate_synthetic_reasoning.py`. The held-out test uses other profiles
+from a broader process that is not published: its parameters are drawn from
+wider ranges, and held-out pairs show behaviours the public profiles do not.
+The public generator is a development aid, not a description of the held-out
+data; a stopping rule has to be set from each profile's own labelled
+calibration data, and thresholds or simulator fits from the public profiles
+do not transfer.
 
 An instance is **solvable** when its full-budget (final-chunk) answer is correct.
 

@@ -8,7 +8,7 @@ This benchmark studies adaptive inference for reasoning language models under ex
 
 A scientist should work on stopping policies for ongoing reasoning traces: how to estimate deployment risk from limited calibration data with a valid finite-sample guarantee, how to choose operating points that use the allowed risk efficiently, how to combine or transform stopping signals (including answer-consistency information across chunks), and how to detect that further reasoning is unlikely to help.
 
-Measured room for improvement exists: on the held-out test the reference leaves a large part of the possible savings unused, especially in the small-calibration and unsolvable-heavy settings, where its calibration is conservative.
+Measured room for improvement exists: on the held-out test the reference leaves a large part of the possible savings unused, especially in the small-calibration and unsolvable-heavy settings, where its calibration is conservative (tighter finite-sample bounds and searching the combined stopping rule jointly both score clearly higher). Which signal is informative differs between (model, dataset) pairs and target risks, and held-out pairs show behaviours the development profiles do not, so improvements should come from better use of the calibration data, not from modelling the development profiles.
 
 ## Approach Scope
 

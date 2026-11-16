@@ -15,12 +15,13 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
+PY="$(command -v python3 || command -v python)"
 mkdir -p data/downloads
 for profile in public_a public_b public_c; do
   for setting in natural ratio_3_1 ratio_1_1 ratio_1_3; do
     target="data/downloads/dev_${profile}_${setting}.jsonl"
     if [ ! -f "$target" ]; then
-      python data/generate_synthetic_reasoning.py \
+      "$PY" data/generate_synthetic_reasoning.py \
         --profile "$profile" --setting "$setting" --size 500 --output "$target"
     fi
   done

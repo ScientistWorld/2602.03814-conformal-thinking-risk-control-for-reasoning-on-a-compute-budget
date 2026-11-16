@@ -1,11 +1,11 @@
 {
-  "_note": "Scaled synthetic benchmark. The paper reports its results only as curves (risk vs. epsilon, accuracy vs. tokens) on real LLM trajectories, so it has no scalar values on this benchmark's scale; its findings are recorded verbatim under each experiment's '_paper_reported'. 'results' holds this gym's reference numbers on the held-out test (scripts/evaluate_test.sh), not paper numbers. Ranking: token_savings and accuracy are scored; risk metrics are constraints enforced by the evaluator's gate (a run whose realized risk exceeds the target at more than 15% of operating points is scored as failed), so they carry coefficient 0.",
+  "_note": "Scaled synthetic benchmark. The paper reports its results only as curves (risk vs. epsilon, accuracy vs. tokens) on real LLM trajectories, so it has no scalar values on this benchmark's scale; its findings are recorded verbatim under each experiment's '_paper_reported'. 'results' holds this gym's reference numbers on the held-out test (scripts/evaluate_test.sh, reference and baselines run alone), not paper numbers. '_hardening1_values_previous_process' keeps the values of the previous trajectory process (before hardening 2) and '_iteration10_values_obsolete_setup' the iteration-10 setup; neither is comparable. Ranking: token_savings and accuracy are scored; risk metrics are constraints enforced by the evaluator's gate (a run whose realized risk exceeds the target at more than 15% of operating points is scored as failed), so they carry coefficient 0.",
   "experiments": {
     "adaptive_budget_efficiency": {
       "description": "Natural solvable mix (about 58% of instances solvable within budget); 400 labelled calibration examples per draw, 4 draws per profile, target risks 0.10/0.15/0.20. Adaptive stopping should save reasoning tokens while realized risks stay within the target.",
       "weight": 0.3,
       "primary_metric": "token_savings",
-      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles drawn from a process broader than the public generator; values in 'results' are this gym's reference runs on the hidden test (scripts/evaluate_test.sh), not paper numbers.",
       "_paper_reported": "Paper (Sec. 5.3, Fig. 5-6): at a fixed risk tolerance, risk-controlled adaptive stopping reaches comparable accuracy with fewer total tokens; adding the lower threshold shifts the accuracy-vs-tokens curve left. Reported only as curves (Qwen3-8B/30B, R1-Distill-32B, Qwen3-VL-8B on AIME, DeepScaleR, GPQA, MathVision); no scalar values.",
       "metrics": {
         "accuracy": {
@@ -67,17 +67,17 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.4871,
-          "token_savings": 0.4531,
-          "false_positive_risk": 0.0476,
-          "false_negative_risk": 0.0362,
+          "accuracy": 0.5102,
+          "token_savings": 0.4414,
+          "false_positive_risk": 0.0658,
+          "false_negative_risk": 0.0442,
           "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.5382,
-          "token_savings": 0.2941,
-          "false_positive_risk": 0.0841,
+          "accuracy": 0.5559,
+          "token_savings": 0.3201,
+          "false_positive_risk": 0.0888,
           "false_negative_risk": 0.0,
           "violation_rate": 0.0
         },
@@ -91,7 +91,7 @@
         },
         "full_budget": {
           "type": "baseline",
-          "accuracy": 0.557,
+          "accuracy": 0.5603,
           "token_savings": 0.0,
           "false_positive_risk": 0.0,
           "false_negative_risk": 0.0,
@@ -122,13 +122,46 @@
           "exit_budget_fraction": 0.0
         }
       },
-      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
+      "_hardening1_values_previous_process": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.4871,
+          "token_savings": 0.4531,
+          "false_positive_risk": 0.0476,
+          "false_negative_risk": 0.0362,
+          "violation_rate": 0.0
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.5382,
+          "token_savings": 0.2941,
+          "false_positive_risk": 0.0841,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.557,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      }
     },
     "risk_control": {
       "description": "Small-calibration regime: 50 labelled calibration examples per draw, 10 draws per profile, target risks 0.05/0.10/0.20/0.25, on held-out profiles disjoint from the other experiments. Realized risk must stay within the target across calibration draws (gate), and the policy should still save tokens.",
       "weight": 0.2,
       "primary_metric": "token_savings",
-      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles drawn from a process broader than the public generator; values in 'results' are this gym's reference runs on the hidden test (scripts/evaluate_test.sh), not paper numbers.",
       "_paper_reported": "Paper (Sec. 5.2, Fig. 4, Fig. 7): over 40 random validation/test splits with 50 validation examples, UCB-calibrated thresholds keep realized test risk below epsilon, while naive validation tuning frequently exceeds it; the gap widens for smaller validation sets (8/16/40). Reported only as curves.",
       "metrics": {
         "accuracy": {
@@ -190,6 +223,64 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
+          "accuracy": 0.5286,
+          "token_savings": 0.1087,
+          "false_positive_risk": 0.0459,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.5286,
+          "token_savings": 0.1087,
+          "false_positive_risk": 0.0459,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.533,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      },
+      "_iteration10_values_obsolete_setup": {
+        "naive_or_uncalibrated": {
+          "type": "baseline",
+          "accuracy": 0.308,
+          "token_fraction": 0.611,
+          "token_savings": 0.389,
+          "false_positive_risk": 0.339,
+          "false_negative_risk": 0.0,
+          "risk_excess": 0.019,
+          "defer_fraction": 0.0,
+          "exit_budget_fraction": 0.358
+        },
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.403,
+          "token_fraction": 0.343,
+          "token_savings": 0.657,
+          "false_positive_risk": 0.169,
+          "false_negative_risk": 0.008,
+          "risk_excess": 0.0,
+          "defer_fraction": 0.428,
+          "exit_budget_fraction": 0.0
+        }
+      },
+      "_hardening1_values_previous_process": {
+        "conformal_thinking": {
+          "type": "proposed",
           "accuracy": 0.5323,
           "token_savings": 0.1999,
           "false_positive_risk": 0.0298,
@@ -221,37 +312,13 @@
           "violation_rate": 0.0
         }
       },
-      "_iteration10_values_obsolete_setup": {
-        "naive_or_uncalibrated": {
-          "type": "baseline",
-          "accuracy": 0.308,
-          "token_fraction": 0.611,
-          "token_savings": 0.389,
-          "false_positive_risk": 0.339,
-          "false_negative_risk": 0.0,
-          "risk_excess": 0.019,
-          "defer_fraction": 0.0,
-          "exit_budget_fraction": 0.358
-        },
-        "conformal_thinking": {
-          "type": "proposed",
-          "accuracy": 0.403,
-          "token_fraction": 0.343,
-          "token_savings": 0.657,
-          "false_positive_risk": 0.169,
-          "false_negative_risk": 0.008,
-          "risk_excess": 0.0,
-          "defer_fraction": 0.428,
-          "exit_budget_fraction": 0.0
-        }
-      },
-      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
+      "_naive_calibration_measured_before_gate": "Fails the gate in risk_control (realized risk above epsilon at 37.5% of operating points; measured there FP=0.1142, FN=0.0653, savings=0.3947, accuracy=0.4312), so the whole run carries the failure values. On the visible train profiles it violates at exactly 15% of risk_control operating points (gate boundary, passes) versus 0% for the reference."
     },
     "difficulty_mix_3_1": {
       "description": "3:1 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.10/0.15/0.20.",
       "weight": 0.15,
       "primary_metric": "token_savings",
-      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles drawn from a process broader than the public generator; values in 'results' are this gym's reference runs on the hidden test (scripts/evaluate_test.sh), not paper numbers.",
       "_paper_reported": "Paper (Fig. 6, 3:1): when solvable instances dominate, UPPER-ONLY captures most savings and adding the lower threshold adds little. Reported only as curves.",
       "metrics": {
         "accuracy": {
@@ -313,17 +380,17 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.6541,
-          "token_savings": 0.4985,
-          "false_positive_risk": 0.0623,
-          "false_negative_risk": 0.0453,
+          "accuracy": 0.6932,
+          "token_savings": 0.4564,
+          "false_positive_risk": 0.0654,
+          "false_negative_risk": 0.0399,
           "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.7194,
-          "token_savings": 0.4017,
-          "false_positive_risk": 0.0831,
+          "accuracy": 0.7336,
+          "token_savings": 0.3987,
+          "false_positive_risk": 0.0835,
           "false_negative_risk": 0.0,
           "violation_rate": 0.0
         },
@@ -368,13 +435,46 @@
           "exit_budget_fraction": 0.0
         }
       },
-      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
+      "_hardening1_values_previous_process": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.6541,
+          "token_savings": 0.4985,
+          "false_positive_risk": 0.0623,
+          "false_negative_risk": 0.0453,
+          "violation_rate": 0.0
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.7194,
+          "token_savings": 0.4017,
+          "false_positive_risk": 0.0831,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.75,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      }
     },
     "difficulty_mix_1_1": {
       "description": "1:1 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.10/0.15/0.20.",
       "weight": 0.15,
       "primary_metric": "token_savings",
-      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles drawn from a process broader than the public generator; values in 'results' are this gym's reference runs on the hidden test (scripts/evaluate_test.sh), not paper numbers.",
       "_paper_reported": "Paper (Fig. 6, 1:1): UPPER-ONLY stays near the high-token regime; adding the lower threshold gives a clear leftward shift at comparable accuracy. Reported only as curves.",
       "metrics": {
         "accuracy": {
@@ -436,17 +536,17 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.4149,
-          "token_savings": 0.4893,
-          "false_positive_risk": 0.0395,
-          "false_negative_risk": 0.0514,
+          "accuracy": 0.4555,
+          "token_savings": 0.4048,
+          "false_positive_risk": 0.0574,
+          "false_negative_risk": 0.0414,
           "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.4871,
-          "token_savings": 0.2655,
-          "false_positive_risk": 0.0829,
+          "accuracy": 0.4982,
+          "token_savings": 0.2764,
+          "false_positive_risk": 0.0894,
           "false_negative_risk": 0.0,
           "violation_rate": 0.0
         },
@@ -491,13 +591,46 @@
           "exit_budget_fraction": 0.0
         }
       },
-      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
+      "_hardening1_values_previous_process": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.4149,
+          "token_savings": 0.4893,
+          "false_positive_risk": 0.0395,
+          "false_negative_risk": 0.0514,
+          "violation_rate": 0.0
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.4871,
+          "token_savings": 0.2655,
+          "false_positive_risk": 0.0829,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.5,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      }
     },
     "difficulty_mix_1_3": {
       "description": "1:3 solvable:unsolvable mix; 400 calibration examples, 4 draws, target risks 0.05/0.10/0.125 (tighter because deferring everything already has false-negative risk of about 0.18 here).",
       "weight": 0.2,
       "primary_metric": "token_savings",
-      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles; values in 'results' are this gym's reference runs, not paper numbers.",
+      "notes": "Scaled synthetic benchmark: simulated reasoning trajectories from held-out (model, dataset) profiles drawn from a process broader than the public generator; values in 'results' are this gym's reference runs on the hidden test (scripts/evaluate_test.sh), not paper numbers.",
       "_paper_reported": "Paper (Fig. 6, 1:3): the lower threshold's gain is largest; unsolvable instances mostly exit via the lower threshold. Reported only as curves.",
       "metrics": {
         "accuracy": {
@@ -559,17 +692,17 @@
       "results": {
         "conformal_thinking": {
           "type": "proposed",
-          "accuracy": 0.2226,
-          "token_savings": 0.2736,
-          "false_positive_risk": 0.0105,
-          "false_negative_risk": 0.0225,
+          "accuracy": 0.2404,
+          "token_savings": 0.1658,
+          "false_positive_risk": 0.0252,
+          "false_negative_risk": 0.0089,
           "violation_rate": 0.0
         },
         "upper_only": {
           "type": "baseline",
-          "accuracy": 0.2512,
-          "token_savings": 0.0722,
-          "false_positive_risk": 0.019,
+          "accuracy": 0.2493,
+          "token_savings": 0.0785,
+          "false_positive_risk": 0.034,
           "false_negative_risk": 0.0,
           "violation_rate": 0.0
         },
@@ -614,7 +747,40 @@
           "exit_budget_fraction": 0.0
         }
       },
-      "_naive_calibration_measured_before_gate": "Failed the gate in risk_control (realized risk above epsilon at 22.5% of operating points; measured there FP=0.0815, FN=0.0512, savings=0.5216, accuracy=0.4602), so the whole run carries the failure values."
+      "_hardening1_values_previous_process": {
+        "conformal_thinking": {
+          "type": "proposed",
+          "accuracy": 0.2226,
+          "token_savings": 0.2736,
+          "false_positive_risk": 0.0105,
+          "false_negative_risk": 0.0225,
+          "violation_rate": 0.0
+        },
+        "upper_only": {
+          "type": "baseline",
+          "accuracy": 0.2512,
+          "token_savings": 0.0722,
+          "false_positive_risk": 0.019,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        },
+        "naive_calibration": {
+          "type": "baseline",
+          "accuracy": 0.0,
+          "token_savings": 0.0,
+          "false_positive_risk": 1.0,
+          "false_negative_risk": 1.0,
+          "violation_rate": 1.0
+        },
+        "full_budget": {
+          "type": "baseline",
+          "accuracy": 0.25,
+          "token_savings": 0.0,
+          "false_positive_risk": 0.0,
+          "false_negative_risk": 0.0,
+          "violation_rate": 0.0
+        }
+      }
     }
   }
 }

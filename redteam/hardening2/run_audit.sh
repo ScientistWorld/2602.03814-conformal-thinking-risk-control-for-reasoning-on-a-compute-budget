@@ -22,7 +22,7 @@ STATE="tmp/job_state/${RUN_TAG:-hardening2}"
 PARTS=tmp/hardening2_parts
 mkdir -p "$STATE" "$PARTS"
 
-phase() {
+phase() {  # helpers called by a phase must not assign to "name" (bash dynamic scope)
   local name=$1
   shift
   if [ -f "$STATE/$name.done" ]; then
@@ -35,7 +35,7 @@ phase() {
 }
 
 register() {  # register <dir> <name>...
-  local dir=$1
+  local dir=$1 nam2
   shift
   rm -rf "$dir" && mkdir -p "$dir"
   for nam2 in "$@"; do
@@ -71,6 +71,7 @@ banks() {
 }
 
 old_gym() {
+  local nam2 f
   mkdir -p "$OLD/eval/test"
   for f in evaluate_split.py hidden_tasks.py; do
     [ -f "$OLD/eval/test/$f" ] || git show "6090d6e:eval/test/$f" > "$OLD/eval/test/$f"

@@ -2,6 +2,8 @@
 
 All experiments score a stopping policy on unseen reasoning trajectories from held-out (model, dataset) profiles. The policy receives labelled calibration data and a target risk level for each operating point, then makes online continue / answer / defer decisions chunk by chunk. Every experiment reports token savings and accuracy (scored) and the realized risks (constraints). A policy that exceeds its target risk too often in any experiment, or breaks the protocol, is scored as failed everywhere.
 
+The profiles differ in which stopping signal is informative, and the held-out profiles come from a broader process than the visible development profiles, so every experiment also measures whether a policy adapts to the (model, dataset) pair from its calibration data rather than relying on the development profiles.
+
 ## adaptive_budget_efficiency
 
 The central compute-efficiency question on a natural mix of solvable and unsolvable instances, with a moderately large calibration set. It establishes how many reasoning tokens a policy can save, and how much accuracy it keeps, while its realized risks stay within the requested tolerances.

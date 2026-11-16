@@ -1,6 +1,6 @@
 # Reproduction Milestones
 
-**Current: core_claim_plus**
+**Current: secondary_claims**
 
 ## Progress Log
 
@@ -35,6 +35,13 @@
 ### [2026-11-09] - core_claim_plus (hardening, iteration 11)
 - Rebuilt the measurement as a hidden, online test: held-out profiles, calibration pools and test sets are generated only inside `eval/test/`; methods are stopping-policy programs that see one chunk at a time; exits, tokens and every score are computed by the evaluator; any risk-constraint or protocol failure fails the run.
 - Reproduced on the hidden test: lower+upper thresholds save more tokens than upper-only (gap +0.10 → +0.16 → +0.22 from 3:1 → natural → 1:1 mixes), UCB never violates the risk target while naive calibration fails the gate with 50 calibration examples. Reference is deterministic and reproduces exactly. Details in `HARDENING.md`.
+
+### [2026-11-16] - secondary_claims (hardening, round 2)
+- Signal-ensemble claim (Fig. 5) now exercised: on the hidden test, confidence-only and EAT-only rank −0.37 below the reference (paired SE 0.005), and the ensemble saves more than either single signal in every experiment.
+- Lower-threshold gain over upper-only grows with the unsolvable share (+0.057 at 3:1, +0.121 natural, +0.129 at 1:1); UCB never violates the target while naive calibration fails at n=50 (37.5% of operating points).
+- Risk control matters more for small validation sets (Fig. 7): naive calibration stays within the gate with 400 calibration examples but fails with 50.
+- Not exercised: the dataset/length-shift ablations (Fig. 8-9) and the learned probe signal.
+- Lower threshold calibrated on the selected signal, as in Sec. 4.4. Simulator-fit and hidden-generator shortcuts closed (details in `HARDENING.md`).
 
 ## Stop Justification
 - Completed at milestone `core_claim_plus`.

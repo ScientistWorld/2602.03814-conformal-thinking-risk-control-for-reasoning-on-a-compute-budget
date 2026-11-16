@@ -1,8 +1,6 @@
 # Once you set action to 'submit' or 'done', STOP immediately.
 # Do NOT sleep, poll, or wait for jobs. The system reads this file
 # only after your turn ends.
-action: submit
-gpus: 0
-test: false
-milestone: core_claim_plus
-notes: "Hardening 2 audit (resumable rerun after preemption): reference + baselines alone (train + hidden test) from final code; audit candidates in batches through the hidden test with outcome dump; new probes on the previous gym (before scores); train for honest variants; analysis in redteam/hardening2/."
+action: done
+milestone: secondary_claims
+notes: "Hardening round 2: signal-disagreeing trajectory process (ensemble ablations now -0.37), broader unpublished held-out process (simulator-fit shortcut +0.53 -> failed), hidden generator sealed during policy runs (+1.84 -> 0), CPU-time limits instead of wall-clock, Sec. 4.4 lower threshold on the selected signal; reference/baselines rerun alone, scores and reference.json regenerated; see HARDENING.md."

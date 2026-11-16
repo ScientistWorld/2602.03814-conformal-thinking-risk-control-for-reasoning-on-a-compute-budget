@@ -63,8 +63,16 @@ This supports `core_claim_plus` on the scaled synthetic benchmark: the dual-thre
 - Final verification cleanup: public-facing scoring and evaluation documentation now use generic answer/defer/budget terminology so from-scratch agents can understand the task without seeing the paper's implementation details.
 - Continuation audit fix: `scores.json` now includes every metric family declared by `reference.json`; missing values such as `solvable_accuracy`, `unsolvable_token_savings`, `max_realized_risk`, and `defer_precision` are recomputed in `eval/`.
 
+## Hardening round 2 (2026-11-16)
+
+- New trajectory process: per-signal lag, noise, per-question bias and false-confidence susceptibility, so the most informative signal differs across profiles and target risks (paper Fig. 1, 5); pre-solve progress so the lower threshold has something to detect (Fig. 2, 6). The held-out process is broader than the public generator and unpublished.
+- Reference: the lower threshold now uses the signal selected for the upper threshold (Sec. 4.4, "given a signal s").
+- Evaluators: CPU-time limits instead of a wall-clock kill; the hidden generator is unreadable while policies run.
+- Audit (`redteam/hardening2/`, `HARDENING.md`): ensemble ablations now rank −0.37; simulator-fit shortcuts fail the gate (before: +0.53); reading the hidden generator now scores exactly the reference (before: +1.84).
+
 ## Deviations from Paper
 
+- (Hardening round 2) Signals differ per channel (lag, noise, bias, false-confidence susceptibility); the held-out process is broader than the public generator. The reference's lower threshold uses the selected signal (Sec. 4.4).
 - (Iteration 11) The data generator now has opaque answers, persistent wrong answers, muted-confidence solvable runs and per-profile signal transforms. Solvability is labelled by the full-budget answer. Calibration happens online through the evaluator's protocol, so calibration size, draws and epsilon are fixed by the benchmark (400 or 50 examples; epsilon grids per experiment).
 
 - **Data/model scale**: The paper uses trajectories from Qwen3-8B, Qwen3-30B-A3B, DeepSeek-R1-Distill-Qwen-32B, and Qwen3-VL-8B on AIME, GPQA-Diamond, DeepScaleR, and MathVision. This reproduction substitutes a deterministic synthetic trajectory dataset with the same fields needed by the algorithm. The substitution avoids multi-GB model downloads and expensive LLM inference while preserving the paper's stopping-policy computation.

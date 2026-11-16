@@ -110,6 +110,7 @@ _CPU_LIMIT_SHIM = (
     "import os, resource, sys; "
     "limit = int(sys.argv[1]); "
     "resource.setrlimit(resource.RLIMIT_CPU, (limit, limit + 30)); "
+    "resource.setrlimit(resource.RLIMIT_CORE, (0, 0)); "
     "os.execvp(sys.argv[2], sys.argv[2:])"
 )
 
